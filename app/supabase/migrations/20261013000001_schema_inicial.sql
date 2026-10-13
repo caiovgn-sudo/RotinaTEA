@@ -177,7 +177,8 @@ ALTER TABLE consentimentos_lgpd   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vinculos_usuario_estudante ENABLE ROW LEVEL SECURITY;
 
 -- Política: usuários só acessam estudantes vinculados a eles
-CREATE POLICY IF NOT EXISTS "estudantes_acesso_vinculado"
+DROP POLICY IF EXISTS "estudantes_acesso_vinculado" ON estudantes;
+CREATE POLICY "estudantes_acesso_vinculado"
   ON estudantes FOR SELECT
   USING (
     id IN (
@@ -187,7 +188,8 @@ CREATE POLICY IF NOT EXISTS "estudantes_acesso_vinculado"
   );
 
 -- Política: usuários só acessam rotinas de seus estudantes
-CREATE POLICY IF NOT EXISTS "rotinas_acesso_vinculado"
+DROP POLICY IF EXISTS "rotinas_acesso_vinculado" ON rotinas_visuais;
+CREATE POLICY "rotinas_acesso_vinculado"
   ON rotinas_visuais FOR ALL
   USING (
     estudante_id IN (
@@ -196,8 +198,21 @@ CREATE POLICY IF NOT EXISTS "rotinas_acesso_vinculado"
     )
   );
 
+-- Política: usuários só acessam itens de rotinas de seus estudantes
+DROP POLICY IF EXISTS "itens_rotina_acesso_vinculado" ON itens_rotina;
+CREATE POLICY "itens_rotina_acesso_vinculado"
+  ON itens_rotina FOR ALL
+  USING (
+    rotina_id IN (
+      SELECT r.id FROM rotinas_visuais r
+      JOIN vinculos_usuario_estudante v ON v.estudante_id = r.estudante_id
+      WHERE v.usuario_id = auth.uid()
+    )
+  );
+
 -- Política: professores podem inserir/atualizar crises apenas de seus estudantes
-CREATE POLICY IF NOT EXISTS "crises_acesso_vinculado"
+DROP POLICY IF EXISTS "crises_acesso_vinculado" ON registros_crise;
+CREATE POLICY "crises_acesso_vinculado"
   ON registros_crise FOR ALL
   USING (
     estudante_id IN (
@@ -207,7 +222,8 @@ CREATE POLICY IF NOT EXISTS "crises_acesso_vinculado"
   );
 
 -- Política: consentimentos visíveis apenas ao responsável legal do estudante
-CREATE POLICY IF NOT EXISTS "consentimentos_acesso_responsavel"
+DROP POLICY IF EXISTS "consentimentos_acesso_responsavel" ON consentimentos_lgpd;
+CREATE POLICY "consentimentos_acesso_responsavel"
   ON consentimentos_lgpd FOR ALL
   USING (
     responsavel_id = auth.uid()
@@ -219,7 +235,8 @@ CREATE POLICY IF NOT EXISTS "consentimentos_acesso_responsavel"
   );
 
 -- Política: usuários só enxergam seus próprios vínculos
-CREATE POLICY IF NOT EXISTS "vinculos_acesso_proprio"
+DROP POLICY IF EXISTS "vinculos_acesso_proprio" ON vinculos_usuario_estudante;
+CREATE POLICY "vinculos_acesso_proprio"
   ON vinculos_usuario_estudante FOR SELECT
   USING (usuario_id = auth.uid());
 
