@@ -1,4 +1,16 @@
 node_modules/
 dist/
+
+# Variáveis de ambiente — nunca commitar valores reais
 .env
 .env.local
+.env.*.local
+.env.production
+
+# Supabase local dev
+.supabase/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log
