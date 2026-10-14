@@ -1,10 +1,14 @@
 // Serviço de Persistência Local (IndexedDB) - Arquitetura Offline-First (RN03)
 import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, SyncItem } from '../types';
+import { supabase } from './supabase';
 
 const DB_NAME = 'rotinatea_offline_db';
 const DB_VERSION = 1;
 
 let dbInstance: IDBDatabase | null = null;
+
+// Mapeamento de IDs locais para UUIDs remotos (para evitar duplicatas em re-sync)
+const idMapLocalParaRemoto = new Map<string, string>();
 
 export async function getDB(): Promise<IDBDatabase> {
   if (dbInstance) return dbInstance;
@@ -203,16 +207,21 @@ export async function salvarOrdemItens(itensAtualizados: ItemRotina[]): Promise<
   });
 }
 
-export async function adicionarItemRotina(novoItem: Omit<ItemRotina, 'id'>): Promise<ItemRotina> {
+export async function adicionarItemRotina(novoItem: Omit<ItemRotina, 'id'>, isOnline = true): Promise<ItemRotina> {
   const db = await getDB();
   const id = 'it-' + Date.now();
   const itemCompleto: ItemRotina = { ...novoItem, id };
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const tx = db.transaction('itens_rotina', 'readwrite');
     const store = tx.objectStore('itens_rotina');
     const req = store.put(itemCompleto);
-    req.onsuccess = () => resolve(itemCompleto);
+    req.onsuccess = async () => {
+      if (!isOnline) {
+        await adicionarAFilaSincronizacao('ITEM_ROTINA', itemCompleto);
+      }
+      resolve(itemCompleto);
+    };
     req.onerror = () => reject(req.error);
   });
 }
@@ -267,12 +276,11 @@ export async function encerrarCriseLocal(
   const agora = new Date();
 
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(['crises', 'sync_queue'], 'readwrite');
+    const tx = db.transaction('crises', 'readwrite');
     const criseStore = tx.objectStore('crises');
-    const queueStore = tx.objectStore('sync_queue');
 
     const getReq = criseStore.get(criseId);
-    getReq.onsuccess = () => {
+    getReq.onsuccess = async () => {
       const crise: RegistroCrise = getReq.result;
       if (!crise) return reject(new Error('Crise não encontrada'));
 
@@ -287,17 +295,9 @@ export async function encerrarCriseLocal(
 
       criseStore.put(crise);
 
-      // Se offline ou com envio assíncrono, adiciona à fila de sincronização
+      // Se offline, adiciona à fila de sincronização para envio posterior
       if (!isOnline) {
-        const syncItem: SyncItem = {
-          id: 'sync-' + Date.now(),
-          tipo: 'REGISTRO_CRISE',
-          payload: crise,
-          criadoEm: agora.toISOString(),
-          tentativas: 0,
-          status: 'PENDENTE'
-        };
-        queueStore.put(syncItem);
+        await adicionarAFilaSincronizacao('REGISTRO_CRISE', crise);
       }
 
       tx.oncomplete = () => resolve(crise);
@@ -339,27 +339,211 @@ export async function carregarItensFilaSync(): Promise<SyncItem[]> {
 
 export async function sincronizarFilaBatch(): Promise<number> {
   const db = await getDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(['sync_queue', 'crises'], 'readwrite');
+  
+  // Primeiro, verifica conectividade
+  const { verificarConectividadeSupabase } = await import('./supabase');
+  const online = await verificarConectividadeSupabase();
+  
+  if (!online) {
+    console.log('[Sync] Offline — sincronização adiada');
+    return 0;
+  }
+
+  return new Promise(async (resolve, reject) => {
+    const tx = db.transaction(['sync_queue', 'crises', 'itens_rotina', 'consentimentos'], 'readwrite');
     const queueStore = tx.objectStore('sync_queue');
     const criseStore = tx.objectStore('crises');
+    const itemStore = tx.objectStore('itens_rotina');
+    const consentStore = tx.objectStore('consentimentos');
 
     const req = queueStore.getAll();
-    req.onsuccess = () => {
+    req.onsuccess = async () => {
       const items: SyncItem[] = req.result || [];
-      const total = items.length;
+      let sincronizados = 0;
 
-      items.forEach((item) => {
-        if (item.tipo === 'REGISTRO_CRISE') {
-          const crise: RegistroCrise = item.payload;
-          crise.sincronizadoOffline = true;
-          criseStore.put(crise);
+      for (const item of items) {
+        try {
+          let sucesso = false;
+
+          switch (item.tipo) {
+            case 'REGISTRO_CRISE':
+              sucesso = await sincronizarCriseComSupabase(item, criseStore);
+              break;
+            case 'ITEM_ROTINA':
+              sucesso = await sincronizarItemRotinaComSupabase(item, itemStore);
+              break;
+            case 'CONSENTIMENTO':
+              sucesso = await sincronizarConsentimentoComSupabase(item, consentStore);
+              break;
+          }
+
+          if (sucesso) {
+            sincronizados++;
+            // Remove da fila local apenas após sucesso no Supabase
+            queueStore.delete(item.id);
+          } else {
+            // Incrementa tentativas e mantém na fila
+            item.tentativas += 1;
+            item.status = item.tentativas >= 3 ? 'ERRO' : 'PENDENTE';
+            queueStore.put(item);
+          }
+        } catch (err) {
+          console.error('[Sync] Erro ao processar item:', item.id, err);
+          item.tentativas += 1;
+          item.status = item.tentativas >= 3 ? 'ERRO' : 'PENDENTE';
+          queueStore.put(item);
         }
-        queueStore.delete(item.id);
+      }
+
+      tx.oncomplete = () => resolve(sincronizados);
+      tx.onerror = () => reject(tx.error);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// --- Helpers de Sincronização por Tipo ---
+
+async function sincronizarCriseComSupabase(
+  item: SyncItem,
+  criseStore: IDBObjectStore
+): Promise<boolean> {
+  const crise: RegistroCrise = item.payload;
+  
+  try {
+    // Converte IDs locais para UUIDs se necessário (usa mapa ou gera novo)
+    const remotoId = idMapLocalParaRemoto.get(crise.id) || crypto.randomUUID();
+    
+    const { error } = await supabase
+      .from('registros_crise')
+      .upsert({
+        id: remotoId,
+        estudante_id: crise.estudanteId,
+        professor_id: crise.professorId,
+        data_hora_inicio: crise.dataHoraInicio,
+        data_hora_fim: crise.dataHoraFim,
+        duracao_segundos: crise.duracaoSegundos,
+        observacoes: crise.observacoes,
+        sincronizado_offline: true,
+        criado_em_local: crise.criadoEmLocal,
+        recebido_em: new Date().toISOString()
+      }, {
+        onConflict: 'id'
       });
 
-      tx.oncomplete = () => resolve(total);
+    if (error) {
+      console.error('[Sync] Erro ao sincronizar crise:', error);
+      return false;
+    }
+
+    // Atualiza mapa de IDs
+    idMapLocalParaRemoto.set(crise.id, remotoId);
+    
+    // Atualiza registro local
+    crise.sincronizadoOffline = true;
+    criseStore.put(crise);
+    
+    return true;
+  } catch (err) {
+    console.error('[Sync] Exceção ao sincronizar crise:', err);
+    return false;
+  }
+}
+
+async function sincronizarItemRotinaComSupabase(
+  item: SyncItem,
+  _itemStore: IDBObjectStore
+): Promise<boolean> {
+  const itemRotina: ItemRotina = item.payload;
+  
+  try {
+    const remotoId = idMapLocalParaRemoto.get(itemRotina.id) || crypto.randomUUID();
+    
+    const { error } = await supabase
+      .from('itens_rotina')
+      .upsert({
+        id: remotoId,
+        rotina_id: itemRotina.rotinaId,
+        titulo: itemRotina.titulo,
+        categoria: itemRotina.categoria,
+        pictograma_key: itemRotina.pictogramaKey,
+        ordem: itemRotina.ordem,
+        duracao_minutos: itemRotina.duracaoMinutos,
+        concluido: itemRotina.concluido
+      }, {
+        onConflict: 'id'
+      });
+
+    if (error) {
+      console.error('[Sync] Erro ao sincronizar item rotina:', error);
+      return false;
+    }
+
+    idMapLocalParaRemoto.set(itemRotina.id, remotoId);
+    return true;
+  } catch (err) {
+    console.error('[Sync] Exceção ao sincronizar item rotina:', err);
+    return false;
+  }
+}
+
+async function sincronizarConsentimentoComSupabase(
+  item: SyncItem,
+  _consentStore: IDBObjectStore
+): Promise<boolean> {
+  const consentimento: ConsentimentoLGPD = item.payload;
+  
+  try {
+    const remotoId = idMapLocalParaRemoto.get(consentimento.id) || crypto.randomUUID();
+    
+    const { error } = await supabase
+      .from('consentimentos_lgpd')
+      .upsert({
+        id: remotoId,
+        estudante_id: consentimento.estudanteId,
+        responsavel_id: consentimento.responsavelId,
+        data_aceite: consentimento.dataAceite,
+        ip_origem: consentimento.ipOrigem,
+        ativo: consentimento.ativo,
+        termo_versao: consentimento.termoVersao,
+        revogado_em: consentimento.ativo ? null : new Date().toISOString()
+      }, {
+        onConflict: 'id'
+      });
+
+    if (error) {
+      console.error('[Sync] Erro ao sincronizar consentimento:', error);
+      return false;
+    }
+
+    idMapLocalParaRemoto.set(consentimento.id, remotoId);
+    return true;
+  } catch (err) {
+    console.error('[Sync] Exceção ao sincronizar consentimento:', err);
+    return false;
+  }
+}
+
+// Função para adicionar itens à fila de sincronização (usada pelas operações CRUD)
+export async function adicionarAFilaSincronizacao(
+  tipo: SyncItem['tipo'],
+  payload: any
+): Promise<void> {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('sync_queue', 'readwrite');
+    const store = tx.objectStore('sync_queue');
+    const syncItem: SyncItem = {
+      id: 'sync-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+      tipo,
+      payload,
+      criadoEm: new Date().toISOString(),
+      tentativas: 0,
+      status: 'PENDENTE'
     };
+    const req = store.put(syncItem);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
   });
 }
 
@@ -381,17 +565,22 @@ export async function carregarConsentimento(estudanteId: string): Promise<Consen
   });
 }
 
-export async function alternarConsentimento(consentimentoId: string): Promise<ConsentimentoLGPD> {
+export async function alternarConsentimento(consentimentoId: string, isOnline = true): Promise<ConsentimentoLGPD> {
   const db = await getDB();
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const tx = db.transaction('consentimentos', 'readwrite');
     const store = tx.objectStore('consentimentos');
     const req = store.get(consentimentoId);
-    req.onsuccess = () => {
+    req.onsuccess = async () => {
       const item: ConsentimentoLGPD = req.result;
       if (!item) return reject(new Error('Consentimento não encontrado'));
       item.ativo = !item.ativo;
       store.put(item);
+      
+      if (!isOnline) {
+        await adicionarAFilaSincronizacao('CONSENTIMENTO', item);
+      }
+      
       tx.oncomplete = () => resolve(item);
     };
     req.onerror = () => reject(req.error);

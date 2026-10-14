@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PerfilUsuario, Estudante, ItemRotina, RegistroCrise, ConsentimentoLGPD } from './types';
 import {
   seedInitialDataIfEmpty,
@@ -16,6 +16,7 @@ import {
   carregarConsentimento,
   alternarConsentimento
 } from './services/db';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
@@ -23,13 +24,20 @@ import { RegistroCriseComponent } from './components/RegistroCrise';
 import { DashboardPEI } from './components/DashboardPEI';
 import { ConsentimentoLGPDComponent } from './components/ConsentimentoLGPD';
 import { ConfiguracaoRotina } from './components/ConfiguracaoRotina';
+import { Login } from './components/Login';
+import { FormularioSUS } from './components/FormularioSUS';
 
-export const App: React.FC = () => {
+const PerfisRequeremAuth: PerfilUsuario[] = ['PROFESSOR', 'COORDENACAO', 'RESPONSAVEL'];
+
+const AppContent: React.FC = () => {
+  const { usuario, loading: authLoading, signOut, refreshUsuario } = useAuth();
+  
   // Estado do Perfil e Conexão
   const [perfilAtual, setPerfilAtual] = useState<PerfilUsuario>('ALUNO');
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [itensPendentesSync, setItensPendentesSync] = useState<number>(0);
   const [altoContraste, setAltoContraste] = useState<boolean>(false);
+  const [contrasteAmarelo, setContrasteAmarelo] = useState<boolean>(false);
   const [fonteAmpliada, setFonteAmpliada] = useState<boolean>(false);
 
   // Sub-aba do Professor
@@ -49,10 +57,24 @@ export const App: React.FC = () => {
   // Notificação suave
   const [aviso, setAviso] = useState<string | null>(null);
 
-  const exibirAviso = (msg: string) => {
+  // SUS Form modal
+  const [mostrarSUS, setMostrarSUS] = useState(false);
+
+  const exibirAviso = useCallback((msg: string) => {
     setAviso(msg);
     setTimeout(() => setAviso(null), 4000);
-  };
+  }, []);
+
+  // Verifica se o perfil atual requer autenticação
+  const perfilRequerAuth = PerfisRequeremAuth.includes(perfilAtual);
+
+  // Redireciona para ALUNO se tentar acessar perfil protegido sem auth
+  useEffect(() => {
+    if (perfilRequerAuth && !authLoading && !usuario) {
+      setPerfilAtual('ALUNO');
+      exibirAviso('Faça login para acessar esta área.');
+    }
+  }, [perfilAtual, usuario, authLoading, exibirAviso]);
 
   // Inicialização do Banco de Dados
   useEffect(() => {
@@ -77,7 +99,6 @@ export const App: React.FC = () => {
     const itens = await carregarItensRotina('rot-001');
     setItensRotina(itens);
 
-    // Seleciona a primeira atividade não concluída para o timer
     const pendente = itens.find((i) => !i.concluido) || itens[0];
     if (pendente) {
       setAtividadeTimer({ id: pendente.id, titulo: pendente.titulo, duracao: pendente.duracaoMinutos });
@@ -104,7 +125,6 @@ export const App: React.FC = () => {
     setIsOnline(novoStatus);
 
     if (novoStatus) {
-      // Quando reconecta à rede, processa sincronização em lote da fila
       const sincronizados = await sincronizarFilaBatch();
       await atualizarFilaSync();
       if (estudanteAtual) {
@@ -127,8 +147,22 @@ export const App: React.FC = () => {
     setAltoContraste(novo);
     if (novo) {
       document.body.classList.add('high-contrast');
+      document.body.classList.remove('high-contrast-yellow');
+      setContrasteAmarelo(false);
     } else {
       document.body.classList.remove('high-contrast');
+    }
+  };
+
+  const handleAlternarContrasteAmarelo = () => {
+    const novo = !contrasteAmarelo;
+    setContrasteAmarelo(novo);
+    if (novo) {
+      document.body.classList.add('high-contrast-yellow');
+      document.body.classList.remove('high-contrast');
+      setAltoContraste(false);
+    } else {
+      document.body.classList.remove('high-contrast-yellow');
     }
   };
 
@@ -155,7 +189,7 @@ export const App: React.FC = () => {
   };
 
   const handleAdicionarItem = async (novo: Omit<ItemRotina, 'id'>) => {
-    await adicionarItemRotina(novo);
+    await adicionarItemRotina(novo, isOnline);
     const atualizados = await carregarItensRotina('rot-001');
     setItensRotina(atualizados);
     setAbaProfessor('ACOMPANHAMENTO');
@@ -165,7 +199,7 @@ export const App: React.FC = () => {
   // Ações de Crise (1 Clique)
   const handleIniciarCrise = async () => {
     if (!estudanteAtual) return;
-    const nova = await iniciarCriseLocal(estudanteAtual.id, 'usr-prof-01');
+    const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || 'usr-prof-01');
     setCriseAtiva(nova);
     exibirAviso('Registro de crise iniciado. Cronômetro ativado.');
   };
@@ -189,10 +223,40 @@ export const App: React.FC = () => {
   // Ação de Consentimento LGPD
   const handleAlternarConsentimento = async () => {
     if (!consentimento) return;
-    const atualizado = await alternarConsentimento(consentimento.id);
+    const atualizado = await alternarConsentimento(consentimento.id, isOnline);
     setConsentimento(atualizado);
     exibirAviso(atualizado.ativo ? 'Consentimento reativado com sucesso.' : 'Consentimento revogado formalmente.');
   };
+
+  const handleLogout = async () => {
+    await signOut();
+    setPerfilAtual('ALUNO');
+    exibirAviso('Sessão encerrada com sucesso.');
+  };
+
+  const handleLoginSuccess = () => {
+    refreshUsuario();
+    exibirAviso(`Bem-vindo, ${usuario?.nome || 'Usuário'}!`);
+  };
+
+  // Mostra tela de login se perfil requer auth e não está autenticado
+  if (perfilRequerAuth && !usuario && !authLoading) {
+    return (
+      <Login onLoginSuccess={handleLoginSuccess} />
+    );
+  }
+
+  // Mostra loading durante verificação de auth
+  if (authLoading) {
+    return (
+      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div role="status" aria-label="Carregando autenticação">
+          <div className="spinner" aria-hidden="true"></div>
+          <p>Verificando sessão...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
@@ -204,8 +268,13 @@ export const App: React.FC = () => {
         itensPendentesSync={itensPendentesSync}
         altoContraste={altoContraste}
         onAlternarAltoContraste={handleAlternarAltoContraste}
+        contrasteAmarelo={contrasteAmarelo}
+        onAlternarContrasteAmarelo={handleAlternarContrasteAmarelo}
         fonteAmpliada={fonteAmpliada}
         onAlternarFonteAmpliada={handleAlternarFonteAmpliada}
+        usuario={usuario}
+        onLogout={handleLogout}
+        perfilRequerAuth={perfilRequerAuth}
       />
 
       {/* Notificação Flutuante / Toast Suave */}
@@ -250,6 +319,17 @@ export const App: React.FC = () => {
             </p>
           </div>
 
+          {perfilAtual === 'COORDENACAO' && usuario && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setMostrarSUS(true)}
+              style={{ marginLeft: 8 }}
+            >
+              <span aria-hidden="true">📋</span> Formulário SUS
+            </button>
+          )}
+
           {perfilAtual === 'PROFESSOR' && (
             <div style={{ display: 'flex', gap: 8 }}>
               <button
@@ -291,7 +371,7 @@ export const App: React.FC = () => {
         )}
 
         {/* 2. VISÃO DO PROFESSOR */}
-        {perfilAtual === 'PROFESSOR' && (
+        {perfilAtual === 'PROFESSOR' && usuario && (
           <>
             {abaProfessor === 'ACOMPANHAMENTO' ? (
               <>
@@ -325,13 +405,14 @@ export const App: React.FC = () => {
                 itens={itensRotina}
                 onAdicionarItem={handleAdicionarItem}
                 rotinaId="rot-001"
+                isOnline={isOnline}
               />
             )}
           </>
         )}
 
         {/* 3. VISÃO DA COORDENAÇÃO / PEI */}
-        {perfilAtual === 'COORDENACAO' && estudanteAtual && (
+        {perfilAtual === 'COORDENACAO' && usuario && estudanteAtual && (
           <DashboardPEI
             estudantes={estudantes}
             estudanteSelecionado={estudanteAtual}
@@ -345,12 +426,21 @@ export const App: React.FC = () => {
         )}
 
         {/* 4. VISÃO DO RESPONSÁVEL LEGAL */}
-        {perfilAtual === 'RESPONSAVEL' && estudanteAtual && (
+        {perfilAtual === 'RESPONSAVEL' && usuario && estudanteAtual && (
           <ConsentimentoLGPDComponent
             estudante={estudanteAtual}
             consentimento={consentimento}
             onAlternarConsentimento={handleAlternarConsentimento}
           />
+        )}
+
+        {/* Mensagem de login necessário */}
+        {perfilRequerAuth && !usuario && (
+          <div className="login-required" role="alert">
+            <h3>Área Restrita</h3>
+            <p>Faça login para acessar esta funcionalidade.</p>
+            <p>Use o seletor de perfis no topo para voltar à visão do Aluno (livre) ou faça login como Professor, Coordenação ou Responsável.</p>
+          </div>
         )}
       </main>
 
@@ -362,6 +452,19 @@ export const App: React.FC = () => {
           Desenvolvido com foco em Tecnologia Assistiva, Acessibilidade Cognitiva (WCAG 2.1 AA) e Privacidade (LGPD).
         </p>
       </footer>
+
+      {/* Modal SUS */}
+      {mostrarSUS && (
+        <FormularioSUS onClose={() => setMostrarSUS(false)} />
+      )}
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };

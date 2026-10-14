@@ -809,3 +809,439 @@ body {
   color: var(--text-muted);
   margin-top: auto;
 }
+
+/* ============================================================
+   MODO ALTO CONTRASTE PRETO/AMARELO (US11 - Baixa Visão)
+   ============================================================ */
+body.high-contrast-yellow {
+  --bg-app: #000000;
+  --bg-surface: #000000;
+  --bg-card: #111111;
+  --bg-card-hover: #222222;
+  --primary: #FFD700;
+  --primary-light: #1A1A00;
+  --primary-hover: #E6C200;
+  --success: #00FF00;
+  --success-light: #001A00;
+  --success-hover: #00E600;
+  --warning: #FFD700;
+  --warning-light: #1A1A00;
+  --crisis: #FF0000;
+  --crisis-light: #1A0000;
+  --crisis-hover: #E60000;
+  --text-main: #FFFF00;
+  --text-muted: #CCCC00;
+  --text-subtle: #999900;
+  --text-inverted: #000000;
+  --border-light: #FFD700;
+  --border-focus: #FFD700;
+}
+
+/* Prioridade: modo amarelo/preto sobre modo alto contraste padrão */
+body.high-contrast-yellow.high-contrast {
+  --bg-app: #000000;
+  --bg-surface: #000000;
+  --bg-card: #111111;
+  --primary: #FFD700;
+  --text-main: #FFFF00;
+  --text-muted: #CCCC00;
+  --border-light: #FFD700;
+}
+
+/* ============================================================
+   ESTILOS PARA IMPRESSÃO / EXPORTAÇÃO PDF (US09)
+   ============================================================ */
+@media print {
+  /* Oculta elementos de navegação e controles */
+  .app-header,
+  .header-actions,
+  .role-tabs,
+  .brand-subtitle,
+  .profile-banner,
+  .btn-timer,
+  .btn-crisis-action,
+  .btn-toggle-task,
+  .btn-order-nav,
+  .btn-revogar-perigo,
+  .card-actions,
+  .controles-edicao-professor,
+  .area-interacao-aluno,
+  .completion-dropzone,
+  .timer-controls,
+  .crisis-header .btn-crisis-action,
+  .profile-banner .btn-timer,
+  .stats-cards-row .stat-card:last-child,
+  .login-container,
+  .app-footer,
+  .modal-overlay,
+  .spinner,
+  .spinner-sm {
+    display: none !important;
+  }
+
+  /* Layout para impressão */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .app-container {
+    display: block;
+    min-height: auto;
+  }
+
+  .main-content {
+    padding: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  .dashboard-container {
+    padding: 0;
+  }
+
+  .stats-cards-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    page-break-inside: avoid;
+  }
+
+  .stat-card {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    padding: 12px;
+    page-break-inside: avoid;
+  }
+
+  .stat-value {
+    color: #000 !important;
+    font-size: 18pt;
+  }
+
+  .stat-label {
+    color: #333 !important;
+    font-size: 10pt;
+  }
+
+  .data-table-container {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+
+  .custom-table {
+    width: 100%;
+    font-size: 10pt;
+  }
+
+  .custom-table th {
+    background: #333 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .custom-table td {
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .anon-code-badge {
+    background: #eee !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Cabeçalho do relatório */
+  .dashboard-container::before {
+    content: "RotinaTEA — Relatório Analítico para PEI";
+    display: block;
+    font-size: 18pt;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 8px;
+  }
+
+  .dashboard-container::after {
+    content: "Gerado em " attr(data-date) " • Dados anonimizados conforme LGPD";
+    display: block;
+    font-size: 9pt;
+    color: #666;
+    text-align: center;
+    margin-top: 16px;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+  }
+
+  /* Quebra de página controlada */
+  .dashboard-container {
+    page-break-inside: auto;
+  }
+
+  .stat-card,
+  .data-table-container {
+    page-break-inside: avoid;
+  }
+}
+
+/* ============================================================
+   ESTILOS DO FORMULÁRIO DE LOGIN (US07)
+   ============================================================ */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--bg-app);
+}
+
+.login-card {
+  background: var(--bg-surface);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-header .logo-badge {
+  margin: 0 auto 12px;
+}
+
+.login-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.login-header .subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.alert-error {
+  background: var(--crisis-light);
+  color: var(--crisis);
+  border: 1px solid var(--crisis);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-speed);
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-app);
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  min-height: 40px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+.spinner-sm {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.link-btn:hover {
+  text-decoration: underline.
+}
+
+.login-info {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--bg-app);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.login-info p {
+  margin-bottom: 8px;
+}
+
+.login-info ul {
+  margin-left: 16px;
+  margin-bottom: 12px;
+}
+
+.login-info li {
+  margin-bottom: 4px;
+}
+
+.login-info .hint {
+  font-style: italic;
+  color: var(--text-subtle);
+  font-size: 0.75rem;
+}
+
+.login-required {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--bg-surface);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  margin: 24px auto;
+  max-width: 500px.
+}
+
+.login-required h3 {
+  color: var(--primary);
+  margin-bottom: 12px.
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px.
+}
+
+.login-hint {
+  font-weight: 600.
+}
+
+/* ============================================================
+   SELETOR DE TEMA DE CONTRASTE (Header)
+   ============================================================ */
+.contrast-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px.
+}
+
+.contrast-selector select {
+  padding: 6px 10px.
+  border: 1px solid var(--border-light).
+  border-radius: 6px.
+  background: var(--bg-surface).
+  color: var(--text-main).
+  font-family: inherit.
+  font-size: 0.8rem.
+  cursor: pointer.
+}

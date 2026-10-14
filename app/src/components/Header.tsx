@@ -1,5 +1,5 @@
-import React from 'react';
-import { PerfilUsuario } from '../types';
+import React, { useState } from 'react';
+import { PerfilUsuario, Usuario } from '../types';
 
 interface HeaderProps {
   perfilAtual: PerfilUsuario;
@@ -9,8 +9,13 @@ interface HeaderProps {
   itensPendentesSync: number;
   altoContraste: boolean;
   onAlternarAltoContraste: () => void;
+  contrasteAmarelo: boolean;
+  onAlternarContrasteAmarelo: () => void;
   fonteAmpliada: boolean;
   onAlternarFonteAmpliada: () => void;
+  usuario: Usuario | null;
+  onLogout: () => void;
+  perfilRequerAuth: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,9 +26,30 @@ export const Header: React.FC<HeaderProps> = ({
   itensPendentesSync,
   altoContraste,
   onAlternarAltoContraste,
+  contrasteAmarelo,
+  onAlternarContrasteAmarelo,
   fonteAmpliada,
-  onAlternarFonteAmpliada
+  onAlternarFonteAmpliada,
+  usuario,
+  onLogout,
+  perfilRequerAuth
 }) => {
+  const [contrasteMode, setContrasteMode] = useState<'padrao' | 'alto' | 'amarelo'>(
+    contrasteAmarelo ? 'amarelo' : (altoContraste ? 'alto' : 'padrao')
+  );
+
+  const handleContrasteChange = (mode: 'padrao' | 'alto' | 'amarelo') => {
+    setContrasteMode(mode);
+    if (mode === 'amarelo') {
+      onAlternarContrasteAmarelo();
+    } else if (mode === 'alto') {
+      onAlternarAltoContraste();
+    } else {
+      // Reset both
+      if (altoContraste) onAlternarAltoContraste();
+      if (contrasteAmarelo) onAlternarContrasteAmarelo();
+    }
+  };
   return (
     <header className="app-header" role="banner">
       <div className="brand-section">
@@ -102,16 +128,29 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Alternância de Contraste */}
-        <button
-          type="button"
-          className="accessibility-btn"
-          onClick={onAlternarAltoContraste}
-          aria-label="Alternar modo de alto contraste suave"
-          title="Modo Alto Contraste Suave"
-        >
-          <span aria-hidden="true">{altoContraste ? '☀️' : '🌙'}</span>
-          <span>{altoContraste ? 'Padrão' : 'Contraste'}</span>
-        </button>
+        <div className="contrast-selector" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <select
+            value={contrasteMode}
+            onChange={(e) => handleContrasteChange(e.target.value as 'padrao' | 'alto' | 'amarelo')}
+            aria-label="Selecionar modo de contraste"
+            title="Modo de Contraste"
+            style={{
+              padding: '6px 10px',
+              border: '1px solid var(--border-light)',
+              borderRadius: '6px',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-main)',
+              fontFamily: 'inherit',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              minHeight: '38px'
+            }}
+          >
+            <option value="padrao">🌙 Padrão</option>
+            <option value="alto">☀️ Alto Contraste</option>
+            <option value="amarelo">🟡 Amarelo/Preto (Baixa Visão)</option>
+          </select>
+        </div>
 
         {/* Alternância de Tamanho de Fonte */}
         <button
@@ -124,6 +163,31 @@ export const Header: React.FC<HeaderProps> = ({
           <span aria-hidden="true">A+</span>
           <span>{fonteAmpliada ? 'Grande' : 'Normal'}</span>
         </button>
+
+        {/* Info do Usuário Logado / Botão Sair */}
+        {perfilRequerAuth && (
+          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
+            {usuario ? (
+              <>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {usuario.nome} ({usuario.perfil})
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={onLogout}
+                  aria-label="Sair da conta"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <span className="login-hint" style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>
+                Login necessário
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
