@@ -31,7 +31,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   return (
     <div className="painel-lgpd">
       <div>
-        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+        <h2 style={{ fontSize: '1.4rem', color: 'var(--cor-titulo)', fontWeight: 700 }}>
           Gestão de Consentimento e Privacidade (LGPD)
         </h2>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>

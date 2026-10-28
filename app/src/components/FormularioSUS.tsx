@@ -112,7 +112,7 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="sus-titulo">
       <div className="modal-card" style={{ maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h2 id="sus-titulo" style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+          <h2 id="sus-titulo" style={{ fontSize: '1.4rem', color: 'var(--cor-titulo)', fontWeight: 700 }}>
             Formulário SUS — System Usability Scale
           </h2>
           <button
@@ -120,6 +120,8 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
             onClick={onClose}
             aria-label="Fechar formulário"
             style={{
+              minWidth: 48,
+              minHeight: 48,
               background: 'none',
               border: 'none',
               fontSize: '1.5rem',
@@ -196,17 +198,6 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
                 </span>
                 <p style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-main)', margin: 0 }}>
                   {pergunta.texto}
-                  <span style={{ 
-                    fontSize: '0.7rem', 
-                    fontWeight: 600, 
-                    padding: '2px 6px', 
-                    borderRadius: 4,
-                    background: pergunta.positivo ? 'var(--success-light)' : 'var(--warning-light)',
-                    color: pergunta.positivo ? 'var(--success)' : 'var(--warning)',
-                    marginLeft: 8
-                  }}>
-                    {pergunta.positivo ? 'Positivo' : 'Negativo'}
-                  </span>
                 </p>
               </div>
 
@@ -276,8 +267,8 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Botões rápidos para teste */}
-        {!resultado && !enviando && (
+        {/* Atalhos de teste: só aparecem com VITE_SUS_ATALHOS_TESTE=true (geram dados inválidos para a avaliação real) */}
+        {import.meta.env.VITE_SUS_ATALHOS_TESTE === 'true' && !resultado && !enviando && (
           <div style={{ display: 'flex', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px dashed var(--border-light)' }}>
             <small style={{ color: 'var(--text-subtle)', flex: 1, textAlign: 'center' }}>
               Preenchimento rápido para testes:

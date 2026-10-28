@@ -273,7 +273,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onVoltarAluno }) =
                     className="input-icon-btn"
                     onClick={() => setMostrarSenha(!mostrarSenha)}
                     aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                    tabIndex={-1}
+                    aria-pressed={mostrarSenha}
                   >
                     {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>

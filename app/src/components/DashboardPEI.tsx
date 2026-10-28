@@ -63,7 +63,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
       </div>
 
       {/* Seletor de Estudante Anonimizado */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-surface)', padding: '12px 18px', borderRadius: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, background: 'var(--bg-surface)', padding: '12px 18px', borderRadius: '12px' }}>
         <label htmlFor="select-estudante" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
           Selecionar Estudante (Código Anonimizado):
         </label>

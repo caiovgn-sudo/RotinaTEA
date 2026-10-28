@@ -2210,3 +2210,109 @@ body.high-contrast-yellow.high-contrast {
   display: flex;
   gap: 8px;
 }
+
+/* =====================================================================
+   Acessibilidade (Etapa 5) — Pilar 2: alvos de toque >= 48px (WCAG 2.5.5 / diretrizes do projeto)
+   ===================================================================== */
+.login-tab,
+.btn-sm,
+.form-group input,
+.form-group select,
+.input-icon-btn,
+main select {
+  min-height: var(--min-touch-target);
+}
+
+.input-icon-btn {
+  min-width: var(--min-touch-target);
+}
+
+.btn-ordem {
+  min-width: var(--min-touch-target) !important;
+}
+
+/* Foco de campos de formulário: contorno forte, sem depender só da cor da borda */
+.form-group input:focus-visible,
+.form-group select:focus-visible {
+  outline: 3px solid var(--border-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* Faixa de estado do cabeçalho com fonte ampliada: permite quebra sem cortar texto */
+body.large-font .status-bar,
+body.large-font .selo-acesso,
+body.large-font .selo-sync {
+  white-space: normal;
+}
+
+/* Contraste de títulos e do selo de conexão nos 3 modos (auditoria da Etapa 5) */
+:root {
+  --cor-titulo: #3A6B7E; /* 5,6:1 sobre branco */
+}
+
+body.high-contrast {
+  --cor-titulo: #8CC4DA; /* o --primary escuro não atinge 4,5:1 sobre o fundo escuro */
+}
+
+body.high-contrast-yellow,
+body.high-contrast-yellow.high-contrast {
+  --cor-titulo: #FFD700;
+}
+
+.sobre-secao h2,
+.sobre-cartao-titulo,
+.sobre-fluxo li > svg {
+  color: var(--cor-titulo);
+}
+
+.badge-connection {
+  color: var(--text-main);
+}
+
+.badge-connection.online,
+.badge-connection.offline {
+  color: var(--text-main);
+}
+
+.role-tab-btn.active,
+.login-tab.active {
+  color: var(--cor-titulo);
+}
+
+.role-tab-btn.blocked {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Cabeçalho responsivo: com 5 abas e fonte ampliada, nada pode forçar rolagem horizontal */
+.role-tabs {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.role-tab-btn {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.header-actions {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    padding: 12px 16px;
+  }
+
+  .control-select {
+    max-width: 100%;
+  }
+}
+
+select {
+  max-width: 100%;
+}
+
+.data-table-container {
+  overflow-x: auto;
+}
