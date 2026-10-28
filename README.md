@@ -58,3 +58,32 @@ npm test
 ```
 
 A aplicação estará disponível em `http://localhost:5173`.
+
+
+---
+
+## 🧭 Como navegar pelo sistema (para avaliadores, educadores e responsáveis)
+
+Abra a aba **Sobre** para ver o objetivo, os quatro perfis, as regras RN01 a RN03 e o caminho de uma crise. Abaixo do cabeçalho, uma faixa informa o tipo de acesso: **Visitante**, **Conta real** ou **Modo demonstração** (dados fictícios, só neste navegador).
+
+| Perfil | Como entrar | O que faz |
+|---|---|---|
+| Aluno | sem login | rotina visual em cartões e temporizador |
+| Professor | login ou demonstração | registro de crise em 1 clique, configuração da rotina, painel de sincronização |
+| Coordenação | login ou demonstração | painel anonimizado do PEI e formulário SUS |
+| Responsável | login ou demonstração | termo da LGPD, consentimento e como revogar |
+
+Em **demonstração** não existe senha e nada é enviado ao servidor. Contas reais são criadas na aba **Cadastrar** e entram sempre como Responsável; Professor e Coordenação são concedidos por um administrador (consulte o fim de `app/supabase/migrations/20261028000001_endurece_perfis.sql`).
+
+### Variáveis de ambiente de interface (`app/.env.example`)
+
+| Variável | Efeito |
+|---|---|
+| `VITE_MODO_DEMO` | `true` habilita o login de demonstração e o simulador de conexão. Use `false` em produção. |
+| `VITE_SUS_ATALHOS_TESTE` | `true` mostra no SUS os atalhos "Todos Neutro/Concordo". Use só em desenvolvimento. |
+
+### Melhorias de UX (outubro de 2026)
+
+Orientação por visão, navegação com visões bloqueadas explicadas, conexão real separada do simulador, painel de sincronização, selos de envio por crise, registro de atividades, diálogo de confirmação, painel da LGPD detalhado e ajustes de acessibilidade. Antes e depois, decisões e roteiro de teste: [MELHORIAS_UX_2026-10.md](MELHORIAS_UX_2026-10.md).
+
+**Limitações (não concluído):** a revogação do consentimento é registrada, mas ainda não bloqueia a coleta; o IP do aceite não é capturado; a redação da base legal precisa de revisão; componentes antigos têm falhas de contraste listadas no documento; não houve teste com leitor de tela nem com conta real do Supabase para a sessão encerrada e a sincronização.

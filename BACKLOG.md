@@ -74,7 +74,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
-- ✅ `npm test` — Vitest: 15 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise
+- ✅ `npm test` — Vitest: 43 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades e IP mascarado
 - ✅ Lint: sem warnings críticos, apenas aviso de dynamic import ineficaz (não bloqueante)
 
 ---
@@ -96,3 +96,26 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 **Pendente / limitações conhecidas:** SUS não persiste; PDF é impressão do navegador; IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.
 
 **28/10/2026 — RLS de crises (Pilar 3):** migração `20261028000002_restringe_crises.sql` substitui a política `FOR ALL` por políticas por operação: leitura para vinculados; inserção só por PROFESSOR/COORDENACAO vinculados com `professor_id = auth.uid()`; atualização só pelo autor; exclusão só de crise encerrada (RN01), pelo autor ou pela coordenação. A interface aplica a mesma regra (`podeRegistrarCrise`). Aplicada no Supabase em 28/10/2026 (4 políticas confirmadas em `pg_policies`).
+
+
+---
+
+## 🎨 Melhorias de UX e organização (28/10/2026)
+
+Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS_UX_2026-10.md).
+
+**Concluído (verificado com tsc, 43 testes e build; telas conferidas no navegador):**
+- [x] **UX01** (Pilar 1): frase de propósito por visão, navegação com visões bloqueadas explicadas, faixa de tipo de acesso (visitante, conta real, demonstração) e aba "Sobre o RotinaTEA".
+- [x] **UX02** (Pilares 1 e 2): conexão real (`navigator.onLine`) separada do simulador de demonstração; painel de sincronização com "Sincronizar agora" e "Tentar novamente"; selos "Salva só neste aparelho", "Enviada ao servidor" e "Falhou o envio".
+- [x] **UX03** (Pilar 1): registro local de atividades sem dados pessoais, diálogo de confirmação acessível e estados vazios explicativos.
+- [x] **UX04** (Pilar 3): painel do Responsável com o que é coletado, finalidade, base legal, versão, data do aceite, IP mascarado e como revogar; aviso de anonimização; mensagens de acesso negado e de sessão encerrada.
+- [x] **UX05** (Pilar 2): alvos de toque ≥ 48px, contraste dos elementos alterados, "Mostrar senha" acessível por teclado, SUS sem etiquetas Positivo/Negativo e cabeçalho sem rolagem horizontal no celular.
+
+**Limitações restantes (não concluído):**
+- A revogação do consentimento é registrada, mas **não bloqueia a coleta** (nenhum código lê `consentimento.ativo`).
+- O IP do aceite não é capturado pelo aplicativo (aparece "Não registrado").
+- A redação da base legal (LGPD arts. 11 e 14) precisa de revisão antes da banca.
+- Componentes antigos ainda têm falhas de contraste (botão de crise 4,16:1, "Concluir" 4,24:1, selos e tipos do cartão; no Alto Contraste, também botões de ordem e métricas). Exige separar tokens de texto e de fundo.
+- Sem teste com leitor de tela, sem testes de componente e sem teste da sessão encerrada nem da sincronização com conta real do Supabase.
+- O registro de atividades é local e não é trilha de auditoria.
+- Desativar o simulador em produção também remove o login de demonstração (`VITE_MODO_DEMO=false`).
