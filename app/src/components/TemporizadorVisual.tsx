@@ -73,7 +73,7 @@ export const TemporizadorVisual: React.FC<TemporizadorVisualProps> = ({
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Temporizador Visual Adaptado
         </span>
-        <h3 style={{ fontSize: '1.25rem', color: 'var(--primary)', marginTop: '4px', fontWeight: 600 }}>
+        <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-text)', marginTop: '4px', fontWeight: 600 }}>
           {tituloAtividade || 'Atividade da Rotina'}
         </h3>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -132,7 +132,7 @@ export const TemporizadorVisual: React.FC<TemporizadorVisualProps> = ({
 
         <div className="timer-time-label">
           {concluido ? (
-            <span style={{ color: 'var(--success)', fontSize: '1.1rem' }}>✓ Feito</span>
+            <span style={{ color: 'var(--success-text)', fontSize: '1.1rem' }}>✓ Feito</span>
           ) : (
             textoTempoFormatado
           )}

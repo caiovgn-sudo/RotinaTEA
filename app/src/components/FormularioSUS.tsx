@@ -65,10 +65,10 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
   };
 
   const getCorClassificacao = (pontuacao: number): string => {
-    if (pontuacao >= 80) return 'var(--success)';
-    if (pontuacao >= 70) return 'var(--warning)';
-    if (pontuacao >= 50) return 'var(--crisis)';
-    return 'var(--crisis)';
+    if (pontuacao >= 80) return 'var(--success-text)';
+    if (pontuacao >= 70) return 'var(--warning-text)';
+    if (pontuacao >= 50) return 'var(--crisis-text)';
+    return 'var(--crisis-text)';
   };
 
   const todasRespondidas = PERGUNTAS_SUS.every(p => respostas[p.id] !== undefined);
@@ -112,7 +112,7 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="sus-titulo">
       <div className="modal-card" style={{ maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h2 id="sus-titulo" style={{ fontSize: '1.4rem', color: 'var(--cor-titulo)', fontWeight: 700 }}>
+          <h2 id="sus-titulo" style={{ fontSize: '1.4rem', color: 'var(--primary-text)', fontWeight: 700 }}>
             Formulário SUS — System Usability Scale
           </h2>
           <button
@@ -141,13 +141,13 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
         </div>
 
         {mensagemSucesso && (
-          <div style={{ backgroundColor: 'var(--success-light)', color: 'var(--success)', padding: '12px 16px', borderRadius: 8, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ backgroundColor: 'var(--success-light)', color: 'var(--success-text)', padding: '12px 16px', borderRadius: 8, fontWeight: 600, marginBottom: 16 }}>
             ✓ {mensagemSucesso}
           </div>
         )}
 
         {erro && (
-          <div style={{ backgroundColor: 'var(--crisis-light)', color: 'var(--crisis)', padding: '12px 16px', borderRadius: 8, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ backgroundColor: 'var(--crisis-light)', color: 'var(--crisis-text)', padding: '12px 16px', borderRadius: 8, fontWeight: 600, marginBottom: 16 }}>
             ✕ {erro}
           </div>
         )}
@@ -186,7 +186,7 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
                   height: 28, 
                   borderRadius: '50%', 
                   background: 'var(--primary)', 
-                  color: 'white', 
+                  color: 'var(--on-fill)', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 

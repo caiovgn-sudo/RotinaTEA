@@ -157,7 +157,7 @@ export function CartaoRotina({
               padding: '10px',
               borderRadius: '10px',
               backgroundColor: 'rgba(92, 131, 116, 0.15)',
-              color: 'var(--success)',
+              color: 'var(--success-text)',
               fontWeight: 600,
               fontSize: '0.9rem',
               display: 'flex',

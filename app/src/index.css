@@ -139,7 +139,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--on-fill);
   font-weight: 700;
   font-size: 1.25rem;
 }
@@ -147,7 +147,7 @@ body {
 .brand-title {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
   letter-spacing: -0.5px;
 }
 
@@ -184,7 +184,7 @@ body {
 
 .role-tab-btn.active {
   background-color: var(--bg-surface);
-  color: var(--primary);
+  color: var(--primary-text);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
 }
@@ -216,13 +216,13 @@ body {
 
 .badge-connection.online {
   background-color: var(--success-light);
-  color: var(--success);
+  color: var(--success-text);
   border-color: rgba(92, 131, 116, 0.3);
 }
 
 .badge-connection.offline {
   background-color: var(--crisis-light);
-  color: var(--crisis);
+  color: var(--crisis-text);
   border-color: rgba(200, 90, 84, 0.3);
 }
 
@@ -328,7 +328,7 @@ body {
   top: 12px;
   left: 12px;
   background-color: var(--primary);
-  color: white;
+  color: var(--on-fill);
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -350,8 +350,8 @@ body {
 }
 
 .card-status-badge.done {
-  background-color: var(--success);
-  color: white;
+  background-color: var(--success-fill);
+  color: var(--on-fill);
 }
 
 .card-status-badge.pending {
@@ -405,8 +405,8 @@ body {
 }
 
 .btn-toggle-task.btn-finish {
-  background-color: var(--success);
-  color: white;
+  background-color: var(--success-fill);
+  color: var(--on-fill);
 }
 
 .btn-toggle-task.btn-finish:hover {
@@ -420,6 +420,7 @@ body {
 }
 
 .btn-order-nav {
+  color: var(--text-main);
   min-width: var(--min-touch-target);
   min-height: var(--min-touch-target);
   border: 1px solid var(--border-light);
@@ -432,7 +433,7 @@ body {
 /* Badge do Status 'Agora' */
 .card-status-badge.now {
   background-color: var(--primary);
-  color: white;
+  color: var(--on-fill);
   animation: pulse-soft 2.5s infinite;
 }
 
@@ -452,7 +453,7 @@ body {
 .btn-ordem {
   min-width: 40px !important;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* Área de Interação e Botão Concluir Amplo para o Aluno */
@@ -464,8 +465,8 @@ body {
 .btn-concluir-amplo {
   width: 100%;
   min-height: 52px;
-  background-color: var(--success);
-  color: white;
+  background-color: var(--success-fill);
+  color: var(--on-fill);
   border: none;
   border-radius: 12px;
   font-family: inherit;
@@ -497,7 +498,7 @@ body {
   border-radius: var(--border-radius);
   padding: 24px;
   text-align: center;
-  color: var(--success);
+  color: var(--success-text);
   font-weight: 600;
   font-size: 1.05rem;
   display: flex;
@@ -548,7 +549,7 @@ body {
   position: absolute;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .timer-controls {
@@ -557,6 +558,7 @@ body {
 }
 
 .btn-timer {
+  color: var(--text-main);
   padding: 10px 18px;
   border-radius: 8px;
   border: 1px solid var(--border-light);
@@ -572,7 +574,7 @@ body {
 
 .btn-timer.primary {
   background-color: var(--primary);
-  color: white;
+  color: var(--on-fill);
   border-color: var(--primary);
 }
 
@@ -617,8 +619,8 @@ body {
 }
 
 .btn-crisis-action.start {
-  background-color: var(--crisis);
-  color: white;
+  background-color: var(--crisis-fill);
+  color: var(--on-fill);
 }
 
 .btn-crisis-action.start:hover {
@@ -627,7 +629,7 @@ body {
 
 .btn-crisis-action.stop {
   background-color: var(--text-main);
-  color: white;
+  color: var(--bg-surface);
   animation: pulse-soft 2s infinite;
 }
 
@@ -661,7 +663,7 @@ body {
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-top: 8px;
 }
 
@@ -682,7 +684,7 @@ body {
 .destaque-tempo {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-top: 8px;
   letter-spacing: -0.5px;
 }
@@ -726,7 +728,7 @@ body {
 
 .anon-code-badge {
   background-color: var(--primary-light);
-  color: var(--primary);
+  color: var(--primary-text);
   padding: 4px 8px;
   border-radius: 6px;
   font-family: monospace;
@@ -745,7 +747,7 @@ body {
 .btn-revogar-perigo {
   padding: 10px 20px;
   background-color: var(--crisis-light);
-  color: var(--crisis);
+  color: var(--crisis-text);
   border: 1.5px solid var(--crisis);
   border-radius: 10px;
   font-family: inherit;
@@ -761,8 +763,8 @@ body {
 }
 
 .btn-revogar-perigo:hover {
-  background-color: var(--crisis);
-  color: white;
+  background-color: var(--crisis-fill);
+  color: var(--on-fill);
   box-shadow: 0 4px 12px rgba(200, 90, 84, 0.3);
 }
 
@@ -1165,7 +1167,7 @@ body.high-contrast-yellow.high-contrast {
 
 .login-tab.active {
   background: var(--bg-surface);
-  color: var(--primary);
+  color: var(--primary-text);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
 }
@@ -1278,7 +1280,7 @@ body.high-contrast-yellow.high-contrast {
 
 .login-demo-card:hover .login-demo-card-icon {
   background: var(--demo-cor, var(--primary));
-  color: white;
+  color: var(--bg-surface);
 }
 
 .login-demo-card-info {
@@ -1332,7 +1334,7 @@ body.high-contrast-yellow.high-contrast {
   padding: 2px 6px;
   border-radius: 4px;
   font-family: monospace;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* ── Compatibilidade com CSS antigo (componentes que usam .login-container) ─ */
@@ -1367,7 +1369,7 @@ body.high-contrast-yellow.high-contrast {
 .login-header h1 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 4px;
 }
 
@@ -1386,13 +1388,13 @@ body.high-contrast-yellow.high-contrast {
 
 .alert-error {
   background: var(--crisis-light);
-  color: var(--crisis);
+  color: var(--crisis-text);
   border: 1px solid var(--crisis);
 }
 
 .alert-success {
   background: var(--success-light);
-  color: var(--success);
+  color: var(--success-text);
   border: 1px solid var(--success);
 }
 
@@ -1446,7 +1448,7 @@ body.high-contrast-yellow.high-contrast {
 
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: var(--on-fill);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -1510,7 +1512,7 @@ body.high-contrast-yellow.high-contrast {
 .link-btn {
   background: none;
   border: none;
-  color: var(--primary);
+  color: var(--primary-text);
   font-weight: 600;
   cursor: pointer;
   padding: 0 4px;
@@ -1561,7 +1563,7 @@ body.high-contrast-yellow.high-contrast {
 }
 
 .login-required h3 {
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 12px;
 }
 
@@ -1803,7 +1805,7 @@ body.high-contrast-yellow.high-contrast {
 
 .sobre-secao h2 {
   font-size: 1.15rem;
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 10px;
 }
 
@@ -1849,7 +1851,7 @@ body.high-contrast-yellow.high-contrast {
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .sobre-lista-regras li,
@@ -1881,7 +1883,7 @@ body.high-contrast-yellow.high-contrast {
 .sobre-fluxo li > svg {
   flex: none;
   margin-top: 4px;
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* Login exibido dentro da área principal (o cabeçalho permanece visível) */
@@ -2004,7 +2006,7 @@ body.high-contrast-yellow.high-contrast {
 }
 
 .texto-erro {
-  color: var(--crisis);
+  color: var(--crisis-text);
 }
 
 .estado-vazio {
@@ -2245,24 +2247,10 @@ body.large-font .selo-sync {
   white-space: normal;
 }
 
-/* Contraste de títulos e do selo de conexão nos 3 modos (auditoria da Etapa 5) */
-:root {
-  --cor-titulo: #3A6B7E; /* 5,6:1 sobre branco */
-}
-
-body.high-contrast {
-  --cor-titulo: #8CC4DA; /* o --primary escuro não atinge 4,5:1 sobre o fundo escuro */
-}
-
-body.high-contrast-yellow,
-body.high-contrast-yellow.high-contrast {
-  --cor-titulo: #FFD700;
-}
-
 .sobre-secao h2,
 .sobre-cartao-titulo,
 .sobre-fluxo li > svg {
-  color: var(--cor-titulo);
+  color: var(--primary-text);
 }
 
 .badge-connection {
@@ -2276,7 +2264,7 @@ body.high-contrast-yellow.high-contrast {
 
 .role-tab-btn.active,
 .login-tab.active {
-  color: var(--cor-titulo);
+  color: var(--primary-text);
 }
 
 .role-tab-btn.blocked {
@@ -2320,4 +2308,75 @@ select {
 /* Botão de revogar e status do consentimento: texto no tom principal (>= 4,5:1) com o tom de alerta na borda e no ícone */
 .btn-revogar-perigo {
   color: var(--text-main);
+}
+
+/* =====================================================================
+   Tokens semânticos de cor (contraste): texto x preenchimento
+   - --*-text    cor de TEXTO sobre superfícies claras ou escuras do modo
+   - --*-fill    cor de PREENCHIMENTO de botões e selos com texto por cima
+   - --on-fill   cor do texto sobre preenchimentos
+   Todos validados com a fórmula de contraste do WCAG 2.1 (>= 4,5:1).
+   ===================================================================== */
+:root {
+  --on-fill: #FFFFFF;
+  --primary-text: #3A6B7E;
+  --success-text: #3A5F50;
+  --crisis-text: #A03E38;
+  --warning-text: #7A5524;
+  --success-fill: #466B5B;
+  --crisis-fill: #AE443B;
+  --success-hover: #3A5F50;
+  --crisis-hover: #9C3B35;
+  --text-subtle: #566070;
+}
+
+body.high-contrast {
+  --primary-text: #8CC4DA;
+  --success-text: #9AD3BA;
+  --crisis-text: #F5948E;
+  --warning-text: #E8B987;
+}
+
+body.high-contrast-yellow,
+body.high-contrast-yellow.high-contrast {
+  --on-fill: #000000;
+  --primary-text: #FFD700;
+  --success-text: #00FF00;
+  --crisis-text: #FF6B6B;
+  --warning-text: #FFD700;
+  --success-fill: #00FF00;
+  --crisis-fill: #FF0000;
+  --crisis-hover: #FF4D4D; /* hover mais claro: texto preto sobre #E60000 dava 4,36:1 */
+}
+
+/* Painel de marca do login: o texto é translúcido sobre um gradiente, então a transparência
+   precisa garantir 4,5:1 mesmo no trecho mais claro (#3A6B7E). Medido: 5,1:1 ou mais. */
+.login-brand-desc {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.login-brand-feature {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.login-brand-footer {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Amarelo/Preto: o gradiente começaria em amarelo (--primary) com texto claro; usa fundo preto e texto amarelo */
+body.high-contrast-yellow .login-brand-panel {
+  background: #000000;
+  border-right: 2px solid var(--border-light);
+}
+
+body.high-contrast-yellow .login-brand-panel,
+body.high-contrast-yellow .login-brand-panel * {
+  color: var(--text-main);
+}
+
+/* Botão de ação destrutiva do diálogo de confirmação */
+.btn-perigo {
+  background-color: var(--crisis-fill);
+  border: 1px solid var(--crisis-fill);
+  color: var(--on-fill);
 }

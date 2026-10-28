@@ -103,7 +103,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onVoltarAluno }) =
       descricao: 'Professor / Mediador',
       email: 'professor@rotinatea.edu.br',
       icon: GraduationCap,
-      cor: 'var(--primary)',
+      cor: 'var(--primary-text)',
       corLight: 'var(--primary-light)',
     },
     {
@@ -112,7 +112,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onVoltarAluno }) =
       descricao: 'Coordenação Pedagógica',
       email: 'coordenacao@rotinatea.edu.br',
       icon: BarChart3,
-      cor: 'var(--success)',
+      cor: 'var(--success-text)',
       corLight: 'var(--success-light)',
     },
     {
@@ -121,7 +121,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, onVoltarAluno }) =
       descricao: 'Responsável Legal / LGPD',
       email: 'responsavel@rotinatea.edu.br',
       icon: ShieldCheck,
-      cor: 'var(--warning)',
+      cor: 'var(--warning-text)',
       corLight: 'var(--warning-light)',
     },
   ];

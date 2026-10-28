@@ -79,7 +79,7 @@ export const PranchaVisual: React.FC<PranchaVisualProps> = ({
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h2 style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-text)', fontWeight: 700 }}>
             {isVisaoAluno ? 'Minha Rotina Escolar' : 'Gerenciamento da Rotina Escolar'}
           </h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>

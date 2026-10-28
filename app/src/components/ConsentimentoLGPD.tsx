@@ -31,7 +31,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   return (
     <div className="painel-lgpd">
       <div>
-        <h2 style={{ fontSize: '1.4rem', color: 'var(--cor-titulo)', fontWeight: 700 }}>
+        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-text)', fontWeight: 700 }}>
           Gestão de Consentimento e Privacidade (LGPD)
         </h2>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -104,7 +104,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
               type="button"
               className="btn-timer primary"
               onClick={onAlternarConsentimento}
-              style={{ backgroundColor: 'var(--success)', borderColor: 'var(--success)' }}
+              style={{ backgroundColor: 'var(--success-fill)', borderColor: 'var(--success-fill)' }}
               aria-label="Reativar consentimento de tratamento de dados"
             >
               Reativar Consentimento

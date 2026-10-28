@@ -43,7 +43,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
     <div className="dashboard-container" aria-label="Painel Analítico para o Plano de Ensino Individualizado">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h2 style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-text)', fontWeight: 700 }}>
             Painel Pedagógico & Métricas do PEI
           </h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -94,7 +94,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
       <div className="stats-cards-row">
         <div className="stat-card">
           <div className="stat-label">Conclusão de Tarefas</div>
-          <div className="stat-value" style={{ color: 'var(--success)' }}>
+          <div className="stat-value" style={{ color: 'var(--success-text)' }}>
             {percentualConclusao}%
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
@@ -104,7 +104,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
 
         <div className="stat-card">
           <div className="stat-label">Registros de Desregulação</div>
-          <div className="stat-value" style={{ color: totalCrises > 0 ? 'var(--crisis)' : 'var(--success)' }}>
+          <div className="stat-value" style={{ color: totalCrises > 0 ? 'var(--crisis-text)' : 'var(--success-text)' }}>
             {totalCrises}
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
@@ -114,7 +114,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
 
         <div className="stat-card card-metrica">
           <div className="stat-label">Duração Média das Crises</div>
-          <h2 className="stat-value destaque-tempo" style={{ color: 'var(--primary)' }}>
+          <h2 className="stat-value destaque-tempo" style={{ color: 'var(--primary-text)' }}>
             {formatarTempo(duracaoMediaSegundos)}
           </h2>
           <p className="legenda" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
@@ -124,7 +124,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
 
         <div className="stat-card">
           <div className="stat-label">Conformidade LGPD</div>
-          <div className="stat-value" style={{ color: 'var(--primary)', fontSize: '1.4rem', marginTop: 12 }}>
+          <div className="stat-value" style={{ color: 'var(--primary-text)', fontSize: '1.4rem', marginTop: 12 }}>
             100% Anonimizado
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>

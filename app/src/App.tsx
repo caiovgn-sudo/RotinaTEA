@@ -409,7 +409,7 @@ const AppContent: React.FC = () => {
             bottom: 24,
             right: 24,
             backgroundColor: 'var(--primary)',
-            color: 'white',
+            color: 'var(--on-fill)',
             padding: '12px 20px',
             borderRadius: 12,
             boxShadow: 'var(--shadow-lg)',

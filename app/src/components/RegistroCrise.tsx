@@ -124,9 +124,9 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', backgroundColor: 'var(--crisis)' }}></span>
-              <strong style={{ color: 'var(--crisis)' }}>Crise em Andamento:</strong>
+              <strong style={{ color: 'var(--crisis-text)' }}>Crise em Andamento:</strong>
             </div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--crisis)', fontFamily: 'monospace' }}>
+            <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--crisis-text)', fontFamily: 'monospace' }}>
               {formatarRelogioDigital(segundosDecorridos)}
             </div>
           </div>
@@ -201,7 +201,7 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
                         borderRadius: '4px',
                         transition: 'color 0.2s'
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--crisis)')}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--crisis-text)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                     >
                       <Trash2 size={16} aria-hidden="true" />
@@ -232,7 +232,7 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
       {modalObservacaoAberto && (
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-obs-titulo">
           <div className="modal-card">
-            <h3 id="modal-obs-titulo" style={{ fontSize: '1.25rem', color: 'var(--primary)', marginBottom: 8 }}>
+            <h3 id="modal-obs-titulo" style={{ fontSize: '1.25rem', color: 'var(--primary-text)', marginBottom: 8 }}>
               Adicionar Observação Comportamental
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 16 }}>

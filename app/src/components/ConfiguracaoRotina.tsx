@@ -116,7 +116,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
-        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
+        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-text)', fontWeight: 700 }}>
           Configuração da Rotina do Aluno
         </h2>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
@@ -125,7 +125,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
       </div>
 
       {mensagemSucesso && (
-        <div style={{ backgroundColor: 'var(--success-light)', color: 'var(--success)', padding: '12px 16px', borderRadius: 8, fontWeight: 600 }}>
+        <div style={{ backgroundColor: 'var(--success-light)', color: 'var(--success-text)', padding: '12px 16px', borderRadius: 8, fontWeight: 600 }}>
           ✓ {mensagemSucesso}
         </div>
       )}
@@ -187,7 +187,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
                   borderRadius: 8,
                   border: '1px solid var(--border-light)',
                   background: mostrarBuscaOnline ? 'var(--primary-light)' : 'var(--bg-surface)',
-                  color: mostrarBuscaOnline ? 'var(--primary)' : 'var(--text-main)',
+                  color: mostrarBuscaOnline ? 'var(--primary-text)' : 'var(--text-main)',
                   fontWeight: 600,
                   fontSize: '0.85rem',
                   cursor: 'pointer',
@@ -206,7 +206,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
                   borderRadius: 8,
                   border: '1px solid var(--border-light)',
                   background: mostrarBuscaOnline ? 'var(--primary)' : 'var(--bg-surface)',
-                  color: mostrarBuscaOnline ? 'white' : isOnline ? 'var(--text-main)' : 'var(--text-subtle)',
+                  color: mostrarBuscaOnline ? 'var(--on-fill)' : isOnline ? 'var(--text-main)' : 'var(--text-subtle)',
                   fontWeight: 600,
                   fontSize: '0.85rem',
                   cursor: isOnline ? 'pointer' : 'not-allowed',
@@ -253,7 +253,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
                 )}
                 
                 {erroBusca && (
-                  <div style={{ background: 'var(--crisis-light)', color: 'var(--crisis)', padding: '8px', borderRadius: 6, fontSize: '0.85rem' }}>
+                  <div style={{ background: 'var(--crisis-light)', color: 'var(--crisis-text)', padding: '8px', borderRadius: 6, fontSize: '0.85rem' }}>
                     {erroBusca}
                   </div>
                 )}
@@ -293,7 +293,7 @@ export const ConfiguracaoRotina: React.FC<ConfiguracaoRotinaProps> = ({
                             {pic.categories.join(', ')}
                           </div>
                         </div>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--primary-text)', fontWeight: 600 }}>
                           Selecionar
                         </span>
                       </button>

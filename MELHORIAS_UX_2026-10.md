@@ -11,6 +11,7 @@ Método: diagnóstico de 17 pontos (Etapa 0, aprovado antes de qualquer alteraç
 | 3 | `9c9a87b` | 1 (e 3) | Registro de atividades, confirmações e estados vazios |
 | 4 | `5ac49a6` | 3 | Governança visível, acesso negado e sessão expirada |
 | 5 | `812864b` | 2 (e 3) | Acessibilidade, contraste, SUS e responsividade |
+| 5b | ver `git log` | 2 | Contraste dos componentes antigos: tokens de texto x preenchimento e teste da paleta |
 
 Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · **3** governança/LGPD/segurança.
 
@@ -90,6 +91,23 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 - **Antes:** alvos de toque de 24 a 46px (abas e campos do login, "Mostrar senha", botões pequenos, botão de fechar do SUS); "Mostrar senha" inalcançável pelo teclado (`tabIndex=-1`); no celular com fonte ampliada, rolagem horizontal de 654px em 375px; títulos com 2,5:1 de contraste no Alto Contraste.
 - **Depois:** todos os alvos ≥ 48px; "Mostrar senha" alcançável pelo teclado; abas, ações e tabelas quebram ou rolam dentro do próprio quadro; token `--cor-titulo` para títulos legíveis nos três modos.
 
+### 1.16 Contraste dos componentes antigos (rodada 2, Pilar 2)
+- **Antes:** uma varredura de todos os textos (não só dos elementos novos) achou cerca de 50 combinações abaixo de 4,5:1. No modo Padrão: botão de crise (4,16:1), "Concluir" (4,24:1), selo "Concluído" (4,24:1), tipos do cartão (4,3:1), "Tarefa Concluída!" (3,22:1) e texto da área de soltar (3,80:1). No Alto Contraste: botões de ordem, selo do código, título da marca, métricas e tempo do temporizador. No Amarelo/Preto: **texto branco fixo sobre amarelo (1,4:1)** em botões, selos e números dos cartões. No login, o texto translúcido do painel de marca ficava entre 3,0:1 e 4,1:1.
+- **Depois:** zero falhas. A causa era uma só: as mesmas variáveis (`--primary`, `--success`, `--crisis`) serviam para **texto** e para **preenchimento**, e o texto sobre preenchimento era branco fixo. Foram criados tokens separados, com valor próprio em cada modo:
+
+| Token | Uso | Padrão | Alto Contraste | Amarelo/Preto |
+|---|---|---|---|---|
+| `--primary-text` | texto no tom principal | #3A6B7E | #8CC4DA | #FFD700 |
+| `--success-text` | texto de sucesso | #3A5F50 | #9AD3BA | #00FF00 |
+| `--crisis-text` | texto de alerta | #A03E38 | #F5948E | #FF6B6B |
+| `--warning-text` | texto de atenção | #7A5524 | #E8B987 | #FFD700 |
+| `--success-fill` | fundo de botões e selos de sucesso | #466B5B | igual | #00FF00 |
+| `--crisis-fill` | fundo de botões e selos de alerta | #AE443B | igual | #FF0000 |
+| `--on-fill` | texto sobre os preenchimentos | #FFFFFF | igual | #000000 |
+
+- **Decisões:** o terracota do botão de crise ficou um pouco mais profundo (#C85A54 para #AE443B) para chegar a 5,7:1 com texto branco; o painel de marca do login usa fundo preto e texto amarelo no modo Amarelo/Preto, porque o gradiente começaria em amarelo; o hover do botão de crise nesse modo é mais claro (#FF4D4D), pois #E60000 dava 4,36:1 com texto preto. Os tons do tema claro que já eram usados como borda e ícone não mudaram.
+- **Como testar:** em cada um dos 3 modos, abrir Professor, iniciar uma crise e conferir o botão e o cartão "Concluído"; abrir o login no modo Amarelo/Preto.
+
 ---
 
 ## 2. Decisões aprovadas na Etapa 0
@@ -106,12 +124,12 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 | Verificação | Resultado |
 |---|---|
 | `npx tsc --noEmit` | sem erros |
-| `npm test` | **43 testes aprovados** em 4 arquivos (eram 15; +28 nesta rodada) |
+| `npm test` | **54 testes aprovados** em 5 arquivos (eram 15 antes das melhorias de UX; +39 desde então) |
 | `npm run build` | sem erros (PWA gerado) |
-| Auditoria no navegador (alvos, contraste e nome acessível) | 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login (3 abas × 3 modos) e SUS (3 modos): **0 alvos < 48px, 0 falhas de contraste nos elementos criados ou alterados, 0 controles sem nome** |
+| Auditoria no navegador (alvos, contraste e nome acessível) | Etapa 5: 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login e SUS: **0 alvos < 48px, 0 controles sem nome**. Rodada 2 (contraste): **78 estados** (login em 3 abas, 5 visões, crise em andamento, modal de observação, configuração de cartões, SUS e diálogo de revogação × 3 modos × 2 tamanhos de fonte), **10.813 textos medidos, 0 falhas de contraste**, incluindo o pior ponto de fundos com gradiente |
 | Celular (375px, fonte ampliada) | sem rolagem horizontal nas 5 visões |
 
-Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos, fila, conexão), `atividades.test.ts` (privacidade, limite, armazenamento) e um caso em `db.test.ts` (IP). Todos importam o código real.
+Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos, fila, conexão), `atividades.test.ts` (privacidade, limite, armazenamento), um caso em `db.test.ts` (IP) e `contraste.test.ts`, que **lê o `index.css` real** e confere, nos 3 modos, 4,5:1 para cada texto sobre cada superfície e para o texto sobre cada preenchimento. Esse teste já pegou uma falha que a auditoria visual não via (o hover do botão de crise no modo Amarelo/Preto) e falha se alguém reintroduzir o verde antigo. Todos importam o código real.
 
 ---
 
@@ -120,11 +138,7 @@ Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos,
 1. **A revogação não bloqueia a coleta.** Nenhum código lê `consentimento.ativo`. A tela diz isso com franqueza: a revogação é registrada, mas o bloqueio automático não existe.
 2. **O IP do aceite não é capturado pelo aplicativo** (o dado de exemplo é `0.0.0.0`); por isso a tela mostra "Não registrado".
 3. **Redação jurídica da base legal** (arts. 11 e 14) precisa de revisão da orientadora ou de assessoria jurídica antes da banca.
-4. **Contraste fora do escopo alterado.** Uma varredura geral de 531 textos por modo achou falhas em componentes antigos, que não foram mexidos:
-   - modo Padrão: botão de crise (4,16:1), botão "Concluir" (4,24:1), selo "Concluído" (4,24:1), tipos do cartão como "Transição" (4,33:1), "Tarefa Concluída!" (3,22:1) e texto da área de soltar (3,80:1);
-   - modo Alto Contraste, também: botões de ordem, selo do código ALN, título da marca, valores das métricas e o tempo do temporizador.
-
-   Causa comum: `--success` e `--crisis` do tema claro com texto branco, e `--primary` sem ajuste no Alto Contraste. A correção exige separar tokens de texto e de fundo; não foi feita para não alterar a paleta documentada sem validação.
+4. **Contraste: o que a medição cobre e o que não cobre.** Depois da correção dos componentes antigos (seção 1.16), a varredura de texto passou a dar zero falhas, mas ela **não mede**: contraste de elementos que não são texto (bordas, ícones, anel do temporizador; exigência de 3:1), estados de foco e `:hover` (só os tokens de hover são testados, não cada tela) e imagens ou pictogramas.
 5. **Sem teste com leitor de tela** e sem teste manual por teclado além do diálogo; as medições usaram o Chromium do painel do app e o celular apenas emulado (375px). Firefox e Safari não foram testados.
 6. **Sem testes de componente** (React Testing Library): só a lógica pura é testada automaticamente; as telas foram verificadas manualmente.
 7. **Sessão encerrada pelo servidor** e **painel de sincronização com conta real**: implementados, mas sem teste com o Supabase real (não há credenciais de teste aqui) e sem teste automatizado.

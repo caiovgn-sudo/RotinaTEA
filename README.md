@@ -86,4 +86,4 @@ Em **demonstração** não existe senha e nada é enviado ao servidor. Contas re
 
 Orientação por visão, navegação com visões bloqueadas explicadas, conexão real separada do simulador, painel de sincronização, selos de envio por crise, registro de atividades, diálogo de confirmação, painel da LGPD detalhado e ajustes de acessibilidade. Antes e depois, decisões e roteiro de teste: [MELHORIAS_UX_2026-10.md](MELHORIAS_UX_2026-10.md).
 
-**Limitações (não concluído):** a revogação do consentimento é registrada, mas ainda não bloqueia a coleta; o IP do aceite não é capturado; a redação da base legal precisa de revisão; componentes antigos têm falhas de contraste listadas no documento; não houve teste com leitor de tela nem com conta real do Supabase para a sessão encerrada e a sincronização.
+**Limitações (não concluído):** a revogação do consentimento é registrada, mas ainda não bloqueia a coleta; o IP do aceite não é capturado; a redação da base legal precisa de revisão; a medição de contraste cobre apenas texto (não mede bordas, ícones e anel do temporizador); não houve teste com leitor de tela nem com conta real do Supabase para a sessão encerrada e a sincronização.
