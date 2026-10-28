@@ -4,7 +4,9 @@ import {
   calcularPontuacaoSUS,
   classificarSUS,
   formatarPontuacaoSUS,
-  respostasSusValidas
+  respostasSusValidas,
+  resumirSUS,
+  resumoDoServidor
 } from '../utils/sus';
 
 // Pilar 2 (Qualidade): o cálculo do SUS importa o código real e confere casos conhecidos do instrumento.
@@ -59,5 +61,38 @@ describe('SUS — classificação e formatação', () => {
   it('formata com vírgula só quando há fração', () => {
     expect(formatarPontuacaoSUS(77.5)).toBe('77,5');
     expect(formatarPontuacaoSUS(80)).toBe('80');
+  });
+});
+
+describe('SUS — resumo das avaliações', () => {
+  const ava = (r: number[]) => ({ respostas: r });
+
+  it('sem avaliações, devolve zeros e nenhum detalhe por pergunta', () => {
+    expect(resumirSUS([])).toEqual({ total: 0, media: 0, minimo: 0, maximo: 0, acimaDaMeta: 0, mediaPorItem: null });
+  });
+
+  it('calcula média, extremos e quantas atingiram a meta de 68', () => {
+    const r = resumirSUS([ava(melhor), ava(pior)]);
+    expect(r).toMatchObject({ total: 2, media: 50, minimo: 0, maximo: 100, acimaDaMeta: 1 });
+  });
+
+  it('só mostra a média por pergunta com 3 ou mais avaliações', () => {
+    expect(resumirSUS([ava(melhor), ava(melhor)]).mediaPorItem).toBeNull();
+    const r = resumirSUS([ava(melhor), ava(melhor), ava(pior)]);
+    expect(r.mediaPorItem).toHaveLength(10);
+    expect(r.mediaPorItem![0]).toBeCloseTo((5 + 5 + 1) / 3, 2);
+  });
+
+  it('ignora avaliações inválidas em vez de quebrar', () => {
+    expect(resumirSUS([ava([1, 2]), ava(melhor)]).total).toBe(1);
+  });
+
+  it('converte a resposta do servidor e rejeita formato inesperado', () => {
+    const ok = resumoDoServidor({ total: 3, media: 72.5, minimo: 60, maximo: 85, acima_meta: 2, media_por_item: [4, 2, 4, 2, 4, 2, 4, 2, 4, 2] });
+    expect(ok).toMatchObject({ total: 3, media: 72.5, acimaDaMeta: 2 });
+    expect(ok!.mediaPorItem).toHaveLength(10);
+    expect(resumoDoServidor({ total: 1, media: 70, minimo: 70, maximo: 70, acima_meta: 1, media_por_item: null })!.mediaPorItem).toBeNull();
+    expect(resumoDoServidor(null)).toBeNull();
+    expect(resumoDoServidor({ total: 'x' })).toBeNull();
   });
 });

@@ -2637,3 +2637,25 @@ body.high-contrast-yellow .login-brand-panel * {
     color: #000000;
   }
 }
+
+/* ---------- Resultados do SUS ---------- */
+.sus-bloco {
+  margin-top: 16px;
+}
+
+.sus-bloco h4 {
+  color: var(--primary-text);
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.sus-faixa {
+  margin: 10px 0;
+  color: var(--text-main);
+}
+
+.sus-vazio {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 6px 0;
+}

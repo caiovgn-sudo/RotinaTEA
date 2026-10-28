@@ -1,6 +1,6 @@
 // Serviço de Persistência Local (IndexedDB) - Arquitetura Offline-First (RN03)
 import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, RespostaSUS, PerfilUsuario, SyncItem, SyncPayload } from '../types';
-import { calcularPontuacaoSUS, SUS_VERSAO_INSTRUMENTO } from '../utils/sus';
+import { calcularPontuacaoSUS, SUS_VERSAO_INSTRUMENTO, resumoDoServidor, type ResumoSUS } from '../utils/sus';
 import { supabase, verificarConectividadeSupabase } from './supabase';
 import { processarFilaSync } from './filaSync';
 import { calcularDuracaoSegundos, podeExcluirCrise } from '../utils/regras';
@@ -642,6 +642,35 @@ export async function contarRespostasSUS(avaliadorId: string): Promise<number> {
     req.onsuccess = () => resolve(((req.result || []) as RespostaSUS[]).filter((r) => r.avaliadorId === avaliadorId).length);
     req.onerror = () => reject(req.error);
   });
+}
+
+/** Todas as avaliações SUS guardadas neste aparelho (usadas para o resumo local). */
+export async function carregarRespostasSUS(): Promise<RespostaSUS[]> {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction('sus_respostas', 'readonly').objectStore('sus_respostas').getAll();
+    req.onsuccess = () => resolve((req.result || []) as RespostaSUS[]);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/**
+ * Resumo agregado de todas as avaliações no servidor (função resumo_sus, restrita à Coordenação).
+ * Devolve null quando não há sessão, a conexão falha ou o perfil não tem permissão.
+ */
+export async function buscarResumoSUSRemoto(): Promise<ResumoSUS | null> {
+  if (!(await sessaoRemotaAtiva())) return null;
+  try {
+    const { data, error } = await supabase.rpc('resumo_sus');
+    if (error) {
+      logger.erro('[SUS] Resumo remoto indisponível', error);
+      return null;
+    }
+    return resumoDoServidor(data);
+  } catch (err) {
+    logger.erro('[SUS] Falha ao consultar o resumo remoto', err);
+    return null;
+  }
 }
 
 // -------------------------------------------------------------

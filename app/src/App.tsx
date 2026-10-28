@@ -43,6 +43,7 @@ import { ConfiguracaoRotina } from './components/ConfiguracaoRotina';
 import { Login } from './components/Login';
 import { SobreRotinaTEA } from './components/SobreRotinaTEA';
 import { FormularioSUS } from './components/FormularioSUS';
+import { ResultadosSUS } from './components/ResultadosSUS';
 import { Bell, ClipboardList, Plus, Calendar, Lock } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -103,6 +104,7 @@ const AppContent: React.FC = () => {
 
   // SUS Form modal
   const [mostrarSUS, setMostrarSUS] = useState(false);
+  const [versaoSUS, setVersaoSUS] = useState(0);
 
   const exibirAviso = useCallback((msg: string) => {
     setAviso(msg);
@@ -620,6 +622,9 @@ const AppContent: React.FC = () => {
             modoDemo={demo}
           />
         )}
+        {visaoPermitida && perfilAtual === 'COORDENACAO' && usuario && (
+          <ResultadosSUS modoDemo={demo} isOnline={isOnline} versao={versaoSUS} />
+        )}
 
         {/* 4. VISÃO DO RESPONSÁVEL LEGAL */}
         {visaoPermitida && perfilAtual === 'RESPONSAVEL' && usuario && estudanteAtual && (
@@ -664,6 +669,7 @@ const AppContent: React.FC = () => {
           onSalvo={(r) => {
             registrar("SUS", "Avaliação SUS salva neste aparelho: " + r.pontuacao + " de 100.");
             void atualizarFilaSync();
+            setVersaoSUS((v) => v + 1);
           }}
         />
       )}

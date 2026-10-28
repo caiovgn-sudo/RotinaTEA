@@ -66,3 +66,56 @@ export function classificarSUS(pontuacao: number): string {
 export function formatarPontuacaoSUS(pontuacao: number): string {
   return Number.isInteger(pontuacao) ? String(pontuacao) : pontuacao.toFixed(1).replace('.', ',');
 }
+
+/** Meta de pontuação do TCC e quantidade mínima de avaliações para mostrar detalhes por pergunta. */
+export const META_SUS = 68;
+export const MINIMO_DETALHE_SUS = 3;
+
+export interface ResumoSUS {
+  total: number;
+  media: number;
+  minimo: number;
+  maximo: number;
+  acimaDaMeta: number;
+  /** Média de cada pergunta (1 a 5); null com menos de MINIMO_DETALHE_SUS avaliações. */
+  mediaPorItem: number[] | null;
+}
+
+const umaCasa = (n: number) => Math.round(n * 10) / 10;
+
+/** Resume as avaliações guardadas no aparelho. A pontuação é recalculada, não se confia no valor gravado. */
+export function resumirSUS(avaliacoes: { respostas: number[] }[]): ResumoSUS {
+  const validas = avaliacoes.filter((a) => respostasSusValidas(a.respostas));
+  const notas = validas.map((a) => calcularPontuacaoSUS(a.respostas));
+  if (notas.length === 0) {
+    return { total: 0, media: 0, minimo: 0, maximo: 0, acimaDaMeta: 0, mediaPorItem: null };
+  }
+  const detalhado = notas.length >= MINIMO_DETALHE_SUS;
+  return {
+    total: notas.length,
+    media: umaCasa(notas.reduce((a, n) => a + n, 0) / notas.length),
+    minimo: Math.min(...notas),
+    maximo: Math.max(...notas),
+    acimaDaMeta: notas.filter((n) => n >= META_SUS).length,
+    mediaPorItem: detalhado
+      ? PERGUNTAS_SUS.map((_, i) => Math.round((validas.reduce((a, v) => a + v.respostas[i], 0) / validas.length) * 100) / 100)
+      : null
+  };
+}
+
+/** Converte a resposta da função resumo_sus() do servidor; devolve null se o formato não for o esperado. */
+export function resumoDoServidor(json: unknown): ResumoSUS | null {
+  if (!json || typeof json !== 'object') return null;
+  const j = json as Record<string, unknown>;
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const total = num(j.total);
+  const media = num(j.media);
+  const minimo = num(j.minimo);
+  const maximo = num(j.maximo);
+  const acima = num(j.acima_meta);
+  if (total === null || media === null || minimo === null || maximo === null || acima === null) return null;
+  const itens = Array.isArray(j.media_por_item) && j.media_por_item.length === PERGUNTAS_SUS.length && j.media_por_item.every((v) => num(v) !== null)
+    ? (j.media_por_item as number[])
+    : null;
+  return { total, media, minimo, maximo, acimaDaMeta: acima, mediaPorItem: itens };
+}
