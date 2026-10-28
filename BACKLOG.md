@@ -115,7 +115,7 @@ Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS
 - [x] **UX05** (Pilar 2): alvos de toque ≥ 48px, contraste dos elementos alterados, "Mostrar senha" acessível por teclado, SUS sem etiquetas Positivo/Negativo e cabeçalho sem rolagem horizontal no celular.
 
 **Limitações restantes (não concluído):**
-- A migração do SUS precisa ser aplicada no Supabase pelo responsável do projeto; o envio com conta real **não foi testado**. Não há tela que consolide as respostas (consulta por SQL) e as faixas de classificação têm `REVISAR` (conferir a referência no artigo).
+- A migração do SUS foi aplicada no Supabase (2 políticas confirmadas em 28/10/2026); o envio com conta real de Coordenação **não foi testado**. Não há tela que consolide as respostas (consulta por SQL) e as faixas de classificação têm `REVISAR` (conferir a referência no artigo).
 - O bloqueio ao revogar vale **no aparelho** (estado local, IndexedDB): não há regra no servidor (RLS) que impeça um educador de gravar crises de um aluno com consentimento revogado, e a revogação feita em outro aparelho só chega aqui quando houver sincronização do termo. Também não apaga dados já coletados.
 - O IP do aceite não é capturado pelo aplicativo (aparece "Não registrado").
 - A redação da base legal (LGPD arts. 11 e 14) precisa de revisão antes da banca.
