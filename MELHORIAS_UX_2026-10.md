@@ -156,8 +156,8 @@ Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos,
 4. **Contraste: o que a medição cobre e o que não cobre.** Depois da correção dos componentes antigos (seção 1.16), a varredura de texto passou a dar zero falhas, mas ela **não mede**: contraste de elementos que não são texto (bordas, ícones, anel do temporizador; exigência de 3:1), estados de foco e `:hover` (só os tokens de hover são testados, não cada tela) e imagens ou pictogramas.
 5. **SUS no servidor não testado.** A migração do SUS ainda precisa ser aplicada e o envio com conta real de Coordenação não foi exercitado; não existe tela de consolidação (consulta por SQL).
 6. **Sem teste com leitor de tela** e sem teste manual por teclado além do diálogo; as medições usaram o Chromium do painel do app e o celular apenas emulado (375px). Firefox e Safari não foram testados.
-6. **Sem testes de componente** (React Testing Library): só a lógica pura é testada automaticamente; as telas foram verificadas manualmente.
-7. **Sessão encerrada pelo servidor** e **painel de sincronização com conta real**: implementados, mas sem teste com o Supabase real (não há credenciais de teste aqui) e sem teste automatizado.
+7. **Sem testes de componente** (React Testing Library): só a lógica pura é testada automaticamente; as telas foram verificadas manualmente.
+8. **Sessão encerrada pelo servidor** e **painel de sincronização com conta real**: implementados, mas sem teste com o Supabase real (não há credenciais de teste aqui) e sem teste automatizado.
 8. **Registro de atividades** é local (30 itens por navegador) e pode ser limpo por qualquer pessoa; **não é uma trilha de auditoria**.
 9. **Desativar o simulador em produção** exige `VITE_MODO_DEMO=false`, que também remove o login de demonstração (as duas funções estão acopladas).
 10. A lógica de visibilidade por perfil é só experiência de uso; **a segurança continua no servidor** (RLS e gatilho de perfil).
