@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Estudante, ItemRotina, RegistroCrise, SyncItem } from '../types';
 import { SeloSync } from './SeloSync';
 import { formatarTempo } from '../utils/tempo';
 import { PainelPEI } from './PainelPEI';
+import { PadroesCrises } from './PadroesCrises';
+import { RelatorioPEI } from './RelatorioPEI';
+import { resumirCrises } from '../utils/pei';
 
 export { formatarTempo, PainelPEI };
 
@@ -30,13 +33,14 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
   const concluidas = itensRotina.filter((i) => i.concluido).length;
   const percentualConclusao = totalTarefas > 0 ? Math.round((concluidas / totalTarefas) * 100) : 0;
 
-  const totalCrises = crises.length;
-  const duracaoMediaSegundos = totalCrises > 0
-    ? Math.round(crises.reduce((acc, c) => acc + c.duracaoSegundos, 0) / totalCrises)
-    : 0;
+  // RN01: só crises encerradas têm duração; as em andamento não entram nas métricas
+  const { total: totalCrises, mediaSegundos: duracaoMediaSegundos } = resumirCrises(crises);
 
-  const exportarParaPEI = () => {
-    window.print();
+  const [relatorioAberto, setRelatorioAberto] = useState(false);
+  const botaoRelatorio = useRef<HTMLButtonElement>(null);
+  const fecharRelatorio = () => {
+    setRelatorioAberto(false);
+    botaoRelatorio.current?.focus();
   };
 
   return (
@@ -54,11 +58,12 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
         <button
           type="button"
           className="btn-timer primary"
-          onClick={exportarParaPEI}
-          aria-label="Exportar relatório consolidado para o PEI"
+          ref={botaoRelatorio}
+          onClick={() => setRelatorioAberto(true)}
+          aria-label="Abrir o relatório do PEI com gráficos para imprimir ou salvar em PDF"
         >
           <span aria-hidden="true">📄</span>
-          <span>Exportar Relatório PEI (PDF)</span>
+          <span>Relatório do PEI (gráficos e PDF)</span>
         </button>
       </div>
 
@@ -133,6 +138,13 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
         </div>
       </div>
 
+      <div className="data-table-container" style={{ padding: '16px 20px' }}>
+        <h3 style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: 600, marginBottom: 12 }}>
+          Padrões observados
+        </h3>
+        <PadroesCrises crises={crises} />
+      </div>
+
       {/* Tabela de Cruzamento Comportamental para o PEI */}
       <div className="data-table-container">
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-light)' }}>
@@ -186,6 +198,15 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
           </tbody>
         </table>
       </div>
+      {relatorioAberto && (
+        <RelatorioPEI
+          estudante={estudanteSelecionado}
+          crises={crises}
+          itensRotina={itensRotina}
+          modoDemo={modoDemo}
+          onFechar={fecharRelatorio}
+        />
+      )}
     </div>
   );
 };

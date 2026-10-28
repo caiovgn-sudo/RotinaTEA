@@ -54,6 +54,11 @@ describe('Contraste da paleta (WCAG 2.1 AA, mínimo 4,5:1)', () => {
         expect(falhas).toEqual([]);
       });
 
+      it('barras dos gráficos sobre a superfície (elemento que não é texto, mínimo 3:1)', () => {
+        const r = razaoContraste(cor(tokens, '--crisis-text'), cor(tokens, '--bg-surface'));
+        expect(r).toBeGreaterThanOrEqual(3);
+      });
+
       it('texto invertido do botão de crise parado (fundo da página sobre texto principal)', () => {
         const r = razaoContraste(cor(tokens, '--bg-surface'), cor(tokens, '--text-main'));
         expect(r).toBeGreaterThanOrEqual(4.5);
