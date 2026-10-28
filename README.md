@@ -70,7 +70,7 @@ Abra a aba **Sobre** para ver o objetivo, os quatro perfis, as regras RN01 a RN0
 |---|---|---|
 | Aluno | sem login | rotina visual em cartões e temporizador |
 | Professor | login ou demonstração | registro de crise em 1 clique, configuração da rotina, painel de sincronização |
-| Coordenação | login ou demonstração | painel anonimizado do PEI e formulário SUS (respostas gravadas; em demonstração só no aparelho) |
+| Coordenação | login ou demonstração | painel anonimizado do PEI com gráficos e relatório, formulário SUS e resultados agregados do SUS |
 | Responsável | login ou demonstração | termo da LGPD, consentimento e como revogar |
 
 Em **demonstração** não existe senha e nada é enviado ao servidor. Contas reais são criadas na aba **Cadastrar** e entram sempre como Responsável; Professor e Coordenação são concedidos por um administrador (consulte o fim de `app/supabase/migrations/20261028000001_endurece_perfis.sql`).
@@ -81,6 +81,10 @@ Em **demonstração** não existe senha e nada é enviado ao servidor. Contas re
 |---|---|
 | `VITE_MODO_DEMO` | `true` habilita o login de demonstração e o simulador de conexão. Use `false` em produção. |
 | `VITE_SUS_ATALHOS_TESTE` | `true` mostra no SUS os atalhos "Todos Neutro/Concordo". Use só em desenvolvimento. |
+
+### Publicação e teste com conta real
+
+Passo a passo da publicação na Vercel, da troca da chave pública do Supabase, da ordem das migrações e do roteiro de teste de ponta a ponta (crise, SUS e consentimento com conta real): [DEPLOY_VERCEL.md](DEPLOY_VERCEL.md).
 
 ### Melhorias de UX (outubro de 2026)
 

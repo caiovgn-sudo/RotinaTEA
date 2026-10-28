@@ -123,6 +123,31 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 - **Cálculo (`utils/sus.ts`):** extraído do componente, com 8 testes (extremos 0 e 100, neutro 50, validação, casa decimal). Deixou de arredondar (97,5 era exibido como 98). As faixas antigas citavam percentuais sem fonte ("melhor que 99% dos sistemas"); passaram a usar a média 68 e os cortes 80,3 e 51 de Sauro e Lewis, marcadas com `REVISAR`.
 - **Como testar:** em Coordenação, abrir "Formulário SUS", responder as 10 perguntas e enviar; conferir a mensagem de onde foi salvo. Para o servidor, aplicar a migração e repetir com conta real de Coordenação.
 
+### 1.19 Relatório do PEI com gráficos e leituras de padrão (rodada 4, Pilares 1 e 2)
+- **Antes:** o botão "Exportar Relatório PEI" só chamava a impressão da própria tela, sem gráficos, e o painel não apontava padrão nenhum.
+- **Depois:** o painel ganhou "Padrões observados" (crises por dia nos últimos 14 dias, por faixa de horário e por dia da semana, mais frases de leitura) e o botão abre um **relatório** próprio, com cabeçalho do aluno só pelo código, resumo, os gráficos, as leituras e a tabela de episódios. A impressão mostra só o relatório (CSS `@media print`); o PDF sai da opção "Salvar como PDF" do navegador.
+- **Lógica (`utils/pei.ts`, 12 testes):** só entram crises encerradas (RN01); os dias sem crise aparecem com zero; semana começa na segunda; os limites das faixas são conferidos (9h entra em "9h às 11h").
+- **Honestidade dos números:** com menos de 5 crises encerradas o painel diz que são poucos dados em vez de apontar padrão; um empate é dito como empate; a tendência compara os últimos 7 dias com os 7 anteriores e só aparece com 3 ou mais crises no período.
+- **Acessibilidade:** gráficos em SVG sem biblioteca, com o valor escrito sobre a barra, descrição para leitor de tela e uma tabela equivalente oculta; o relatório é uma caixa de diálogo com foco no título, Esc para fechar e foco devolvido ao botão. Um teste mede a cor das barras (3:1) nos 3 modos e já acusou 2,57:1 no Alto Contraste, o que levou a usar a cor de texto de alerta nas barras.
+- **Privacidade:** observações do educador passam por `descricaoSegura` (mascara e-mail, CPF e códigos), e o rodapé avisa que nomes digitados à mão não são detectados.
+- **Como testar:** em Coordenação, rolar até "Padrões observados" e abrir "Relatório do PEI"; conferir Esc, a impressão (Ctrl+P) e os 3 modos de contraste.
+
+### 1.20 Resultados do SUS na Coordenação (rodada 4, Pilares 2 e 3)
+- **Antes:** as notas só podiam ser consultadas por SQL, e cada avaliador lê apenas as próprias respostas.
+- **Depois:** a tela "Resultados da avaliação de usabilidade (SUS)" mostra total, média, menor e maior nota, quantas ficaram acima da meta de 68 e a média por pergunta, para o aparelho e, com conta real, para o servidor.
+- **Servidor:** a função `resumo_sus()` (migração `20261029000001`) devolve só agregados, só para a Coordenação, e não calcula a média por pergunta com menos de 3 avaliações, para não expor a resposta de uma pessoa.
+- **Testes:** `resumirSUS` e `resumoDoServidor` (5 casos). **Pendente:** aplicar a migração.
+
+### 1.21 Dados de exemplo no servidor e consentimento com a conta real (rodada 4, Pilar 1)
+- **Antes:** estudantes, rotina e cartões existiam só no IndexedDB, então a fila falhava nas chaves estrangeiras; o consentimento de exemplo citava um responsável fictício que não existe em `usuarios`.
+- **Depois:** a migração `20261029000002` cria no servidor os mesmos identificadores (idempotente) e a função administrativa `vincular_conta_aos_exemplos(email)`, que só o SQL Editor executa. O consentimento é enviado com a conta autenticada como responsável (`responsavelParaEnvio`, 3 testes).
+- **Pendente:** aplicar a migração e rodar o roteiro de DEPLOY_VERCEL.md com conta real.
+
+### 1.22 Testes de integração e publicação (rodada 4, Pilares 1 e 2)
+- **Integração (`integracao.test.ts`, 17 testes):** o código real de `services/db.ts` sobre IndexedDB simulado e um dublê do Supabase. Cobre seed, ciclo da crise, RN01, consentimento, SUS, upsert com o UUID local, três tentativas até ERRO, "tentar novamente" e o responsável do consentimento. Validação do teste: duas alterações deliberadas no código foram acusadas e depois revertidas.
+- **Publicação:** `vercel.json` ganhou `sw.js` sem cache longo; `configuracao.test.ts` garante que toda variável `VITE_` usada está no `.env.example` (sem chave real) e que os cabeçalhos e o redirecionamento existem. O passo a passo, incluindo a troca da chave pública, está em [DEPLOY_VERCEL.md](DEPLOY_VERCEL.md).
+- **Não feito:** a publicação em si e o CSP.
+
 ---
 
 ## 2. Decisões aprovadas na Etapa 0
@@ -139,7 +164,7 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 | Verificação | Resultado |
 |---|---|
 | `npx tsc --noEmit` | sem erros |
-| `npm test` | **67 testes aprovados** em 6 arquivos (eram 15 antes das melhorias de UX; +52 desde então) |
+| `npm test` | **114 testes aprovados** em 9 arquivos (eram 15 antes das melhorias de UX; +99 desde então) |
 | `npm run build` | sem erros (PWA gerado) |
 | Auditoria no navegador (alvos, contraste e nome acessível) | Etapa 5: 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login e SUS: **0 alvos < 48px, 0 controles sem nome**. Rodada 2 (contraste): **78 estados** (login em 3 abas, 5 visões, crise em andamento, modal de observação, configuração de cartões, SUS e diálogo de revogação × 3 modos × 2 tamanhos de fonte), **10.813 textos medidos, 0 falhas de contraste**, incluindo o pior ponto de fundos com gradiente |
 | Celular (375px, fonte ampliada) | sem rolagem horizontal nas 5 visões |
