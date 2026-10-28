@@ -6,6 +6,7 @@ import {
   descreverTentativas,
   conexaoEfetiva,
   rotuloConexao,
+  responsavelParaEnvio,
   ROTULO_ESTADO_SYNC
 } from '../utils/sync';
 import { MAX_TENTATIVAS_SYNC } from '../utils/regras';
@@ -108,5 +109,22 @@ describe('Conexão real versus simulador', () => {
     expect(rotuloConexao(true, true, true)).toBe('Offline (simulado)');
     expect(rotuloConexao(false, true, true)).toContain('sem internet');
     expect(rotuloConexao(true, true, false)).toBe('Online');
+  });
+});
+
+describe('Responsável enviado no consentimento', () => {
+  const exemplos = ['d0000001-0000-4000-a000-000000000001', 'd0000002-0000-4000-a000-000000000002'];
+
+  it('troca o responsável fictício pela conta autenticada', () => {
+    expect(responsavelParaEnvio(exemplos[1], 'conta-real', exemplos)).toBe('conta-real');
+  });
+
+  it('mantém o identificador quando já é de uma conta real', () => {
+    expect(responsavelParaEnvio('outra-conta', 'conta-real', exemplos)).toBe('outra-conta');
+  });
+
+  it('sem conta autenticada, não inventa responsável', () => {
+    expect(responsavelParaEnvio(exemplos[1], null, exemplos)).toBe(exemplos[1]);
+    expect(responsavelParaEnvio(exemplos[1], undefined, exemplos)).toBe(exemplos[1]);
   });
 });

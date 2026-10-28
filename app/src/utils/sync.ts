@@ -75,3 +75,16 @@ export function rotuloConexao(real: boolean, simuladoOffline: boolean, simulador
   if (simuladorDisponivel && simuladoOffline) return 'Offline (simulado)';
   return 'Online';
 }
+
+/**
+ * O consentimento de exemplo guarda um responsável fictício, que não existe em `usuarios` e quebraria a
+ * chave estrangeira no servidor. Com sessão real, quem altera o consentimento é a conta autenticada,
+ * então é ela que vai como responsável. Identificadores que não são de exemplo seguem como estão.
+ */
+export function responsavelParaEnvio(
+  responsavelLocal: string,
+  contaAutenticada: string | null | undefined,
+  idsDeExemplo: readonly string[]
+): string {
+  return contaAutenticada && idsDeExemplo.includes(responsavelLocal) ? contaAutenticada : responsavelLocal;
+}

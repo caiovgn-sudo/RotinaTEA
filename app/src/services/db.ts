@@ -5,7 +5,7 @@ import { supabase, verificarConectividadeSupabase } from './supabase';
 import { processarFilaSync } from './filaSync';
 import { calcularDuracaoSegundos, podeExcluirCrise } from '../utils/regras';
 import { logger } from '../utils/logger';
-import { reativarItemFila } from '../utils/sync';
+import { reativarItemFila, responsavelParaEnvio } from '../utils/sync';
 
 const DB_NAME = 'rotinatea_offline_db';
 const DB_VERSION = 3;
@@ -514,11 +514,17 @@ async function enviarItemRotina(it: ItemRotina): Promise<boolean> {
 }
 
 async function enviarConsentimento(c: ConsentimentoLGPD): Promise<boolean> {
+  let conta: string | null = null;
+  try {
+    conta = (await supabase.auth.getSession()).data.session?.user.id ?? null;
+  } catch {
+    conta = null;
+  }
   const { error } = await supabase.from('consentimentos_lgpd').upsert(
     {
       id: c.id,
       estudante_id: c.estudanteId,
-      responsavel_id: c.responsavelId,
+      responsavel_id: responsavelParaEnvio(c.responsavelId, conta, [SEED_PROFESSOR_ID, SEED_RESPONSAVEL_ID]),
       data_aceite: c.dataAceite,
       ip_origem: c.ipOrigem,
       ativo: c.ativo,
