@@ -19,6 +19,7 @@ import {
   SEED_PROFESSOR_ID
 } from './services/db';
 import { AuthProvider, useAuth, ehUsuarioDemo } from './context/AuthContext';
+import { podeRegistrarCrise } from './utils/regras';
 import { Header } from './components/Header';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
@@ -194,6 +195,10 @@ const AppContent: React.FC = () => {
   // Ações de Crise (1 Clique)
   const handleIniciarCrise = async () => {
     if (!estudanteAtual) return;
+    if (!podeRegistrarCrise(usuario?.perfil)) {
+      exibirAviso('Apenas Professor ou Coordenação podem registrar crises.');
+      return;
+    }
     const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || SEED_PROFESSOR_ID);
     setCriseAtiva(nova);
     exibirAviso('Registro de crise iniciado. Cronômetro ativado.');

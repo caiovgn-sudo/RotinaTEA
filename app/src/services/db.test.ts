@@ -6,7 +6,8 @@ import {
   mascararIp,
   statusAposFalha,
   MAX_TENTATIVAS_SYNC,
-  PERFIL_PADRAO_CADASTRO
+  PERFIL_PADRAO_CADASTRO,
+  podeRegistrarCrise
 } from '../utils/regras';
 import { processarFilaSync } from './filaSync';
 import { formatarTempo } from '../utils/tempo';
@@ -72,6 +73,14 @@ describe('RN02 — Anonimização (LGPD)', () => {
 describe('Segurança — perfil de cadastro', () => {
   it('novas contas recebem o perfil de menor privilégio', () => {
     expect(PERFIL_PADRAO_CADASTRO).toBe('RESPONSAVEL');
+  });
+
+  it('somente Professor e Coordenação podem registrar crises (espelha a RLS)', () => {
+    expect(podeRegistrarCrise('PROFESSOR')).toBe(true);
+    expect(podeRegistrarCrise('COORDENACAO')).toBe(true);
+    expect(podeRegistrarCrise('RESPONSAVEL')).toBe(false);
+    expect(podeRegistrarCrise('ALUNO')).toBe(false);
+    expect(podeRegistrarCrise(null)).toBe(false);
   });
 });
 

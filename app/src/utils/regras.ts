@@ -26,6 +26,13 @@ export function podeExcluirCrise(crise: Pick<RegistroCrise, 'dataHoraFim'>): boo
   return crise.dataHoraFim !== null;
 }
 
+/** Perfis autorizados a registrar crises; espelha a RLS de `registros_crise` (migração 20261028000002). */
+export const PERFIS_REGISTRAM_CRISE: readonly PerfilUsuario[] = ['PROFESSOR', 'COORDENACAO'];
+
+export function podeRegistrarCrise(perfil: PerfilUsuario | null | undefined): boolean {
+  return !!perfil && PERFIS_REGISTRAM_CRISE.includes(perfil);
+}
+
 /** RN02 — Código anonimizado do aluno (ex.: ALN-8921). */
 export const REGEX_CODIGO_ANONIMIZADO = /^ALN-\d{4}$/;
 

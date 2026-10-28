@@ -74,7 +74,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
-- ✅ `npm test` — Vitest: 14 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão
+- ✅ `npm test` — Vitest: 15 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise
 - ✅ Lint: sem warnings críticos, apenas aviso de dynamic import ineficaz (não bloqueante)
 
 ---
@@ -93,4 +93,6 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 **Corrigido:** contas de teste com senha fixa removidas (modo demo sem senha, local); perfil definido no servidor (migração `20261028000001_endurece_perfis.sql`); `carregarCrises` não apaga mais dados; exclusão de crise em andamento bloqueada (RN01); sincronização sem `await` de rede dentro de transação IndexedDB, com upsert idempotente; IP mascarado na tela e IP de seed neutralizado; testes passam a importar o código real; chave do Supabase removida da documentação.
 
-**Pendente / limitações conhecidas:** SUS não persiste; PDF é impressão do navegador; RLS permite que qualquer perfil vinculado grave crises (restringir a Professor/Coordenação); IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.
+**Pendente / limitações conhecidas:** SUS não persiste; PDF é impressão do navegador; IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.
+
+**28/10/2026 — RLS de crises (Pilar 3):** migração `20261028000002_restringe_crises.sql` substitui a política `FOR ALL` por políticas por operação: leitura para vinculados; inserção só por PROFESSOR/COORDENACAO vinculados com `professor_id = auth.uid()`; atualização só pelo autor; exclusão só de crise encerrada (RN01), pelo autor ou pela coordenação. A interface aplica a mesma regra (`podeRegistrarCrise`). **Aplicar no Supabase** (SQL Editor ou `supabase db push`) — ainda não aplicada.
