@@ -85,7 +85,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
         <div className="lgpd-status">
           <div>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Situação:</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: isAtivo ? 'var(--success)' : 'var(--crisis)' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)' }}>
               {isAtivo ? '✔️ Consentimento Ativo e Autorizado' : '❌ Consentimento Revogado'}
             </div>
           </div>

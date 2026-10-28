@@ -2316,3 +2316,8 @@ select {
 .data-table-container {
   overflow-x: auto;
 }
+
+/* Botão de revogar e status do consentimento: texto no tom principal (>= 4,5:1) com o tom de alerta na borda e no ícone */
+.btn-revogar-perigo {
+  color: var(--text-main);
+}
