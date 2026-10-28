@@ -1,14 +1,32 @@
 // Serviço de Persistência Local (IndexedDB) - Arquitetura Offline-First (RN03)
-import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, SyncItem } from '../types';
-import { supabase } from './supabase';
+import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, SyncItem, SyncPayload } from '../types';
+import { supabase, verificarConectividadeSupabase } from './supabase';
+import { processarFilaSync } from './filaSync';
+import { calcularDuracaoSegundos, podeExcluirCrise } from '../utils/regras';
+import { logger } from '../utils/logger';
 
 const DB_NAME = 'rotinatea_offline_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: IDBDatabase | null = null;
 
-// Mapeamento de IDs locais para UUIDs remotos (para evitar duplicatas em re-sync)
-const idMapLocalParaRemoto = new Map<string, string>();
+// UUIDs canônicos para Seed e compatibilidade total com PostgreSQL/Supabase
+export const SEED_ESTUDANTE_1_ID = 'e0000001-0000-4000-a000-000000000001';
+export const SEED_ESTUDANTE_2_ID = 'e0000002-0000-4000-a000-000000000002';
+export const SEED_ROTINA_1_ID = 'b0000001-0000-4000-a000-000000000001';
+export const SEED_PROFESSOR_ID = 'd0000001-0000-4000-a000-000000000001';
+export const SEED_RESPONSAVEL_ID = 'd0000002-0000-4000-a000-000000000002';
+
+export function gerarUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export async function getDB(): Promise<IDBDatabase> {
   if (dbInstance) return dbInstance;
@@ -65,14 +83,14 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
     if (countReq.result === 0) {
       // Estudante 1 anonimizado (RN02)
       const estudante1: Estudante = {
-        id: 'est-001',
+        id: SEED_ESTUDANTE_1_ID,
         codigoAnonimizado: 'ALN-8921',
         turma: '3º Ano B - Manhã',
         nivelSuporte: 1
       };
       // Estudante 2 anonimizado
       const estudante2: Estudante = {
-        id: 'est-002',
+        id: SEED_ESTUDANTE_2_ID,
         codigoAnonimizado: 'ALN-4412',
         turma: '2º Ano A - Tarde',
         nivelSuporte: 2
@@ -83,8 +101,8 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
 
       // Rotina visual inicial
       const rotina1: RotinaVisual = {
-        id: 'rot-001',
-        estudanteId: 'est-001',
+        id: SEED_ROTINA_1_ID,
+        estudanteId: SEED_ESTUDANTE_1_ID,
         data: new Date().toISOString().split('T')[0],
         status: 'EM_ANDAMENTO',
         itens: []
@@ -93,12 +111,12 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
 
       // Itens da rotina com pictogramas ARASAAC
       const itensIniciais: ItemRotina[] = [
-        { id: 'it-1', rotinaId: 'rot-001', titulo: 'Entrada e Acolhimento', categoria: 'Transição', pictogramaKey: 'acolhimento', ordem: 1, duracaoMinutos: 15, concluido: true },
-        { id: 'it-2', rotinaId: 'rot-001', titulo: 'Roda de Conversa', categoria: 'Interação', pictogramaKey: 'roda_conversa', ordem: 2, duracaoMinutos: 20, concluido: true },
-        { id: 'it-3', rotinaId: 'rot-001', titulo: 'Atividade no Caderno', categoria: 'Pedagógico', pictogramaKey: 'atividade_mesa', ordem: 3, duracaoMinutos: 30, concluido: false },
-        { id: 'it-4', rotinaId: 'rot-001', titulo: 'Lavar Mãos e Lanche', categoria: 'Alimentação', pictogramaKey: 'lanche', ordem: 4, duracaoMinutos: 25, concluido: false },
-        { id: 'it-5', rotinaId: 'rot-001', titulo: 'Parque / Recreio', categoria: 'Lazer', pictogramaKey: 'parque', ordem: 5, duracaoMinutos: 30, concluido: false },
-        { id: 'it-6', rotinaId: 'rot-001', titulo: 'Guardar Mochila e Saída', categoria: 'Transição', pictogramaKey: 'saida', ordem: 6, duracaoMinutos: 15, concluido: false }
+        { id: 'c0000001-0000-4000-a000-000000000001', rotinaId: SEED_ROTINA_1_ID, titulo: 'Entrada e Acolhimento', categoria: 'Transição', pictogramaKey: 'acolhimento', ordem: 1, duracaoMinutos: 15, concluido: true },
+        { id: 'c0000001-0000-4000-a000-000000000002', rotinaId: SEED_ROTINA_1_ID, titulo: 'Roda de Conversa', categoria: 'Interação', pictogramaKey: 'roda_conversa', ordem: 2, duracaoMinutos: 20, concluido: true },
+        { id: 'c0000001-0000-4000-a000-000000000003', rotinaId: SEED_ROTINA_1_ID, titulo: 'Atividade no Caderno', categoria: 'Pedagógico', pictogramaKey: 'atividade_mesa', ordem: 3, duracaoMinutos: 30, concluido: false },
+        { id: 'c0000001-0000-4000-a000-000000000004', rotinaId: SEED_ROTINA_1_ID, titulo: 'Lavar Mãos e Lanche', categoria: 'Alimentação', pictogramaKey: 'lanche', ordem: 4, duracaoMinutos: 25, concluido: false },
+        { id: 'c0000001-0000-4000-a000-000000000005', rotinaId: SEED_ROTINA_1_ID, titulo: 'Parque / Recreio', categoria: 'Lazer', pictogramaKey: 'parque', ordem: 5, duracaoMinutos: 30, concluido: false },
+        { id: 'c0000001-0000-4000-a000-000000000006', rotinaId: SEED_ROTINA_1_ID, titulo: 'Guardar Mochila e Saída', categoria: 'Transição', pictogramaKey: 'saida', ordem: 6, duracaoMinutos: 15, concluido: false }
       ];
 
       const itemStore = tx.objectStore('itens_rotina');
@@ -106,11 +124,11 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
 
       // Consentimento inicial LGPD
       const consentimento1: ConsentimentoLGPD = {
-        id: 'cns-001',
-        estudanteId: 'est-001',
-        responsavelId: 'usr-resp-01',
+        id: 'a0000001-0000-4000-a000-000000000001',
+        estudanteId: SEED_ESTUDANTE_1_ID,
+        responsavelId: SEED_RESPONSAVEL_ID,
         dataAceite: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        ipOrigem: '189.102.45.12',
+        ipOrigem: '0.0.0.0',
         ativo: true,
         termoVersao: 'v1.2-2026'
       };
@@ -119,9 +137,9 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
       // Crises históricas para visualização analítica no PEI
       const crisesIniciais: RegistroCrise[] = [
         {
-          id: 'crs-001',
-          estudanteId: 'est-001',
-          professorId: 'usr-prof-01',
+          id: 'f0000001-0000-4000-a000-000000000001',
+          estudanteId: SEED_ESTUDANTE_1_ID,
+          professorId: SEED_PROFESSOR_ID,
           dataHoraInicio: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 10 * 3600 * 1000).toISOString(),
           dataHoraFim: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 10 * 3600 * 1000 + 380 * 1000).toISOString(),
           duracaoSegundos: 380,
@@ -130,9 +148,9 @@ export async function seedInitialDataIfEmpty(): Promise<void> {
           criadoEmLocal: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
         },
         {
-          id: 'crs-002',
-          estudanteId: 'est-001',
-          professorId: 'usr-prof-01',
+          id: 'f0000001-0000-4000-a000-000000000002',
+          estudanteId: SEED_ESTUDANTE_1_ID,
+          professorId: SEED_PROFESSOR_ID,
           dataHoraInicio: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 11 * 3600 * 1000).toISOString(),
           dataHoraFim: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 11 * 3600 * 1000 + 240 * 1000).toISOString(),
           duracaoSegundos: 240,
@@ -162,15 +180,15 @@ export async function carregarEstudantes(): Promise<Estudante[]> {
 
 export async function carregarItensRotina(rotinaId: string): Promise<ItemRotina[]> {
   const db = await getDB();
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const tx = db.transaction('itens_rotina', 'readonly');
-    const store = tx.objectStore('itens_rotina');
-    const req = store.getAll();
+    const req = tx.objectStore('itens_rotina').index('rotinaId').getAll(rotinaId);
     req.onsuccess = () => {
-      const items: ItemRotina[] = (req.result || []).filter((it: ItemRotina) => it.rotinaId === rotinaId);
-      items.sort((a, b) => a.ordem - b.ordem);
+      const items: ItemRotina[] = req.result || [];
+      items.sort((x, y) => x.ordem - y.ordem);
       resolve(items);
     };
+    req.onerror = () => reject(req.error);
   });
 }
 
@@ -207,23 +225,50 @@ export async function salvarOrdemItens(itensAtualizados: ItemRotina[]): Promise<
   });
 }
 
+/** Há sessão autenticada no Supabase? Só então faz sentido enviar dados ao servidor (RLS). */
+async function sessaoRemotaAtiva(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return !!data.session;
+  } catch {
+    return false;
+  }
+}
+
+/** Dispara a sincronização em segundo plano, sem bloquear nem derrubar a operação local (RN03). */
+function solicitarSincronizacao(isOnline: boolean): void {
+  if (!isOnline) return;
+  void sincronizarFilaBatch().catch((err) => logger.erro('[Sync] Falha em segundo plano', err));
+}
+
+/** Persistência local primeiro (RN03); a fila é gravada em transação separada, sem await de rede. */
+async function registrarNaFilaSeNecessario(
+  tipo: SyncItem['tipo'],
+  payload: SyncPayload,
+  isOnline: boolean
+): Promise<void> {
+  if (!isOnline || (await sessaoRemotaAtiva())) {
+    await adicionarAFilaSincronizacao(tipo, payload);
+  }
+  solicitarSincronizacao(isOnline);
+}
+
+function aguardarTransacao(tx: IDBTransaction): Promise<void> {
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error ?? new Error('Transação abortada'));
+  });
+}
+
 export async function adicionarItemRotina(novoItem: Omit<ItemRotina, 'id'>, isOnline = true): Promise<ItemRotina> {
   const db = await getDB();
-  const id = 'it-' + Date.now();
-  const itemCompleto: ItemRotina = { ...novoItem, id };
-
-  return new Promise(async (resolve, reject) => {
-    const tx = db.transaction('itens_rotina', 'readwrite');
-    const store = tx.objectStore('itens_rotina');
-    const req = store.put(itemCompleto);
-    req.onsuccess = async () => {
-      if (!isOnline) {
-        await adicionarAFilaSincronizacao('ITEM_ROTINA', itemCompleto);
-      }
-      resolve(itemCompleto);
-    };
-    req.onerror = () => reject(req.error);
-  });
+  const itemCompleto: ItemRotina = { ...novoItem, id: gerarUUID() };
+  const tx = db.transaction('itens_rotina', 'readwrite');
+  tx.objectStore('itens_rotina').put(itemCompleto);
+  await aguardarTransacao(tx);
+  await registrarNaFilaSeNecessario('ITEM_ROTINA', itemCompleto, isOnline);
+  return itemCompleto;
 }
 
 // -------------------------------------------------------------
@@ -248,7 +293,7 @@ export async function iniciarCriseLocal(estudanteId: string, professorId: string
   const db = await getDB();
   const agora = new Date().toISOString();
   const novaCrise: RegistroCrise = {
-    id: 'crs-' + Date.now(),
+    id: gerarUUID(),
     estudanteId,
     professorId,
     dataHoraInicio: agora,
@@ -273,54 +318,92 @@ export async function encerrarCriseLocal(
   isOnline = true
 ): Promise<RegistroCrise> {
   const db = await getDB();
-  const agora = new Date();
+  const agora = new Date().toISOString();
 
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('crises', 'readwrite');
-    const criseStore = tx.objectStore('crises');
-
-    const getReq = criseStore.get(criseId);
-    getReq.onsuccess = async () => {
-      const crise: RegistroCrise = getReq.result;
-      if (!crise) return reject(new Error('Crise não encontrada'));
-
-      crise.dataHoraFim = agora.toISOString();
-      const inicioMs = new Date(crise.dataHoraInicio).getTime();
-      const fimMs = agora.getTime();
-      crise.duracaoSegundos = Math.max(1, Math.round((fimMs - inicioMs) / 1000));
-      if (observacoes !== undefined) {
-        crise.observacoes = observacoes;
+  const tx = db.transaction('crises', 'readwrite');
+  const store = tx.objectStore('crises');
+  const crise = await new Promise<RegistroCrise>((resolve, reject) => {
+    const getReq = store.get(criseId);
+    getReq.onsuccess = () => {
+      const atual: RegistroCrise | undefined = getReq.result;
+      if (!atual) return reject(new Error('Crise não encontrada'));
+      try {
+        atual.dataHoraFim = agora;
+        atual.duracaoSegundos = calcularDuracaoSegundos(atual.dataHoraInicio, agora);
+      } catch (e) {
+        tx.abort();
+        return reject(e);
       }
-      crise.sincronizadoOffline = isOnline;
-
-      criseStore.put(crise);
-
-      // Se offline, adiciona à fila de sincronização para envio posterior
-      if (!isOnline) {
-        await adicionarAFilaSincronizacao('REGISTRO_CRISE', crise);
-      }
-
-      tx.oncomplete = () => resolve(crise);
+      if (observacoes !== undefined) atual.observacoes = observacoes;
+      atual.sincronizadoOffline = false; // só vira true após confirmação do servidor
+      store.put(atual);
+      resolve(atual);
     };
     getReq.onerror = () => reject(getReq.error);
   });
+  await aguardarTransacao(tx);
+
+  await registrarNaFilaSeNecessario('REGISTRO_CRISE', crise, isOnline);
+  return crise;
 }
 
 export async function carregarCrises(estudanteId?: string): Promise<RegistroCrise[]> {
   const db = await getDB();
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    // Somente leitura: consultar nunca altera nem apaga dados clínicos.
     const tx = db.transaction('crises', 'readonly');
-    const store = tx.objectStore('crises');
-    const req = store.getAll();
+    const req = tx.objectStore('crises').getAll();
     req.onsuccess = () => {
       let result: RegistroCrise[] = req.result || [];
       if (estudanteId) {
         result = result.filter((c) => c.estudanteId === estudanteId);
       }
-      result.sort((a, b) => new Date(b.dataHoraInicio).getTime() - new Date(a.dataHoraInicio).getTime());
+      result.sort((x, y) => new Date(y.dataHoraInicio).getTime() - new Date(x.dataHoraInicio).getTime());
       resolve(result);
     };
+    req.onerror = () => reject(req.error);
   });
+}
+
+export async function excluirCriseLocal(criseId: string): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction(['crises', 'sync_queue'], 'readwrite');
+  const store = tx.objectStore('crises');
+  const syncStore = tx.objectStore('sync_queue');
+
+  await new Promise<void>((resolve, reject) => {
+    const getReq = store.get(criseId);
+    getReq.onsuccess = () => {
+      const crise: RegistroCrise | undefined = getReq.result;
+      if (!crise) return resolve();
+      if (!podeExcluirCrise(crise)) {
+        tx.abort();
+        return reject(new Error('RN01: uma crise em andamento não pode ser excluída. Encerre-a primeiro.'));
+      }
+      store.delete(criseId);
+      const qReq = syncStore.getAll();
+      qReq.onsuccess = () => {
+        (qReq.result as SyncItem[]).forEach((item) => {
+          if (item.tipo === 'REGISTRO_CRISE' && (item.payload as RegistroCrise).id === criseId) {
+            syncStore.delete(item.id);
+          }
+        });
+        resolve();
+      };
+      qReq.onerror = () => reject(qReq.error);
+    };
+    getReq.onerror = () => reject(getReq.error);
+  });
+  await aguardarTransacao(tx);
+
+  // Exclusão remota apenas se houver sessão (best-effort; RLS decide a permissão)
+  if (await sessaoRemotaAtiva()) {
+    try {
+      await supabase.from('registros_crise').delete().eq('id', criseId);
+    } catch {
+      // offline: o registro local já foi removido
+    }
+  }
 }
 
 // -------------------------------------------------------------
@@ -337,214 +420,152 @@ export async function carregarItensFilaSync(): Promise<SyncItem[]> {
   });
 }
 
-export async function sincronizarFilaBatch(): Promise<number> {
-  const db = await getDB();
-  
-  // Primeiro, verifica conectividade
-  const { verificarConectividadeSupabase } = await import('./supabase');
-  const online = await verificarConectividadeSupabase();
-  
-  if (!online) {
-    console.log('[Sync] Offline — sincronização adiada');
+let sincronizacaoEmAndamento: Promise<number> | null = null;
+
+/** Envia a fila ao Supabase. Chamadas simultâneas compartilham a mesma execução (sem duplicar envios). */
+export function sincronizarFilaBatch(): Promise<number> {
+  if (!sincronizacaoEmAndamento) {
+    sincronizacaoEmAndamento = executarSincronizacao().finally(() => {
+      sincronizacaoEmAndamento = null;
+    });
+  }
+  return sincronizacaoEmAndamento;
+}
+
+async function executarSincronizacao(): Promise<number> {
+  if (!(await verificarConectividadeSupabase())) {
+    logger.info('[Sync] Offline — sincronização adiada');
+    return 0;
+  }
+  if (!(await sessaoRemotaAtiva())) {
+    logger.info('[Sync] Sem sessão autenticada — itens permanecem na fila local');
     return 0;
   }
 
-  return new Promise(async (resolve, reject) => {
-    const tx = db.transaction(['sync_queue', 'crises', 'itens_rotina', 'consentimentos'], 'readwrite');
-    const queueStore = tx.objectStore('sync_queue');
-    const criseStore = tx.objectStore('crises');
-    const itemStore = tx.objectStore('itens_rotina');
-    const consentStore = tx.objectStore('consentimentos');
-
-    const req = queueStore.getAll();
-    req.onsuccess = async () => {
-      const items: SyncItem[] = req.result || [];
-      let sincronizados = 0;
-
-      for (const item of items) {
-        try {
-          let sucesso = false;
-
-          switch (item.tipo) {
-            case 'REGISTRO_CRISE':
-              sucesso = await sincronizarCriseComSupabase(item, criseStore);
-              break;
-            case 'ITEM_ROTINA':
-              sucesso = await sincronizarItemRotinaComSupabase(item, itemStore);
-              break;
-            case 'CONSENTIMENTO':
-              sucesso = await sincronizarConsentimentoComSupabase(item, consentStore);
-              break;
-          }
-
-          if (sucesso) {
-            sincronizados++;
-            // Remove da fila local apenas após sucesso no Supabase
-            queueStore.delete(item.id);
-          } else {
-            // Incrementa tentativas e mantém na fila
-            item.tentativas += 1;
-            item.status = item.tentativas >= 3 ? 'ERRO' : 'PENDENTE';
-            queueStore.put(item);
-          }
-        } catch (err) {
-          console.error('[Sync] Erro ao processar item:', item.id, err);
-          item.tentativas += 1;
-          item.status = item.tentativas >= 3 ? 'ERRO' : 'PENDENTE';
-          queueStore.put(item);
-        }
-      }
-
-      tx.oncomplete = () => resolve(sincronizados);
-      tx.onerror = () => reject(tx.error);
-    };
-    req.onerror = () => reject(req.error);
-  });
+  const itens = await carregarItensFilaSync();
+  return processarFilaSync(
+    itens.filter((i) => i.status !== 'ERRO'),
+    {
+      enviar: enviarItemParaSupabase,
+      aoSucesso: concluirItemLocal,
+      aoFalha: registrarFalhaLocal
+    }
+  );
 }
 
-// --- Helpers de Sincronização por Tipo ---
+// --- Envio por tipo: sempre idempotente (upsert pelo mesmo UUID local) ---
 
-async function sincronizarCriseComSupabase(
-  item: SyncItem,
-  criseStore: IDBObjectStore
-): Promise<boolean> {
-  const crise: RegistroCrise = item.payload;
-  
-  try {
-    // Converte IDs locais para UUIDs se necessário (usa mapa ou gera novo)
-    const remotoId = idMapLocalParaRemoto.get(crise.id) || crypto.randomUUID();
-    
-    const { error } = await supabase
-      .from('registros_crise')
-      .upsert({
-        id: remotoId,
-        estudante_id: crise.estudanteId,
-        professor_id: crise.professorId,
-        data_hora_inicio: crise.dataHoraInicio,
-        data_hora_fim: crise.dataHoraFim,
-        duracao_segundos: crise.duracaoSegundos,
-        observacoes: crise.observacoes,
-        sincronizado_offline: true,
-        criado_em_local: crise.criadoEmLocal,
-        recebido_em: new Date().toISOString()
-      }, {
-        onConflict: 'id'
-      });
-
-    if (error) {
-      console.error('[Sync] Erro ao sincronizar crise:', error);
+async function enviarItemParaSupabase(item: SyncItem): Promise<boolean> {
+  switch (item.tipo) {
+    case 'REGISTRO_CRISE':
+      return enviarCrise(item.payload as RegistroCrise);
+    case 'ITEM_ROTINA':
+      return enviarItemRotina(item.payload as ItemRotina);
+    case 'CONSENTIMENTO':
+      return enviarConsentimento(item.payload as ConsentimentoLGPD);
+    default:
       return false;
-    }
-
-    // Atualiza mapa de IDs
-    idMapLocalParaRemoto.set(crise.id, remotoId);
-    
-    // Atualiza registro local
-    crise.sincronizadoOffline = true;
-    criseStore.put(crise);
-    
-    return true;
-  } catch (err) {
-    console.error('[Sync] Exceção ao sincronizar crise:', err);
-    return false;
   }
 }
 
-async function sincronizarItemRotinaComSupabase(
-  item: SyncItem,
-  _itemStore: IDBObjectStore
-): Promise<boolean> {
-  const itemRotina: ItemRotina = item.payload;
-  
-  try {
-    const remotoId = idMapLocalParaRemoto.get(itemRotina.id) || crypto.randomUUID();
-    
-    const { error } = await supabase
-      .from('itens_rotina')
-      .upsert({
-        id: remotoId,
-        rotina_id: itemRotina.rotinaId,
-        titulo: itemRotina.titulo,
-        categoria: itemRotina.categoria,
-        pictograma_key: itemRotina.pictogramaKey,
-        ordem: itemRotina.ordem,
-        duracao_minutos: itemRotina.duracaoMinutos,
-        concluido: itemRotina.concluido
-      }, {
-        onConflict: 'id'
-      });
-
-    if (error) {
-      console.error('[Sync] Erro ao sincronizar item rotina:', error);
-      return false;
-    }
-
-    idMapLocalParaRemoto.set(itemRotina.id, remotoId);
-    return true;
-  } catch (err) {
-    console.error('[Sync] Exceção ao sincronizar item rotina:', err);
-    return false;
-  }
+async function enviarCrise(crise: RegistroCrise): Promise<boolean> {
+  const { error } = await supabase.from('registros_crise').upsert(
+    {
+      id: crise.id,
+      estudante_id: crise.estudanteId,
+      professor_id: crise.professorId,
+      data_hora_inicio: crise.dataHoraInicio,
+      data_hora_fim: crise.dataHoraFim,
+      duracao_segundos: crise.duracaoSegundos,
+      observacoes: crise.observacoes ?? null,
+      sincronizado_offline: true,
+      criado_em_local: crise.criadoEmLocal,
+      recebido_em: new Date().toISOString()
+    },
+    { onConflict: 'id' }
+  );
+  if (error) logger.erro('[Sync] Erro ao sincronizar crise', error);
+  return !error;
 }
 
-async function sincronizarConsentimentoComSupabase(
-  item: SyncItem,
-  _consentStore: IDBObjectStore
-): Promise<boolean> {
-  const consentimento: ConsentimentoLGPD = item.payload;
-  
-  try {
-    const remotoId = idMapLocalParaRemoto.get(consentimento.id) || crypto.randomUUID();
-    
-    const { error } = await supabase
-      .from('consentimentos_lgpd')
-      .upsert({
-        id: remotoId,
-        estudante_id: consentimento.estudanteId,
-        responsavel_id: consentimento.responsavelId,
-        data_aceite: consentimento.dataAceite,
-        ip_origem: consentimento.ipOrigem,
-        ativo: consentimento.ativo,
-        termo_versao: consentimento.termoVersao,
-        revogado_em: consentimento.ativo ? null : new Date().toISOString()
-      }, {
-        onConflict: 'id'
-      });
-
-    if (error) {
-      console.error('[Sync] Erro ao sincronizar consentimento:', error);
-      return false;
-    }
-
-    idMapLocalParaRemoto.set(consentimento.id, remotoId);
-    return true;
-  } catch (err) {
-    console.error('[Sync] Exceção ao sincronizar consentimento:', err);
-    return false;
-  }
+async function enviarItemRotina(it: ItemRotina): Promise<boolean> {
+  const { error } = await supabase.from('itens_rotina').upsert(
+    {
+      id: it.id,
+      rotina_id: it.rotinaId,
+      titulo: it.titulo,
+      categoria: it.categoria,
+      pictograma_key: it.pictogramaKey,
+      ordem: it.ordem,
+      duracao_minutos: it.duracaoMinutos,
+      concluido: it.concluido
+    },
+    { onConflict: 'id' }
+  );
+  if (error) logger.erro('[Sync] Erro ao sincronizar item de rotina', error);
+  return !error;
 }
 
-// Função para adicionar itens à fila de sincronização (usada pelas operações CRUD)
-export async function adicionarAFilaSincronizacao(
-  tipo: SyncItem['tipo'],
-  payload: any
-): Promise<void> {
+async function enviarConsentimento(c: ConsentimentoLGPD): Promise<boolean> {
+  const { error } = await supabase.from('consentimentos_lgpd').upsert(
+    {
+      id: c.id,
+      estudante_id: c.estudanteId,
+      responsavel_id: c.responsavelId,
+      data_aceite: c.dataAceite,
+      ip_origem: c.ipOrigem,
+      ativo: c.ativo,
+      termo_versao: c.termoVersao,
+      revogado_em: c.ativo ? null : c.revogadoEm ?? new Date().toISOString()
+    },
+    { onConflict: 'id' }
+  );
+  if (error) logger.erro('[Sync] Erro ao sincronizar consentimento', error);
+  return !error;
+}
+
+// --- Etapas locais curtas (uma transação por etapa, sem rede dentro) ---
+
+async function concluirItemLocal(item: SyncItem): Promise<void> {
   const db = await getDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('sync_queue', 'readwrite');
-    const store = tx.objectStore('sync_queue');
-    const syncItem: SyncItem = {
-      id: 'sync-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-      tipo,
-      payload,
-      criadoEm: new Date().toISOString(),
-      tentativas: 0,
-      status: 'PENDENTE'
+  const tx = db.transaction(['sync_queue', 'crises'], 'readwrite');
+  tx.objectStore('sync_queue').delete(item.id);
+  if (item.tipo === 'REGISTRO_CRISE') {
+    const criseStore = tx.objectStore('crises');
+    const id = (item.payload as RegistroCrise).id;
+    const getReq = criseStore.get(id);
+    getReq.onsuccess = () => {
+      const atual: RegistroCrise | undefined = getReq.result;
+      if (atual) {
+        atual.sincronizadoOffline = true;
+        criseStore.put(atual);
+      }
     };
-    const req = store.put(syncItem);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
-  });
+  }
+  await aguardarTransacao(tx);
+}
+
+async function registrarFalhaLocal(item: SyncItem): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction('sync_queue', 'readwrite');
+  tx.objectStore('sync_queue').put(item);
+  await aguardarTransacao(tx);
+}
+
+/** Adiciona à fila de sincronização (usada pelas operações CRUD). */
+export async function adicionarAFilaSincronizacao(tipo: SyncItem['tipo'], payload: SyncPayload): Promise<void> {
+  const db = await getDB();
+  const syncItem: SyncItem = {
+    id: 'sync-' + Date.now() + '-' + gerarUUID().slice(0, 8),
+    tipo,
+    payload,
+    criadoEm: new Date().toISOString(),
+    tentativas: 0,
+    status: 'PENDENTE'
+  };
+  const tx = db.transaction('sync_queue', 'readwrite');
+  tx.objectStore('sync_queue').put(syncItem);
+  await aguardarTransacao(tx);
 }
 
 // -------------------------------------------------------------
@@ -567,22 +588,21 @@ export async function carregarConsentimento(estudanteId: string): Promise<Consen
 
 export async function alternarConsentimento(consentimentoId: string, isOnline = true): Promise<ConsentimentoLGPD> {
   const db = await getDB();
-  return new Promise(async (resolve, reject) => {
-    const tx = db.transaction('consentimentos', 'readwrite');
-    const store = tx.objectStore('consentimentos');
+  const tx = db.transaction('consentimentos', 'readwrite');
+  const store = tx.objectStore('consentimentos');
+  const item = await new Promise<ConsentimentoLGPD>((resolve, reject) => {
     const req = store.get(consentimentoId);
-    req.onsuccess = async () => {
-      const item: ConsentimentoLGPD = req.result;
-      if (!item) return reject(new Error('Consentimento não encontrado'));
-      item.ativo = !item.ativo;
-      store.put(item);
-      
-      if (!isOnline) {
-        await adicionarAFilaSincronizacao('CONSENTIMENTO', item);
-      }
-      
-      tx.oncomplete = () => resolve(item);
+    req.onsuccess = () => {
+      const atual: ConsentimentoLGPD | undefined = req.result;
+      if (!atual) return reject(new Error('Consentimento não encontrado'));
+      atual.ativo = !atual.ativo;
+      atual.revogadoEm = atual.ativo ? undefined : new Date().toISOString();
+      store.put(atual);
+      resolve(atual);
     };
     req.onerror = () => reject(req.error);
   });
+  await aguardarTransacao(tx);
+  await registrarNaFilaSeNecessario('CONSENTIMENTO', item, isOnline);
+  return item;
 }

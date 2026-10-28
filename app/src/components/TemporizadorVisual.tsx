@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 
 interface TemporizadorVisualProps {
   tituloAtividade: string;
@@ -79,14 +80,15 @@ export const TemporizadorVisual: React.FC<TemporizadorVisualProps> = ({
           Transição suave e sem sobrecarga sensorial. Acompanhe a diminuição do anel de tempo.
         </p>
 
-        <div className="timer-controls" style={{ marginTop: '16px' }}>
+        <div className="timer-controls" style={{ marginTop: '16px', display: 'flex', gap: 10 }}>
           <button
             type="button"
             className="btn-timer primary"
             onClick={toggleAtivo}
             aria-label={ativo ? 'Pausar temporizador' : 'Iniciar temporizador'}
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            <span aria-hidden="true">{ativo ? '⏸️' : '▶️'}</span>
+            {ativo ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             <span>{ativo ? 'Pausar' : 'Iniciar'}</span>
           </button>
           <button
@@ -94,8 +96,9 @@ export const TemporizadorVisual: React.FC<TemporizadorVisualProps> = ({
             className="btn-timer"
             onClick={reiniciar}
             aria-label="Reiniciar tempo da atividade"
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            <span aria-hidden="true">🔄</span>
+            <RotateCcw size={16} aria-hidden="true" />
             <span>Reiniciar</span>
           </button>
         </div>

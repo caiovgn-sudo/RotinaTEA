@@ -1,5 +1,6 @@
 import React from 'react';
 import { Estudante, ConsentimentoLGPD } from '../types';
+import { mascararIp } from '../utils/regras';
 
 interface ConsentimentoLGPDProps {
   estudante?: Estudante;
@@ -27,7 +28,6 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   };
 
   const executarRevogacao = () => {
-    console.log("Consentimento revogado com sucesso. Registrando log de auditoria...");
     if (onAlternarConsentimento) {
       onAlternarConsentimento();
     }
@@ -74,7 +74,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
             </div>
             {consentimento && (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-subtle)', marginTop: 4 }}>
-                IP Registrado: {consentimento.ipOrigem} • Versão: {consentimento.termoVersao}
+                IP Registrado: {mascararIp(consentimento.ipOrigem)} • Versão: {consentimento.termoVersao}
               </div>
             )}
           </div>

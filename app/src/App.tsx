@@ -14,9 +14,11 @@ import {
   carregarItensFilaSync,
   sincronizarFilaBatch,
   carregarConsentimento,
-  alternarConsentimento
+  alternarConsentimento,
+  SEED_ROTINA_1_ID,
+  SEED_PROFESSOR_ID
 } from './services/db';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth, ehUsuarioDemo } from './context/AuthContext';
 import { Header } from './components/Header';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
@@ -26,6 +28,7 @@ import { ConsentimentoLGPDComponent } from './components/ConsentimentoLGPD';
 import { ConfiguracaoRotina } from './components/ConfiguracaoRotina';
 import { Login } from './components/Login';
 import { FormularioSUS } from './components/FormularioSUS';
+import { Bell, ClipboardList, Plus, Calendar } from 'lucide-react';
 
 const PerfisRequeremAuth: PerfilUsuario[] = ['PROFESSOR', 'COORDENACAO', 'RESPONSAVEL'];
 
@@ -68,14 +71,6 @@ const AppContent: React.FC = () => {
   // Verifica se o perfil atual requer autenticação
   const perfilRequerAuth = PerfisRequeremAuth.includes(perfilAtual);
 
-  // Redireciona para ALUNO se tentar acessar perfil protegido sem auth
-  useEffect(() => {
-    if (perfilRequerAuth && !authLoading && !usuario) {
-      setPerfilAtual('ALUNO');
-      exibirAviso('Faça login para acessar esta área.');
-    }
-  }, [perfilAtual, usuario, authLoading, exibirAviso]);
-
   // Inicialização do Banco de Dados
   useEffect(() => {
     const inicializar = async () => {
@@ -96,7 +91,7 @@ const AppContent: React.FC = () => {
   }, []);
 
   const carregarDadosEstudante = async (estudanteId: string) => {
-    const itens = await carregarItensRotina('rot-001');
+    const itens = await carregarItensRotina(SEED_ROTINA_1_ID);
     setItensRotina(itens);
 
     const pendente = itens.find((i) => !i.concluido) || itens[0];
@@ -179,7 +174,7 @@ const AppContent: React.FC = () => {
   // Ações da Prancha
   const handleAlternarItem = async (itemId: string) => {
     await alternarStatusItem(itemId);
-    const atualizados = await carregarItensRotina('rot-001');
+    const atualizados = await carregarItensRotina(SEED_ROTINA_1_ID);
     setItensRotina(atualizados);
   };
 
@@ -190,7 +185,7 @@ const AppContent: React.FC = () => {
 
   const handleAdicionarItem = async (novo: Omit<ItemRotina, 'id'>) => {
     await adicionarItemRotina(novo, isOnline);
-    const atualizados = await carregarItensRotina('rot-001');
+    const atualizados = await carregarItensRotina(SEED_ROTINA_1_ID);
     setItensRotina(atualizados);
     setAbaProfessor('ACOMPANHAMENTO');
     exibirAviso('Nova atividade inserida na rotina com sucesso!');
@@ -199,7 +194,7 @@ const AppContent: React.FC = () => {
   // Ações de Crise (1 Clique)
   const handleIniciarCrise = async () => {
     if (!estudanteAtual) return;
-    const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || 'usr-prof-01');
+    const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || SEED_PROFESSOR_ID);
     setCriseAtiva(nova);
     exibirAviso('Registro de crise iniciado. Cronômetro ativado.');
   };
@@ -216,7 +211,7 @@ const AppContent: React.FC = () => {
     if (!isOnline) {
       exibirAviso(`Crise de ${encerrada.duracaoSegundos}s gravada localmente (offline). Sincronização pendente.`);
     } else {
-      exibirAviso(`Crise de ${encerrada.duracaoSegundos}s gravada e sincronizada.`);
+      exibirAviso(`Crise de ${encerrada.duracaoSegundos}s registrada. O envio ao servidor ocorre em segundo plano.`);
     }
   };
 
@@ -230,7 +225,6 @@ const AppContent: React.FC = () => {
 
   const handleLogout = async () => {
     await signOut();
-    setPerfilAtual('ALUNO');
     exibirAviso('Sessão encerrada com sucesso.');
   };
 
@@ -242,7 +236,10 @@ const AppContent: React.FC = () => {
   // Mostra tela de login se perfil requer auth e não está autenticado
   if (perfilRequerAuth && !usuario && !authLoading) {
     return (
-      <Login onLoginSuccess={handleLoginSuccess} />
+      <Login
+        onLoginSuccess={handleLoginSuccess}
+        onVoltarAluno={() => setPerfilAtual('ALUNO')}
+      />
     );
   }
 
@@ -253,6 +250,26 @@ const AppContent: React.FC = () => {
         <div role="status" aria-label="Carregando autenticação">
           <div className="spinner" aria-hidden="true"></div>
           <p>Verificando sessão...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Perfil fixado no servidor: o usuário só acessa a visão compatível com o perfil da sua conta.
+  if (perfilRequerAuth && usuario && usuario.perfil !== perfilAtual && !ehUsuarioDemo(usuario)) {
+    return (
+      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div role="alert" style={{ textAlign: 'center', maxWidth: 420, padding: 24 }}>
+          <h2>Acesso restrito</h2>
+          <p>Sua conta ({usuario.perfil}) não tem permissão para esta visão.</p>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
+            <button className="btn btn-primary" onClick={() => setPerfilAtual(usuario.perfil)}>
+              Ir para a minha visão
+            </button>
+            <button className="btn btn-secondary" onClick={() => setPerfilAtual('ALUNO')}>
+              Voltar à prancha do aluno
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -299,7 +316,7 @@ const AppContent: React.FC = () => {
             gap: 8
           }}
         >
-          <span aria-hidden="true">🔔</span>
+          <Bell size={18} aria-hidden="true" />
           <span>{aviso}</span>
         </div>
       )}
@@ -324,9 +341,10 @@ const AppContent: React.FC = () => {
               type="button"
               className="btn btn-secondary"
               onClick={() => setMostrarSUS(true)}
-              style={{ marginLeft: 8 }}
+              style={{ marginLeft: 8, display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              <span aria-hidden="true">📋</span> Formulário SUS
+              <ClipboardList size={16} aria-hidden="true" />
+              <span>Formulário SUS</span>
             </button>
           )}
 
@@ -336,15 +354,19 @@ const AppContent: React.FC = () => {
                 type="button"
                 className={`btn-timer ${abaProfessor === 'ACOMPANHAMENTO' ? 'primary' : ''}`}
                 onClick={() => setAbaProfessor('ACOMPANHAMENTO')}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
               >
-                Rotina & Crises
+                <Calendar size={14} aria-hidden="true" />
+                <span>Rotina & Crises</span>
               </button>
               <button
                 type="button"
                 className={`btn-timer ${abaProfessor === 'CONFIGURACAO' ? 'primary' : ''}`}
                 onClick={() => setAbaProfessor('CONFIGURACAO')}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
               >
-                + Configurar Cartões
+                <Plus size={14} aria-hidden="true" />
+                <span>Configurar Cartões</span>
               </button>
             </div>
           )}
@@ -383,6 +405,7 @@ const AppContent: React.FC = () => {
                     onIniciarCrise={handleIniciarCrise}
                     onEncerrarCrise={handleEncerrarCrise}
                     isOnline={isOnline}
+                    modoDemo={ehUsuarioDemo(usuario)}
                   />
                 )}
                 <TemporizadorVisual
@@ -404,7 +427,7 @@ const AppContent: React.FC = () => {
               <ConfiguracaoRotina
                 itens={itensRotina}
                 onAdicionarItem={handleAdicionarItem}
-                rotinaId="rot-001"
+                rotinaId={SEED_ROTINA_1_ID}
                 isOnline={isOnline}
               />
             )}

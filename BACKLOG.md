@@ -7,8 +7,8 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 ## 📋 Quadro Kanban Atual
 
 ### 📌 Backlog (A Fazer)
-- [x] **US09**: Geração de relatórios consolidados em arquivo PDF formatado para prontuário PEI (via `@media print` + CSS otimizado).
-- [x] **US10**: Aplicação empírica do formulário padronizado SUS (System Usability Scale) com educadores de escolas parceiras (modal integrado no Dashboard PEI).
+- [~] **US09**: Relatório PEI para impressão/PDF via `@media print` (parcial: sem gráficos dedicados nem geração de arquivo no servidor).
+- [~] **US10**: Formulário SUS implementado (10 itens, cálculo e classificação); **a resposta ainda não é gravada** (insert desativado) e a aplicação com educadores não foi realizada.
 - [x] **US11**: Modo de alto contraste preto/amarelo suave alternativo para baixa visão associada (seletor no Header).
 - [x] **US12**: Integração remota com a API de busca online do ARASAAC quando houver conectividade (busca em tempo real no ConfiguracaoRotina).
 
@@ -26,7 +26,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### 🔍 Code Review / Qualidade
 - [x] **QC01**: Verificação de contraste e foco visual de teclado (WCAG 2.1 AA).
-- [x] **QC02**: Validação de tolerância a falhas sem internet (IndexedDB local-first).
+- [~] **QC02**: Tolerância a falhas sem internet: implementada; testes automatizados cobrem a fila de sincronização (lógica pura). Testes de integração com IndexedDB e Supabase pendentes.
 - [x] **QC03**: Verificação de anonimização estrita nos dados do aluno.
 
 ### ✅ Done (Concluído)
@@ -60,9 +60,9 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 ### Serviços & Integração
 | Arquivo | Status | Observações |
 |---------|--------|-------------|
-| `db.ts` (IndexedDB) | ✅ | Seed, CRUD, **fila de sync com retry (max 3)**, deduplicação via mapa ID local→remoto |
+| `db.ts` (IndexedDB) | ✅ | Seed, CRUD, fila de sync com retry (máx. 3) e **upsert idempotente pelo UUID local**; rede fora das transações IndexedDB (`filaSync.ts`) |
 | `supabase.ts` | ✅ | Cliente configurado, verificação de conectividade, persistência de sessão |
-| `AuthContext.tsx` | ✅ | Login, signup, logout, refresh, associação `usuarios` table |
+| `AuthContext.tsx` | ✅ | Perfil lido do servidor (`usuarios`); cadastro sempre como Responsável; **modo demonstração explícito, sem senha e sem acesso remoto** (`VITE_MODO_DEMO`) |
 | `vite.config.ts` | ✅ | **PWA plugin** (manifest, SW, cache strategies para Supabase/ARASAAC) |
 
 ### Acessibilidade & PWA
@@ -74,7 +74,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
-- ✅ `npm test` — Vitest: 5/5 testes unitários passando (RN01, RN02, RN03, RF01, helpers)
+- ✅ `npm test` — Vitest: 14 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão
 - ✅ Lint: sem warnings críticos, apenas aviso de dynamic import ineficaz (não bloqueante)
 
 ---
@@ -86,3 +86,11 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 3. **Testes E2E** — Cypress/Playwright para fluxos críticos (crise 1-clique, sync offline→online, login)
 4. **Coleta SUS Real** — Aplicar formulário com educadores parceiros, consolidar resultados no TCC
 5. **Documentação Final** — Atualizar `README.md` com URLs de produção, gerar `LINKS_DO_PROJETO.md`
+
+---
+
+## 🔧 Revisão técnica de 28/10/2026 (estado real)
+
+**Corrigido:** contas de teste com senha fixa removidas (modo demo sem senha, local); perfil definido no servidor (migração `20261028000001_endurece_perfis.sql`); `carregarCrises` não apaga mais dados; exclusão de crise em andamento bloqueada (RN01); sincronização sem `await` de rede dentro de transação IndexedDB, com upsert idempotente; IP mascarado na tela e IP de seed neutralizado; testes passam a importar o código real; chave do Supabase removida da documentação.
+
+**Pendente / limitações conhecidas:** SUS não persiste; PDF é impressão do navegador; RLS permite que qualquer perfil vinculado grave crises (restringir a Professor/Coordenação); IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.

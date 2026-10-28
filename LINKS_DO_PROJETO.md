@@ -32,8 +32,8 @@ npx vercel --prod
 **Ou via Dashboard Vercel:**
 1. Acesse [vercel.com](https://vercel.com) → "Add New Project" → Import `caiovgn-sudo/RotinaTEA`
 2. Configure as variáveis de ambiente:
-   - `VITE_SUPABASE_URL` = `https://fwuantsjxniwbxlzrqkz.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3dWFudHNqeG5pd2J4bHpycWt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MjYyMzIsImV4cCI6MjEwNzUwMjIzMn0.FdxGVCUJTrO75kdhloJxaOJRVWsjDXDooLNm9pFP3hY`
+   - `VITE_SUPABASE_URL` = `https://<ref-do-projeto>.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = `<chave-anon-no-painel-do-Supabase>`
    - `VITE_APP_ENV` = `production`
 3. Deploy automático na branch `main`
 
@@ -41,8 +41,8 @@ npx vercel --prod
 
 ## 🗄️ Supabase (Backend) ✅ **CONFIGURADO E MIGRADO**
 
-- **Dashboard do Projeto:** https://supabase.com/dashboard/project/fwuantsjxniwbxlzrqkz
-- **API URL:** https://fwuantsjxniwbxlzrqkz.supabase.co
+- **Dashboard do Projeto:** https://supabase.com/dashboard/project/<ref-do-projeto>
+- **API URL:** https://<ref-do-projeto>.supabase.co
 - **Chave Anônima (anon):** Configurada no `.env` local e deve ser adicionada na Vercel
 - **Status da migração:** ✅ **Aplicada** — banco remoto está `up to date` (verificado via `supabase db push`)
 
@@ -99,8 +99,10 @@ npx vercel --prod
 
 | Variável | Valor | Onde configurar |
 |----------|-------|-----------------|
-| `VITE_SUPABASE_URL` | `https://fwuantsjxniwbxlzrqkz.supabase.co` | Vercel + `.env` local |
-| `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` | Vercel + `.env` local |
+| `VITE_SUPABASE_URL` | `https://<ref-do-projeto>.supabase.co` | Vercel + `.env` local |
+| `VITE_SUPABASE_ANON_KEY` | `<chave-anon-no-painel-do-Supabase>` | Vercel + `.env` local |
 | `VITE_APP_ENV` | `production` | Vercel |
 
-> **Segurança:** O arquivo `.env` local **não foi commitado** (está no `.gitignore`). As chaves acima são de referência para configuração na Vercel.
+> **Segurança:** valores reais (URL e chave anon) ficam apenas no `.env` local e nas variáveis da Vercel — nunca neste arquivo. Se a chave anterior esteve em repositório público, gere uma nova no painel do Supabase (Project Settings → API). Defina `VITE_MODO_DEMO=false` em produção para desativar o modo demonstração.
+>
+> **Nota anterior:** O arquivo `.env` local **não foi commitado** (está no `.gitignore`). Os valores acima são apenas marcadores; os reais ficam no `.env` e na Vercel.

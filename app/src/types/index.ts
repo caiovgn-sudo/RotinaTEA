@@ -65,12 +65,15 @@ export interface ConsentimentoLGPD {
   ipOrigem: string;
   ativo: boolean;
   termoVersao: string;
+  revogadoEm?: string;
 }
+
+export type SyncPayload = RegistroCrise | ItemRotina | ConsentimentoLGPD;
 
 export interface SyncItem {
   id: string;
   tipo: 'REGISTRO_CRISE' | 'ITEM_ROTINA' | 'CONSENTIMENTO';
-  payload: any;
+  payload: SyncPayload;
   criadoEm: string;
   tentativas: number;
   status: 'PENDENTE' | 'ENVIADO' | 'ERRO';

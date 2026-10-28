@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
 import { PerfilUsuario, Usuario } from '../types';
+import {
+  User,
+  GraduationCap,
+  BarChart3,
+  ShieldCheck,
+  Wifi,
+  WifiOff,
+  LogOut,
+  LogIn,
+  Type
+} from 'lucide-react';
 
 interface HeaderProps {
   perfilAtual: PerfilUsuario;
@@ -15,7 +26,7 @@ interface HeaderProps {
   onAlternarFonteAmpliada: () => void;
   usuario: Usuario | null;
   onLogout: () => void;
-  perfilRequerAuth: boolean;
+  perfilRequerAuth?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,8 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   fonteAmpliada,
   onAlternarFonteAmpliada,
   usuario,
-  onLogout,
-  perfilRequerAuth
+  onLogout
 }) => {
   const [contrasteMode, setContrasteMode] = useState<'padrao' | 'alto' | 'amarelo'>(
     contrasteAmarelo ? 'amarelo' : (altoContraste ? 'alto' : 'padrao')
@@ -70,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onTrocarPerfil('ALUNO')}
           aria-pressed={perfilAtual === 'ALUNO'}
         >
-          <span aria-hidden="true">🧒</span> Aluno TEA
+          <User size={16} aria-hidden="true" /> Aluno TEA
         </button>
         <button
           type="button"
@@ -78,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onTrocarPerfil('PROFESSOR')}
           aria-pressed={perfilAtual === 'PROFESSOR'}
         >
-          <span aria-hidden="true">👩‍🏫</span> Professor
+          <GraduationCap size={16} aria-hidden="true" /> Professor
         </button>
         <button
           type="button"
@@ -86,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onTrocarPerfil('COORDENACAO')}
           aria-pressed={perfilAtual === 'COORDENACAO'}
         >
-          <span aria-hidden="true">📊</span> Coordenação / PEI
+          <BarChart3 size={16} aria-hidden="true" /> Coordenação / PEI
         </button>
         <button
           type="button"
@@ -94,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onTrocarPerfil('RESPONSAVEL')}
           aria-pressed={perfilAtual === 'RESPONSAVEL'}
         >
-          <span aria-hidden="true">🛡️</span> Responsável LGPD
+          <ShieldCheck size={16} aria-hidden="true" /> Responsável LGPD
         </button>
       </nav>
 
@@ -108,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Clique para simular perda de conexão ou restabelecimento de internet"
           aria-label={`Status da conexão: ${isOnline ? 'Online' : 'Offline'}. Clique para alternar.`}
         >
-          <span aria-hidden="true">{isOnline ? '🟢' : '🔴'}</span>
+          {isOnline ? <Wifi size={14} aria-hidden="true" /> : <WifiOff size={14} aria-hidden="true" />}
           <span>{isOnline ? 'Online' : 'Offline'}</span>
           {itensPendentesSync > 0 && (
             <span
@@ -160,32 +170,39 @@ export const Header: React.FC<HeaderProps> = ({
           aria-label={fonteAmpliada ? 'Restaurar tamanho padrão da fonte' : 'Ampliar tamanho da fonte'}
           title={fonteAmpliada ? 'Fonte Padrão' : 'Fonte Ampliada (A+)'}
         >
-          <span aria-hidden="true">A+</span>
+          <Type size={16} aria-hidden="true" />
           <span>{fonteAmpliada ? 'Grande' : 'Normal'}</span>
         </button>
 
-        {/* Info do Usuário Logado / Botão Sair */}
-        {perfilRequerAuth && (
-          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto' }}>
-            {usuario ? (
-              <>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  {usuario.nome} ({usuario.perfil})
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={onLogout}
-                  aria-label="Sair da conta"
-                >
-                  Sair
-                </button>
-              </>
-            ) : (
-              <span className="login-hint" style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>
-                Login necessário
-              </span>
-            )}
+        {/* Info do Usuário Logado / Botão Entrar ou Sair */}
+        {usuario ? (
+          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+              {usuario.nome} <small style={{ opacity: 0.8 }}>({usuario.perfil})</small>
+            </span>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={onLogout}
+              aria-label="Sair da conta"
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <LogOut size={14} aria-hidden="true" />
+              Sair
+            </button>
+          </div>
+        ) : (
+          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => onTrocarPerfil('PROFESSOR')}
+              aria-label="Fazer login no sistema"
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <LogIn size={14} aria-hidden="true" />
+              Entrar
+            </button>
           </div>
         )}
       </div>

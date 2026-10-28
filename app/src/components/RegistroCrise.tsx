@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RegistroCrise, Estudante } from '../types';
 import { formatarTempo } from './PainelPEI';
+import { AlertTriangle, Square, Trash2 } from 'lucide-react';
 
 interface RegistroCriseProps {
   estudante: Estudante;
@@ -8,7 +9,9 @@ interface RegistroCriseProps {
   historicoCrises: RegistroCrise[];
   onIniciarCrise: () => void;
   onEncerrarCrise: (criseId: string, observacoes?: string) => void;
+  onExcluirCrise?: (criseId: string) => void;
   isOnline: boolean;
+  modoDemo?: boolean;
 }
 
 export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
@@ -17,7 +20,9 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
   historicoCrises,
   onIniciarCrise,
   onEncerrarCrise,
-  isOnline
+  onExcluirCrise,
+  isOnline,
+  modoDemo = false
 }) => {
   const [segundosDecorridos, setSegundosDecorridos] = useState(0);
   const [modalObservacaoAberto, setModalObservacaoAberto] = useState(false);
@@ -81,7 +86,7 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Modo: <strong>{isOnline ? 'Sincronização Direta' : 'Offline-First (IndexedDB)'}</strong>
+            Modo: <strong>{modoDemo ? 'Demonstração (somente local)' : isOnline ? 'Sincronização Direta' : 'Offline-First (IndexedDB)'}</strong>
           </span>
         </div>
       </div>
@@ -93,8 +98,9 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
           className="btn-crisis-action start"
           onClick={onIniciarCrise}
           aria-label="Iniciar registro de crise em 1 clique"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
         >
-          <span style={{ fontSize: '1.4rem' }} aria-hidden="true">⚠️</span>
+          <AlertTriangle size={22} aria-hidden="true" />
           <span>Iniciar Registro de Crise (1 Clique)</span>
         </button>
       ) : (
@@ -124,8 +130,9 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
             className="btn-crisis-action stop"
             onClick={handleEncerrar}
             aria-label="Encerrar registro de crise e calcular duração"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
           >
-            <span style={{ fontSize: '1.4rem' }} aria-hidden="true">⏹️</span>
+            <Square size={22} aria-hidden="true" />
             <span>Encerrar Crise ({formatarRelogioDigital(segundosDecorridos)})</span>
           </button>
         </div>
@@ -163,18 +170,44 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
                   )}
                 </div>
 
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    backgroundColor: crise.sincronizadoOffline ? 'var(--success-light)' : 'var(--warning-light)',
-                    color: crise.sincronizadoOffline ? 'var(--success)' : 'var(--warning)',
-                    fontWeight: 600
-                  }}
-                >
-                  {crise.sincronizadoOffline ? '✓ Sincronizado' : '⏳ Salvo Offline'}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      backgroundColor: crise.sincronizadoOffline ? 'var(--success-light)' : 'var(--warning-light)',
+                      color: crise.sincronizadoOffline ? 'var(--success)' : 'var(--warning)',
+                      fontWeight: 600
+                    }}
+                  >
+                    {crise.sincronizadoOffline ? '✓ Sincronizado' : '⏳ Salvo Offline'}
+                  </span>
+
+                  {onExcluirCrise && (
+                    <button
+                      type="button"
+                      onClick={() => onExcluirCrise(crise.id)}
+                      title="Excluir este registro"
+                      aria-label="Excluir este registro de crise"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderRadius: '4px',
+                        transition: 'color 0.2s'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--crisis)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                    >
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
