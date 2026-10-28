@@ -1,5 +1,6 @@
 // Serviço de Persistência Local (IndexedDB) - Arquitetura Offline-First (RN03)
-import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, SyncItem, SyncPayload } from '../types';
+import { Estudante, ItemRotina, RegistroCrise, RotinaVisual, ConsentimentoLGPD, RespostaSUS, PerfilUsuario, SyncItem, SyncPayload } from '../types';
+import { calcularPontuacaoSUS, SUS_VERSAO_INSTRUMENTO } from '../utils/sus';
 import { supabase, verificarConectividadeSupabase } from './supabase';
 import { processarFilaSync } from './filaSync';
 import { calcularDuracaoSegundos, podeExcluirCrise } from '../utils/regras';
@@ -7,7 +8,7 @@ import { logger } from '../utils/logger';
 import { reativarItemFila } from '../utils/sync';
 
 const DB_NAME = 'rotinatea_offline_db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -59,6 +60,9 @@ export async function getDB(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains('sync_queue')) {
         db.createObjectStore('sync_queue', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('sus_respostas')) {
+        db.createObjectStore('sus_respostas', { keyPath: 'id' });
       }
     };
 
@@ -464,6 +468,8 @@ async function enviarItemParaSupabase(item: SyncItem): Promise<boolean> {
       return enviarItemRotina(item.payload as ItemRotina);
     case 'CONSENTIMENTO':
       return enviarConsentimento(item.payload as ConsentimentoLGPD);
+    case 'RESPOSTA_SUS':
+      return enviarRespostaSUS(item.payload as RespostaSUS);
     default:
       return false;
   }
@@ -525,6 +531,24 @@ async function enviarConsentimento(c: ConsentimentoLGPD): Promise<boolean> {
   return !error;
 }
 
+async function enviarRespostaSUS(r: RespostaSUS): Promise<boolean> {
+  // A resposta é imutável no servidor: reenvio do mesmo id é ignorado (ON CONFLICT DO NOTHING).
+  const { error } = await supabase.from('respostas_sus').upsert(
+    {
+      id: r.id,
+      avaliador_id: r.avaliadorId,
+      perfil_avaliador: r.perfilAvaliador,
+      respostas: r.respostas,
+      pontuacao: r.pontuacao,
+      versao_instrumento: r.versaoInstrumento,
+      criado_em_local: r.criadoEmLocal
+    },
+    { onConflict: 'id', ignoreDuplicates: true }
+  );
+  if (error) logger.erro('[Sync] Erro ao sincronizar resposta SUS', error);
+  return !error;
+}
+
 // --- Etapas locais curtas (uma transação por etapa, sem rede dentro) ---
 
 async function concluirItemLocal(item: SyncItem): Promise<void> {
@@ -581,6 +605,43 @@ export async function adicionarAFilaSincronizacao(tipo: SyncItem['tipo'], payloa
   const tx = db.transaction('sync_queue', 'readwrite');
   tx.objectStore('sync_queue').put(syncItem);
   await aguardarTransacao(tx);
+}
+
+// -------------------------------------------------------------
+// Avaliação de usabilidade (SUS): local primeiro (RN03), envio pela fila
+// -------------------------------------------------------------
+
+/** Grava a resposta neste aparelho e, havendo sessão real ou falta de conexão, na fila de envio. */
+export async function salvarRespostaSUS(
+  avaliador: { id: string; perfil: PerfilUsuario },
+  respostas: number[],
+  isOnline = true
+): Promise<RespostaSUS> {
+  const registro: RespostaSUS = {
+    id: gerarUUID(),
+    avaliadorId: avaliador.id,
+    perfilAvaliador: avaliador.perfil,
+    respostas: [...respostas],
+    pontuacao: calcularPontuacaoSUS(respostas),
+    versaoInstrumento: SUS_VERSAO_INSTRUMENTO,
+    criadoEmLocal: new Date().toISOString()
+  };
+  const db = await getDB();
+  const tx = db.transaction('sus_respostas', 'readwrite');
+  tx.objectStore('sus_respostas').put(registro);
+  await aguardarTransacao(tx);
+  await registrarNaFilaSeNecessario('RESPOSTA_SUS', registro, isOnline);
+  return registro;
+}
+
+/** Quantas avaliações SUS este aparelho guarda para o avaliador. */
+export async function contarRespostasSUS(avaliadorId: string): Promise<number> {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction('sus_respostas', 'readonly').objectStore('sus_respostas').getAll();
+    req.onsuccess = () => resolve(((req.result || []) as RespostaSUS[]).filter((r) => r.avaliadorId === avaliadorId).length);
+    req.onerror = () => reject(req.error);
+  });
 }
 
 // -------------------------------------------------------------

@@ -116,6 +116,13 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 - **Testes:** 5 casos em `db.test.ts` (ativo, revogado, reativado, sem termo, mensagem). Navegador: revogar no Responsável, abrir Professor, botão inativo e clique sem efeito; reativar e botão volta ao normal.
 - **Como testar:** Responsável, "Revogar Consentimento" e "Sim, revogar"; abrir Professor. Reativar e conferir que o botão volta.
 
+### 1.18 SUS passa a gravar as respostas (rodada 3, Pilares 1 e 2)
+- **Antes:** o formulário calculava a nota e a descartava (o `insert` estava só em comentário), então a avaliação de usabilidade do TCC não deixava dado nenhum.
+- **Depois:** a resposta é gravada primeiro no aparelho (IndexedDB, versão 3 do banco, loja `sus_respostas`; RN03) e, com sessão real, entra na fila de envio como `RESPOSTA_SUS`, que reaproveita as tentativas e o painel de sincronização. A tela informa onde ficou salva: só neste aparelho (demonstração), enviada em segundo plano ou aguardando conexão.
+- **Servidor:** migração `20261028000003_respostas_sus.sql` cria `respostas_sus` (10 respostas de 1 a 5, nota de 0 a 100, versão do instrumento). RLS: só COORDENACAO insere, com `avaliador_id = auth.uid()`; cada avaliador lê só as próprias; sem UPDATE e sem DELETE. Sem ligação com estudante e sem nome do avaliador (minimização, Pilar 3).
+- **Cálculo (`utils/sus.ts`):** extraído do componente, com 8 testes (extremos 0 e 100, neutro 50, validação, casa decimal). Deixou de arredondar (97,5 era exibido como 98). As faixas antigas citavam percentuais sem fonte ("melhor que 99% dos sistemas"); passaram a usar a média 68 e os cortes 80,3 e 51 de Sauro e Lewis, marcadas com `REVISAR`.
+- **Como testar:** em Coordenação, abrir "Formulário SUS", responder as 10 perguntas e enviar; conferir a mensagem de onde foi salvo. Para o servidor, aplicar a migração e repetir com conta real de Coordenação.
+
 ---
 
 ## 2. Decisões aprovadas na Etapa 0
@@ -132,7 +139,7 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 | Verificação | Resultado |
 |---|---|
 | `npx tsc --noEmit` | sem erros |
-| `npm test` | **59 testes aprovados** em 5 arquivos (eram 15 antes das melhorias de UX; +44 desde então) |
+| `npm test` | **67 testes aprovados** em 6 arquivos (eram 15 antes das melhorias de UX; +52 desde então) |
 | `npm run build` | sem erros (PWA gerado) |
 | Auditoria no navegador (alvos, contraste e nome acessível) | Etapa 5: 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login e SUS: **0 alvos < 48px, 0 controles sem nome**. Rodada 2 (contraste): **78 estados** (login em 3 abas, 5 visões, crise em andamento, modal de observação, configuração de cartões, SUS e diálogo de revogação × 3 modos × 2 tamanhos de fonte), **10.813 textos medidos, 0 falhas de contraste**, incluindo o pior ponto de fundos com gradiente |
 | Celular (375px, fonte ampliada) | sem rolagem horizontal nas 5 visões |
@@ -147,7 +154,8 @@ Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos,
 2. **O IP do aceite não é capturado pelo aplicativo** (o dado de exemplo é `0.0.0.0`); por isso a tela mostra "Não registrado".
 3. **Redação jurídica da base legal** (arts. 11 e 14) precisa de revisão da orientadora ou de assessoria jurídica antes da banca.
 4. **Contraste: o que a medição cobre e o que não cobre.** Depois da correção dos componentes antigos (seção 1.16), a varredura de texto passou a dar zero falhas, mas ela **não mede**: contraste de elementos que não são texto (bordas, ícones, anel do temporizador; exigência de 3:1), estados de foco e `:hover` (só os tokens de hover são testados, não cada tela) e imagens ou pictogramas.
-5. **Sem teste com leitor de tela** e sem teste manual por teclado além do diálogo; as medições usaram o Chromium do painel do app e o celular apenas emulado (375px). Firefox e Safari não foram testados.
+5. **SUS no servidor não testado.** A migração do SUS ainda precisa ser aplicada e o envio com conta real de Coordenação não foi exercitado; não existe tela de consolidação (consulta por SQL).
+6. **Sem teste com leitor de tela** e sem teste manual por teclado além do diálogo; as medições usaram o Chromium do painel do app e o celular apenas emulado (375px). Firefox e Safari não foram testados.
 6. **Sem testes de componente** (React Testing Library): só a lógica pura é testada automaticamente; as telas foram verificadas manualmente.
 7. **Sessão encerrada pelo servidor** e **painel de sincronização com conta real**: implementados, mas sem teste com o Supabase real (não há credenciais de teste aqui) e sem teste automatizado.
 8. **Registro de atividades** é local (30 itens por navegador) e pode ser limpo por qualquer pessoa; **não é uma trilha de auditoria**.

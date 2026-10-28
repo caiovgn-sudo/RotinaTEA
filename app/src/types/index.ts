@@ -68,11 +68,22 @@ export interface ConsentimentoLGPD {
   revogadoEm?: string;
 }
 
-export type SyncPayload = RegistroCrise | ItemRotina | ConsentimentoLGPD;
+/** Resposta ao questionário SUS. Não tem ligação com estudante nem guarda nome do avaliador. */
+export interface RespostaSUS {
+  id: string;
+  avaliadorId: string;
+  perfilAvaliador: PerfilUsuario;
+  respostas: number[];
+  pontuacao: number;
+  versaoInstrumento: string;
+  criadoEmLocal: string;
+}
+
+export type SyncPayload = RegistroCrise | ItemRotina | ConsentimentoLGPD | RespostaSUS;
 
 export interface SyncItem {
   id: string;
-  tipo: 'REGISTRO_CRISE' | 'ITEM_ROTINA' | 'CONSENTIMENTO';
+  tipo: 'REGISTRO_CRISE' | 'ITEM_ROTINA' | 'CONSENTIMENTO' | 'RESPOSTA_SUS';
   payload: SyncPayload;
   criadoEm: string;
   tentativas: number;

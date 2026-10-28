@@ -657,7 +657,15 @@ const AppContent: React.FC = () => {
 
       {/* Modal SUS */}
       {mostrarSUS && (
-        <FormularioSUS onClose={() => setMostrarSUS(false)} />
+        <FormularioSUS
+          onClose={() => setMostrarSUS(false)}
+          isOnline={isOnline}
+          modoDemo={demo}
+          onSalvo={(r) => {
+            registrar("SUS", "Avaliação SUS salva neste aparelho: " + r.pontuacao + " de 100.");
+            void atualizarFilaSync();
+          }}
+        />
       )}
     </div>
   );

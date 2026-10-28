@@ -70,7 +70,7 @@ Abra a aba **Sobre** para ver o objetivo, os quatro perfis, as regras RN01 a RN0
 |---|---|---|
 | Aluno | sem login | rotina visual em cartões e temporizador |
 | Professor | login ou demonstração | registro de crise em 1 clique, configuração da rotina, painel de sincronização |
-| Coordenação | login ou demonstração | painel anonimizado do PEI e formulário SUS |
+| Coordenação | login ou demonstração | painel anonimizado do PEI e formulário SUS (respostas gravadas; em demonstração só no aparelho) |
 | Responsável | login ou demonstração | termo da LGPD, consentimento e como revogar |
 
 Em **demonstração** não existe senha e nada é enviado ao servidor. Contas reais são criadas na aba **Cadastrar** e entram sempre como Responsável; Professor e Coordenação são concedidos por um administrador (consulte o fim de `app/supabase/migrations/20261028000001_endurece_perfis.sql`).

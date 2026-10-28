@@ -1,32 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { RespostaSUS } from '../types';
+import { salvarRespostaSUS } from '../services/db';
+import { PERGUNTAS_SUS, OPCOES_LIKERT, classificarSUS, formatarPontuacaoSUS } from '../utils/sus';
 
 interface FormularioSUSProps {
   onClose: () => void;
+  isOnline?: boolean;
+  modoDemo?: boolean;
+  onSalvo?: (resposta: RespostaSUS) => void;
 }
 
-const PERGUNTAS_SUS = [
-  { id: 1, texto: 'Acho que gostaria de usar este sistema frequentemente.', positivo: true },
-  { id: 2, texto: 'Achei o sistema desnecessariamente complexo.', positivo: false },
-  { id: 3, texto: 'Achei o sistema fácil de usar.', positivo: true },
-  { id: 4, texto: 'Acho que precisaria da assistência de uma pessoa técnica para conseguir usar este sistema.', positivo: false },
-  { id: 5, texto: 'Achei que as várias funções deste sistema foram bem integradas.', positivo: true },
-  { id: 6, texto: 'Achei que havia muita inconsistência neste sistema.', positivo: false },
-  { id: 7, texto: 'Acho que a maioria das pessoas aprenderia a usar este sistema muito rapidamente.', positivo: true },
-  { id: 8, texto: 'Achei o sistema muito complicado de usar.', positivo: false },
-  { id: 9, texto: 'Me senti muito confiante usando o sistema.', positivo: true },
-  { id: 10, texto: 'Precisei aprender muitas coisas antes de poder usar este sistema.', positivo: false },
-];
-
-const OPCOES_LIKERT = [
-  { valor: 1, label: 'Discordo totalmente' },
-  { valor: 2, label: 'Discordo' },
-  { valor: 3, label: 'Neutro' },
-  { valor: 4, label: 'Concordo' },
-  { valor: 5, label: 'Concordo totalmente' },
-];
-
-export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
+export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose, isOnline = true, modoDemo = false, onSalvo }) => {
   const { usuario } = useAuth();
   const [respostas, setRespostas] = useState<Record<number, number>>({});
   const [enviando, setEnviando] = useState(false);
@@ -36,32 +21,6 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
   const handleResposta = (perguntaId: number, valor: number) => {
     setRespostas(prev => ({ ...prev, [perguntaId]: valor }));
     setErro(null);
-  };
-
-  const calcularPontuacao = (): number => {
-    let soma = 0;
-    PERGUNTAS_SUS.forEach((p) => {
-      const resposta = respostas[p.id];
-      if (resposta === undefined) return;
-      
-      if (p.positivo) {
-        // Para itens positivos: (resposta - 1)
-        soma += resposta - 1;
-      } else {
-        // Para itens negativos: (5 - resposta)
-        soma += 5 - resposta;
-      }
-    });
-    // SUS score = soma * 2.5 (máximo 100)
-    return Math.round(soma * 2.5);
-  };
-
-  const getClassificacao = (pontuacao: number): string => {
-    if (pontuacao >= 90) return 'Excelente (Melhor do que 99% dos sistemas)';
-    if (pontuacao >= 80) return 'Bom (Melhor do que 85% dos sistemas)';
-    if (pontuacao >= 70) return 'Aceitável (Média da indústria)';
-    if (pontuacao >= 50) return 'Pobre (Abaixo da média)';
-    return 'Crítico (Sérios problemas de usabilidade)';
   };
 
   const getCorClassificacao = (pontuacao: number): string => {
@@ -74,7 +33,7 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
   const todasRespondidas = PERGUNTAS_SUS.every(p => respostas[p.id] !== undefined);
 
   const handleEnviar = async () => {
-    if (!todasRespondidas) {
+    if (!todasRespondidas || !usuario) {
       setErro('Por favor, responda a todas as 10 perguntas antes de enviar.');
       return;
     }
@@ -83,16 +42,23 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
     setErro(null);
 
     try {
-      const pontuacao = calcularPontuacao();
-      const classificacao = getClassificacao(pontuacao);
+      // Local primeiro (RN03): a resposta é gravada neste aparelho antes de qualquer envio
+      const lista = PERGUNTAS_SUS.map((p) => respostas[p.id]);
+      const salvo = await salvarRespostaSUS({ id: usuario.id, perfil: usuario.perfil }, lista, isOnline);
+      const classificacao = classificarSUS(salvo.pontuacao);
 
-      // Aqui poderia salvar no Supabase se necessário
-      // await supabase.from('sus_respostas').insert({ ... });
-
-      setResultado({ pontuacao, classificacao });
-      setMensagemSucesso(`SUS enviado! Pontuação: ${pontuacao}/100 — ${classificacao}`);
-    } catch (err) {
-      setErro('Erro ao enviar formulário. Tente novamente.');
+      setResultado({ pontuacao: salvo.pontuacao, classificacao });
+      setMensagemSucesso(
+        'Avaliação salva ' +
+          (modoDemo
+            ? 'só neste aparelho (modo demonstração: nada é enviado ao servidor).'
+            : isOnline
+              ? 'neste aparelho e enviada ao servidor em segundo plano.'
+              : 'neste aparelho. O envio ao servidor ocorre quando a conexão voltar.')
+      );
+      onSalvo?.(salvo);
+    } catch {
+      setErro('Não foi possível salvar a avaliação neste aparelho. Tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -164,7 +130,7 @@ export const FormularioSUS: React.FC<FormularioSUSProps> = ({ onClose }) => {
             border: `2px solid ${getCorClassificacao(resultado.pontuacao)}`
           }}>
             <div style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: 8 }}>
-              {resultado.pontuacao} / 100
+              {formatarPontuacaoSUS(resultado.pontuacao)} / 100
             </div>
             <div style={{ fontSize: '1.1rem' }}>
               {resultado.classificacao}

@@ -52,7 +52,8 @@ export function resumirFila(fila: SyncItem[]): ResumoFila {
 export const ROTULO_TIPO_SYNC: Record<SyncItem['tipo'], string> = {
   REGISTRO_CRISE: 'Registro de crise',
   ITEM_ROTINA: 'Cartão da rotina',
-  CONSENTIMENTO: 'Consentimento LGPD'
+  CONSENTIMENTO: 'Consentimento LGPD',
+  RESPOSTA_SUS: 'Avaliação SUS'
 };
 
 export function descreverTentativas(item: SyncItem): string {

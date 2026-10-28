@@ -11,7 +11,8 @@ export type TipoAtividade =
   | 'SINCRONIZACAO'
   | 'CONEXAO'
   | 'ACESSO'
-  | 'ROTINA';
+  | 'ROTINA'
+  | 'SUS';
 
 export interface Atividade {
   id: string;
@@ -53,7 +54,8 @@ const TIPOS_VALIDOS: readonly TipoAtividade[] = [
   'SINCRONIZACAO',
   'CONEXAO',
   'ACESSO',
-  'ROTINA'
+  'ROTINA',
+  'SUS'
 ];
 
 function ehAtividade(v: unknown): v is Atividade {

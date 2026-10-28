@@ -8,7 +8,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### 📌 Backlog (A Fazer)
 - [~] **US09**: Relatório PEI para impressão/PDF via `@media print` (parcial: sem gráficos dedicados nem geração de arquivo no servidor).
-- [~] **US10**: Formulário SUS implementado (10 itens, cálculo e classificação); **a resposta ainda não é gravada** (insert desativado) e a aplicação com educadores não foi realizada.
+- [~] **US10**: Formulário SUS implementado (10 itens, cálculo e classificação); a resposta agora é **gravada** (local primeiro; envio ao Supabase pela fila, após aplicar a migração `20261028000003_respostas_sus.sql`); a aplicação com educadores não foi realizada.
 - [x] **US11**: Modo de alto contraste preto/amarelo suave alternativo para baixa visão associada (seletor no Header).
 - [x] **US12**: Integração remota com a API de busca online do ARASAAC quando houver conectividade (busca em tempo real no ConfiguracaoRotina).
 
@@ -74,7 +74,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
-- ✅ `npm test` — Vitest: 59 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar e contraste da paleta (lê o `index.css`)
+- ✅ `npm test` — Vitest: 67 testes importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar, cálculo do SUS e contraste da paleta (lê o `index.css`)
 - ✅ Lint: sem warnings críticos, apenas aviso de dynamic import ineficaz (não bloqueante)
 
 ---
@@ -93,7 +93,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 **Corrigido:** contas de teste com senha fixa removidas (modo demo sem senha, local); perfil definido no servidor (migração `20261028000001_endurece_perfis.sql`); `carregarCrises` não apaga mais dados; exclusão de crise em andamento bloqueada (RN01); sincronização sem `await` de rede dentro de transação IndexedDB, com upsert idempotente; IP mascarado na tela e IP de seed neutralizado; testes passam a importar o código real; chave do Supabase removida da documentação.
 
-**Pendente / limitações conhecidas:** SUS não persiste; PDF é impressão do navegador; IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.
+**Pendente / limitações conhecidas:** PDF é impressão do navegador; IDs de seed do IndexedDB precisam existir no banco remoto (FKs); testes de integração com IndexedDB/Supabase; deploy na Vercel; validação com educadores.
 
 **28/10/2026 — RLS de crises (Pilar 3):** migração `20261028000002_restringe_crises.sql` substitui a política `FOR ALL` por políticas por operação: leitura para vinculados; inserção só por PROFESSOR/COORDENACAO vinculados com `professor_id = auth.uid()`; atualização só pelo autor; exclusão só de crise encerrada (RN01), pelo autor ou pela coordenação. A interface aplica a mesma regra (`podeRegistrarCrise`). Aplicada no Supabase em 28/10/2026 (4 políticas confirmadas em `pg_policies`).
 
@@ -104,16 +104,18 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS_UX_2026-10.md).
 
-**Concluído (verificado com tsc, 59 testes e build; telas conferidas no navegador):**
+**Concluído (verificado com tsc, 67 testes e build; telas conferidas no navegador):**
 - [x] **UX01** (Pilar 1): frase de propósito por visão, navegação com visões bloqueadas explicadas, faixa de tipo de acesso (visitante, conta real, demonstração) e aba "Sobre o RotinaTEA".
 - [x] **UX02** (Pilares 1 e 2): conexão real (`navigator.onLine`) separada do simulador de demonstração; painel de sincronização com "Sincronizar agora" e "Tentar novamente"; selos "Salva só neste aparelho", "Enviada ao servidor" e "Falhou o envio".
 - [x] **UX03** (Pilar 1): registro local de atividades sem dados pessoais, diálogo de confirmação acessível e estados vazios explicativos.
 - [x] **UX04** (Pilar 3): painel do Responsável com o que é coletado, finalidade, base legal, versão, data do aceite, IP mascarado e como revogar; aviso de anonimização; mensagens de acesso negado e de sessão encerrada.
+- [x] **UX08** (Pilares 1 e 2): o SUS grava as respostas (IndexedDB v3, fila de envio, tabela `respostas_sus` com RLS: só COORDENACAO insere e cada avaliador lê as próprias; imutável). Cálculo movido para `utils/sus.ts` com 8 testes e sem arredondar (97,5 em vez de 98); em modo demonstração a resposta fica só no aparelho e a tela diz isso.
 - [x] **UX07** (Pilar 3): a revogação do consentimento agora **bloqueia o início de novos registros de crise** (regra `coletaPermitida`, 5 testes; o botão fica inativo com explicação e o clique também é barrado relendo o termo salvo). Uma crise já em andamento pode ser encerrada (RN01) e os registros anteriores permanecem.
 - [x] **UX06** (Pilar 2): contraste dos componentes antigos corrigido com tokens separados de texto e de preenchimento (`--*-text`, `--*-fill`, `--on-fill`); 78 estados e 10.813 textos medidos sem falhas nos 3 modos; `contraste.test.ts` protege a paleta contra regressão.
 - [x] **UX05** (Pilar 2): alvos de toque ≥ 48px, contraste dos elementos alterados, "Mostrar senha" acessível por teclado, SUS sem etiquetas Positivo/Negativo e cabeçalho sem rolagem horizontal no celular.
 
 **Limitações restantes (não concluído):**
+- A migração do SUS precisa ser aplicada no Supabase pelo responsável do projeto; o envio com conta real **não foi testado**. Não há tela que consolide as respostas (consulta por SQL) e as faixas de classificação têm `REVISAR` (conferir a referência no artigo).
 - O bloqueio ao revogar vale **no aparelho** (estado local, IndexedDB): não há regra no servidor (RLS) que impeça um educador de gravar crises de um aluno com consentimento revogado, e a revogação feita em outro aparelho só chega aqui quando houver sincronização do termo. Também não apaga dados já coletados.
 - O IP do aceite não é capturado pelo aplicativo (aparece "Não registrado").
 - A redação da base legal (LGPD arts. 11 e 14) precisa de revisão antes da banca.
