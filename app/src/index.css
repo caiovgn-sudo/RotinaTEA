@@ -2380,3 +2380,24 @@ body.high-contrast-yellow .login-brand-panel * {
   border: 1px solid var(--crisis-fill);
   color: var(--on-fill);
 }
+
+/* LGPD: consentimento revogado, então o botão de iniciar crise fica inativo (continua focável e explica o motivo).
+   Cores só de texto/superfície já medidos em contraste.test.ts nos 3 modos. */
+.btn-crisis-action.start[aria-disabled='true'],
+.btn-crisis-action.start[aria-disabled='true']:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  border: 2px dashed var(--border-light);
+  cursor: not-allowed;
+}
+
+.aviso-coleta-bloqueada {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background-color: var(--warning-light);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}

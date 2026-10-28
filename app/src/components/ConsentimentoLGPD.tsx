@@ -113,8 +113,9 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
         </div>
 
         <p className="lgpd-nota" role="note">
-          Neste protótipo, a revogação é registrada, mas o bloqueio automático da coleta ainda não foi implementado.
-          Enquanto isso, a escola deve interromper o uso dos dados do aluno quando houver revogação.
+          Com o consentimento revogado, o aplicativo <strong>impede que novos registros de crise sejam iniciados</strong>{' '}
+          para este aluno. Uma crise que já estava em andamento pode ser encerrada, e os registros anteriores
+          continuam guardados (a exclusão de dados é um pedido separado à escola).
         </p>
 
         {consentimento && (
@@ -155,7 +156,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
         titulo="Revogar o consentimento?"
         mensagem={
           <>
-            <p>Ao revogar, o seu pedido fica registrado com a data.</p>
+            <p>Ao revogar, o seu pedido fica registrado com a data e a escola deixa de poder iniciar novos registros de crise deste aluno.</p>
             <p style={{ marginTop: 8 }}>Você poderá reativar o consentimento depois, nesta mesma tela.</p>
           </>
         }

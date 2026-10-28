@@ -8,7 +8,9 @@ import {
   statusAposFalha,
   MAX_TENTATIVAS_SYNC,
   PERFIL_PADRAO_CADASTRO,
-  podeRegistrarCrise
+  podeRegistrarCrise,
+  coletaPermitida,
+  MENSAGEM_COLETA_BLOQUEADA
 } from '../utils/regras';
 import { processarFilaSync } from './filaSync';
 import { formatarTempo } from '../utils/tempo';
@@ -92,6 +94,32 @@ describe('Segurança — perfil de cadastro', () => {
     expect(podeRegistrarCrise('RESPONSAVEL')).toBe(false);
     expect(podeRegistrarCrise('ALUNO')).toBe(false);
     expect(podeRegistrarCrise(null)).toBe(false);
+  });
+});
+
+describe('LGPD — bloqueio da coleta ao revogar o consentimento', () => {
+  it('permite a coleta com consentimento ativo', () => {
+    expect(coletaPermitida({ ativo: true })).toBe(true);
+  });
+
+  it('bloqueia novos registros quando o consentimento foi revogado', () => {
+    expect(coletaPermitida({ ativo: false })).toBe(false);
+  });
+
+  it('volta a permitir após a reativação', () => {
+    const termo = { ativo: false };
+    expect(coletaPermitida(termo)).toBe(false);
+    expect(coletaPermitida({ ...termo, ativo: true })).toBe(true);
+  });
+
+  it('sem termo carregado não bloqueia (apenas um termo revogado bloqueia)', () => {
+    expect(coletaPermitida(null)).toBe(true);
+    expect(coletaPermitida(undefined)).toBe(true);
+  });
+
+  it('a mensagem ao educador explica o motivo e como desbloquear', () => {
+    expect(MENSAGEM_COLETA_BLOQUEADA).toMatch(/revogou/);
+    expect(MENSAGEM_COLETA_BLOQUEADA).toMatch(/reativado/);
   });
 });
 

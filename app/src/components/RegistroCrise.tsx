@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RegistroCrise, Estudante, SyncItem } from '../types';
 import { SeloSync } from './SeloSync';
 import { DialogoConfirmacao } from './DialogoConfirmacao';
-import { podeExcluirCrise } from '../utils/regras';
+import { podeExcluirCrise, MENSAGEM_COLETA_BLOQUEADA } from '../utils/regras';
 import { formatarTempo } from './PainelPEI';
 import { AlertTriangle, Square, Trash2 } from 'lucide-react';
 
@@ -16,6 +16,8 @@ interface RegistroCriseProps {
   isOnline: boolean;
   modoDemo?: boolean;
   filaSync?: SyncItem[];
+  /** LGPD: consentimento revogado, então não é possível iniciar novos registros (a crise em andamento pode ser encerrada). */
+  coletaBloqueada?: boolean;
 }
 
 export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
@@ -27,7 +29,8 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
   onExcluirCrise,
   isOnline,
   modoDemo = false,
-  filaSync = []
+  filaSync = [],
+  coletaBloqueada = false
 }) => {
   const [segundosDecorridos, setSegundosDecorridos] = useState(0);
   const [modalObservacaoAberto, setModalObservacaoAberto] = useState(false);
@@ -99,16 +102,25 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
 
       {/* Botão de 1 Clique */}
       {!criseAtiva ? (
-        <button
-          type="button"
-          className="btn-crisis-action start"
-          onClick={onIniciarCrise}
-          aria-label="Iniciar registro de crise em 1 clique"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
-        >
-          <AlertTriangle size={22} aria-hidden="true" />
-          <span>Iniciar Registro de Crise (1 Clique)</span>
-        </button>
+        <>
+          <button
+            type="button"
+            className="btn-crisis-action start"
+            onClick={coletaBloqueada ? undefined : onIniciarCrise}
+            aria-disabled={coletaBloqueada}
+            aria-describedby={coletaBloqueada ? 'aviso-coleta-bloqueada' : undefined}
+            aria-label="Iniciar registro de crise em 1 clique"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+          >
+            <AlertTriangle size={22} aria-hidden="true" />
+            <span>Iniciar Registro de Crise (1 Clique)</span>
+          </button>
+          {coletaBloqueada && (
+            <p id="aviso-coleta-bloqueada" className="aviso-coleta-bloqueada" role="note">
+              <strong>Registro bloqueado.</strong> {MENSAGEM_COLETA_BLOQUEADA}
+            </p>
+          )}
+        </>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div

@@ -33,6 +33,18 @@ export function podeRegistrarCrise(perfil: PerfilUsuario | null | undefined): bo
   return !!perfil && PERFIS_REGISTRAM_CRISE.includes(perfil);
 }
 
+/**
+ * LGPD (art. 18, IX) — a coleta de novos registros de crise só ocorre enquanto não houver revogação.
+ * Sem termo carregado (aluno sem registro de consentimento) a coleta segue permitida; só um termo
+ * existente e revogado bloqueia. Uma crise já em andamento pode ser encerrada (RN01).
+ */
+export function coletaPermitida(consentimento: { ativo: boolean } | null | undefined): boolean {
+  return !consentimento || consentimento.ativo;
+}
+
+export const MENSAGEM_COLETA_BLOQUEADA =
+  'O responsável legal revogou o consentimento deste aluno. Novos registros de crise estão bloqueados até que o consentimento seja reativado.';
+
 /** RN02 — Código anonimizado do aluno (ex.: ALN-8921). */
 export const REGEX_CODIGO_ANONIMIZADO = /^ALN-\d{4}$/;
 

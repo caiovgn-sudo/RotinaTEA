@@ -108,6 +108,14 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 - **Decisões:** o terracota do botão de crise ficou um pouco mais profundo (#C85A54 para #AE443B) para chegar a 5,7:1 com texto branco; o painel de marca do login usa fundo preto e texto amarelo no modo Amarelo/Preto, porque o gradiente começaria em amarelo; o hover do botão de crise nesse modo é mais claro (#FF4D4D), pois #E60000 dava 4,36:1 com texto preto. Os tons do tema claro que já eram usados como borda e ícone não mudaram.
 - **Como testar:** em cada um dos 3 modos, abrir Professor, iniciar uma crise e conferir o botão e o cartão "Concluído"; abrir o login no modo Amarelo/Preto.
 
+### 1.17 Bloqueio da coleta ao revogar o consentimento (rodada 3, Pilar 3)
+- **Antes:** a revogação era apenas registrada; nenhum código lia `consentimento.ativo`, e a tela avisava isso.
+- **Depois:** com o consentimento revogado, o botão "Iniciar Registro de Crise" fica inativo (continua focável, com `aria-disabled` e `aria-describedby`) e mostra o motivo e como desbloquear. O clique também é barrado no tratamento da ação, que relê o termo salvo no aparelho (defesa em profundidade contra tela desatualizada). A tentativa bloqueada vai para o registro de atividades.
+- **Regra (`utils/regras.ts`, `coletaPermitida`):** só um termo existente e revogado bloqueia; sem termo carregado a coleta segue permitida. Encerrar uma crise em andamento continua possível (RN01: não se perde um registro aberto), e o histórico permanece.
+- **Texto ao responsável:** a nota da tela LGPD e o diálogo de revogação passaram a dizer o que de fato acontece, sem prometer exclusão de dados.
+- **Testes:** 5 casos em `db.test.ts` (ativo, revogado, reativado, sem termo, mensagem). Navegador: revogar no Responsável, abrir Professor, botão inativo e clique sem efeito; reativar e botão volta ao normal.
+- **Como testar:** Responsável, "Revogar Consentimento" e "Sim, revogar"; abrir Professor. Reativar e conferir que o botão volta.
+
 ---
 
 ## 2. Decisões aprovadas na Etapa 0
@@ -124,7 +132,7 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 | Verificação | Resultado |
 |---|---|
 | `npx tsc --noEmit` | sem erros |
-| `npm test` | **54 testes aprovados** em 5 arquivos (eram 15 antes das melhorias de UX; +39 desde então) |
+| `npm test` | **59 testes aprovados** em 5 arquivos (eram 15 antes das melhorias de UX; +44 desde então) |
 | `npm run build` | sem erros (PWA gerado) |
 | Auditoria no navegador (alvos, contraste e nome acessível) | Etapa 5: 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login e SUS: **0 alvos < 48px, 0 controles sem nome**. Rodada 2 (contraste): **78 estados** (login em 3 abas, 5 visões, crise em andamento, modal de observação, configuração de cartões, SUS e diálogo de revogação × 3 modos × 2 tamanhos de fonte), **10.813 textos medidos, 0 falhas de contraste**, incluindo o pior ponto de fundos com gradiente |
 | Celular (375px, fonte ampliada) | sem rolagem horizontal nas 5 visões |
@@ -135,7 +143,7 @@ Testes novos: `acesso.test.ts` (visibilidade por perfil), `sync.test.ts` (selos,
 
 ## 4. Limitações restantes (o que **não** está concluído)
 
-1. **A revogação não bloqueia a coleta.** Nenhum código lê `consentimento.ativo`. A tela diz isso com franqueza: a revogação é registrada, mas o bloqueio automático não existe.
+1. **O bloqueio ao revogar vale só no aparelho.** O início de novos registros de crise é barrado pelo aplicativo (seção 1.17), mas não há regra no servidor (RLS) que impeça a gravação, a revogação feita em outro aparelho só chega aqui depois da sincronização do termo, e os dados já coletados não são apagados.
 2. **O IP do aceite não é capturado pelo aplicativo** (o dado de exemplo é `0.0.0.0`); por isso a tela mostra "Não registrado".
 3. **Redação jurídica da base legal** (arts. 11 e 14) precisa de revisão da orientadora ou de assessoria jurídica antes da banca.
 4. **Contraste: o que a medição cobre e o que não cobre.** Depois da correção dos componentes antigos (seção 1.16), a varredura de texto passou a dar zero falhas, mas ela **não mede**: contraste de elementos que não são texto (bordas, ícones, anel do temporizador; exigência de 3:1), estados de foco e `:hover` (só os tokens de hover são testados, não cada tela) e imagens ou pictogramas.

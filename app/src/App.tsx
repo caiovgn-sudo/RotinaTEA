@@ -22,7 +22,7 @@ import {
 import { AuthProvider, useAuth, ehUsuarioDemo, MODO_DEMO_HABILITADO } from './context/AuthContext';
 import { useConexaoReal } from './hooks/useConexaoReal';
 import { conexaoEfetiva } from './utils/sync';
-import { podeRegistrarCrise } from './utils/regras';
+import { podeRegistrarCrise, coletaPermitida, MENSAGEM_COLETA_BLOQUEADA } from './utils/regras';
 import { acessoVisao, acessoVisoes, tipoAcesso, PROPOSITO_VISAO, NOME_PERFIL } from './utils/acesso';
 import {
   Atividade,
@@ -275,6 +275,14 @@ const AppContent: React.FC = () => {
     if (!estudanteAtual) return;
     if (!podeRegistrarCrise(usuario?.perfil)) {
       exibirAviso('Apenas Professor ou Coordenação podem registrar crises.');
+      return;
+    }
+    // LGPD: relê o termo no armazenamento local, para não depender de um estado de tela desatualizado
+    const termoAtual = await carregarConsentimento(estudanteAtual.id);
+    setConsentimento(termoAtual);
+    if (!coletaPermitida(termoAtual)) {
+      registrar('CONSENTIMENTO', 'Registro de crise bloqueado: consentimento revogado.');
+      exibirAviso(MENSAGEM_COLETA_BLOQUEADA);
       return;
     }
     const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || SEED_PROFESSOR_ID);
@@ -559,6 +567,7 @@ const AppContent: React.FC = () => {
                     isOnline={isOnline}
                     modoDemo={demo}
                     filaSync={filaSync}
+                    coletaBloqueada={!coletaPermitida(consentimento)}
                   />
                 )}
                 <PainelSincronizacao
