@@ -23,9 +23,17 @@ import { AuthProvider, useAuth, ehUsuarioDemo, MODO_DEMO_HABILITADO } from './co
 import { useConexaoReal } from './hooks/useConexaoReal';
 import { conexaoEfetiva } from './utils/sync';
 import { podeRegistrarCrise } from './utils/regras';
-import { acessoVisao, acessoVisoes, tipoAcesso, PROPOSITO_VISAO } from './utils/acesso';
+import { acessoVisao, acessoVisoes, tipoAcesso, PROPOSITO_VISAO, NOME_PERFIL } from './utils/acesso';
+import {
+  Atividade,
+  TipoAtividade,
+  registrarAtividade,
+  lerAtividades,
+  gravarAtividades
+} from './utils/atividades';
 import { Header } from './components/Header';
 import { PainelSincronizacao } from './components/PainelSincronizacao';
+import { RegistroAtividades } from './components/RegistroAtividades';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
 import { RegistroCriseComponent } from './components/RegistroCrise';
@@ -74,6 +82,22 @@ const AppContent: React.FC = () => {
 
   // Notificação suave
   const [aviso, setAviso] = useState<string | null>(null);
+
+  // Registro local das últimas ações (sem dados pessoais — RN02)
+  const [atividades, setAtividades] = useState<Atividade[]>(() =>
+    lerAtividades(typeof localStorage === 'undefined' ? null : localStorage)
+  );
+  const registrar = useCallback((tipo: TipoAtividade, descricao: string) => {
+    setAtividades((anteriores) => {
+      const novas = registrarAtividade(anteriores, tipo, descricao);
+      gravarAtividades(typeof localStorage === 'undefined' ? null : localStorage, novas);
+      return novas;
+    });
+  }, []);
+  const limparAtividades = () => {
+    setAtividades([]);
+    gravarAtividades(typeof localStorage === 'undefined' ? null : localStorage, []);
+  };
 
   // SUS Form modal
   const [mostrarSUS, setMostrarSUS] = useState(false);
@@ -141,6 +165,7 @@ const AppContent: React.FC = () => {
 
     const reagir = async () => {
       if (!isOnline) {
+        registrar('CONEXAO', conexaoReal ? 'Queda de conexão simulada.' : 'Sem internet: registros salvos só neste aparelho.');
         exibirAviso(
           conexaoReal
             ? 'Queda de conexão simulada. Os registros continuam sendo salvos neste aparelho.'
@@ -152,6 +177,8 @@ const AppContent: React.FC = () => {
       await atualizarFilaSync();
       if (estudanteAtual) setHistoricoCrises(await carregarCrises(estudanteAtual.id));
       const restantes = (await carregarItensFilaSync()).length;
+      registrar('CONEXAO', 'Conexão restabelecida.');
+      if (enviados > 0) registrar('SINCRONIZACAO', enviados + ' registro(s) enviados ao servidor.');
       exibirAviso(
         enviados > 0
           ? 'Conexão restabelecida. ' + enviados + ' registro(s) enviados ao servidor.'
@@ -172,6 +199,7 @@ const AppContent: React.FC = () => {
       const enviados = await sincronizarFilaBatch();
       await atualizarFilaSync();
       if (estudanteAtual) setHistoricoCrises(await carregarCrises(estudanteAtual.id));
+      registrar('SINCRONIZACAO', enviados > 0 ? enviados + ' registro(s) enviados ao servidor.' : 'Sincronização manual: nada foi enviado.');
       exibirAviso(enviados > 0 ? enviados + ' registro(s) enviados ao servidor.' : 'Nada foi enviado. Confira a situação dos itens.');
     } finally {
       setSincronizando(false);
@@ -180,6 +208,7 @@ const AppContent: React.FC = () => {
 
   const handleTentarNovamente = async (itemId: string) => {
     await reativarItemNaFila(itemId);
+    registrar('SINCRONIZACAO', 'Novo envio solicitado para um item com erro.');
     await handleSincronizarAgora();
   };
 
@@ -235,6 +264,7 @@ const AppContent: React.FC = () => {
     const atualizados = await carregarItensRotina(SEED_ROTINA_1_ID);
     setItensRotina(atualizados);
     setAbaProfessor('ACOMPANHAMENTO');
+    registrar('ROTINA', 'Cartão adicionado à rotina do aluno.');
     exibirAviso('Nova atividade inserida na rotina com sucesso!');
   };
 
@@ -247,6 +277,7 @@ const AppContent: React.FC = () => {
     }
     const nova = await iniciarCriseLocal(estudanteAtual.id, usuario?.id || SEED_PROFESSOR_ID);
     setCriseAtiva(nova);
+    registrar('CRISE_INICIADA', 'Crise iniciada. O horário foi guardado neste aparelho.');
     exibirAviso('Registro de crise iniciado. Cronômetro ativado.');
   };
 
@@ -258,6 +289,7 @@ const AppContent: React.FC = () => {
       setHistoricoCrises(crises);
     }
     await atualizarFilaSync();
+    registrar('CRISE_ENCERRADA', 'Crise encerrada: ' + encerrada.duracaoSegundos + 's. Salva neste aparelho' + (isOnline ? ' e na fila de envio.' : '; envio pendente (sem conexão).'));
 
     if (!isOnline) {
       exibirAviso(`Crise de ${encerrada.duracaoSegundos}s gravada localmente (offline). Sincronização pendente.`);
@@ -271,11 +303,13 @@ const AppContent: React.FC = () => {
     if (!consentimento) return;
     const atualizado = await alternarConsentimento(consentimento.id, isOnline);
     setConsentimento(atualizado);
+    registrar('CONSENTIMENTO', atualizado.ativo ? 'Consentimento reativado pelo responsável.' : 'Consentimento revogado pelo responsável.');
     exibirAviso(atualizado.ativo ? 'Consentimento reativado com sucesso.' : 'Consentimento revogado formalmente.');
   };
 
   const handleLogout = async () => {
     await signOut();
+    registrar('ACESSO', 'Sessão encerrada.');
     setPerfilAtual('ALUNO');
     setSobreAberto(false);
     exibirAviso('Sessão encerrada com sucesso.');
@@ -299,8 +333,9 @@ const AppContent: React.FC = () => {
       setSobreAberto(false);
       setPerfilAtual(usuario.perfil);
       exibirAviso(`Bem-vindo(a), ${usuario.nome}!`);
+      registrar('ACESSO', 'Acesso como ' + NOME_PERFIL[usuario.perfil] + (ehUsuarioDemo(usuario) ? ' (modo demonstração).' : ' (conta real).'));
     }
-  }, [usuario, mostrarLogin, exibirAviso]);
+  }, [usuario, mostrarLogin, exibirAviso, registrar]);
 
   // Se a sessão terminar em uma visão restrita, volta para a prancha do aluno
   useEffect(() => {
@@ -546,6 +581,8 @@ const AppContent: React.FC = () => {
             </button>
           </div>
         )}
+
+        <RegistroAtividades atividades={atividades} onLimpar={limparAtividades} />
         </>
         )}
       </main>

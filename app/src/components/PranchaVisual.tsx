@@ -93,6 +93,14 @@ export const PranchaVisual: React.FC<PranchaVisualProps> = ({
         </div>
       </div>
 
+      {itens.length === 0 && (
+        <p className="estado-vazio">
+          {isVisaoAluno
+            ? 'Ainda não há atividades na sua rotina de hoje. Peça ajuda ao professor.'
+            : 'Nenhum cartão na rotina deste aluno. Use “Configurar Cartões” para adicionar a primeira atividade.'}
+        </p>
+      )}
+
       {/* Grid de Cartões da Rotina usando CartaoRotina */}
       <div className="prancha-grid" role="list" aria-label="Lista de Atividades da Rotina">
         {itens.map((item, index) => {

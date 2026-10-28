@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { RegistroCrise, Estudante, SyncItem } from '../types';
 import { SeloSync } from './SeloSync';
+import { DialogoConfirmacao } from './DialogoConfirmacao';
+import { podeExcluirCrise } from '../utils/regras';
 import { formatarTempo } from './PainelPEI';
 import { AlertTriangle, Square, Trash2 } from 'lucide-react';
 
@@ -31,6 +33,7 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
   const [modalObservacaoAberto, setModalObservacaoAberto] = useState(false);
   const [criseRecenteId, setCriseRecenteId] = useState<string | null>(null);
   const [textoObservacao, setTextoObservacao] = useState('');
+  const [criseParaExcluir, setCriseParaExcluir] = useState<string | null>(null);
 
   // Contador em tempo real durante a crise
   useEffect(() => {
@@ -142,7 +145,12 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
       )}
 
       {/* Histórico Recente de Crises */}
-      {historicoCrises.length > 0 && (
+      {historicoCrises.length === 0 ? (
+        <p className="estado-vazio" style={{ marginTop: 20 }}>
+          Nenhuma crise registrada ainda. Use o botão vermelho quando um episódio começar: o horário é guardado na hora e
+          a duração é calculada quando você encerrar.
+        </p>
+      ) : (
         <div style={{ marginTop: '20px' }}>
           <h4 style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
             Histórico Recente de Registros ({historicoCrises.length})
@@ -176,10 +184,10 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <SeloSync crise={crise} fila={filaSync} modoDemo={modoDemo} />
 
-                  {onExcluirCrise && (
+                  {onExcluirCrise && podeExcluirCrise(crise) && (
                     <button
                       type="button"
-                      onClick={() => onExcluirCrise(crise.id)}
+                      onClick={() => setCriseParaExcluir(crise.id)}
                       title="Excluir este registro"
                       aria-label="Excluir este registro de crise"
                       style={{
@@ -205,6 +213,20 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
           </div>
         </div>
       )}
+
+      <DialogoConfirmacao
+        aberto={criseParaExcluir !== null}
+        titulo="Excluir este registro de crise?"
+        mensagem="O registro será apagado deste aparelho e do servidor, se já tiver sido enviado. Essa ação não pode ser desfeita."
+        rotuloConfirmar="Excluir registro"
+        rotuloCancelar="Manter registro"
+        perigo
+        onConfirmar={() => {
+          if (criseParaExcluir && onExcluirCrise) onExcluirCrise(criseParaExcluir);
+          setCriseParaExcluir(null);
+        }}
+        onCancelar={() => setCriseParaExcluir(null)}
+      />
 
       {/* Modal Opcional de Observação Comportamental (Extensão) */}
       {modalObservacaoAberto && (

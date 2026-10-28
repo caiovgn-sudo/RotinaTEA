@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { DialogoConfirmacao } from './DialogoConfirmacao';
 import { Estudante, ConsentimentoLGPD } from '../types';
 import { mascararIp } from '../utils/regras';
 
@@ -13,24 +14,11 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   consentimento,
   onAlternarConsentimento
 }) => {
-  // 1. Função que intercepta o clique antes de revogar
-  const handleRevogarConsentimento = () => {
-    const confirmacao = window.confirm(
-      "⚠️ ATENÇÃO: AÇÃO DESTRUTIVA\n\n" +
-      "Tem certeza que deseja revogar o consentimento de tratamento de dados?\n\n" +
-      "Isso paralisará o uso do aplicativo RotinaTEA para o aluno e suspenderá a coleta de métricas para o PEI. Esta ação precisará de assinatura presencial para ser revertida."
-    );
-
-    // 2. Se o Responsável clicar em "OK", segue o fluxo. Se clicar "Cancelar", nada acontece.
-    if (confirmacao) {
-      executarRevogacao();
-    }
-  };
+  const [confirmandoRevogacao, setConfirmandoRevogacao] = useState(false);
 
   const executarRevogacao = () => {
-    if (onAlternarConsentimento) {
-      onAlternarConsentimento();
-    }
+    setConfirmandoRevogacao(false);
+    onAlternarConsentimento?.();
   };
 
   const isAtivo = consentimento ? consentimento.ativo : true;
@@ -79,12 +67,12 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
             )}
           </div>
 
-          {/* 3. Botão com interceptação de confirmação de segurança */}
+          {/* Botão com confirmação em diálogo próprio, em linguagem simples */}
           {isAtivo ? (
             <button 
               type="button"
               className="btn-revogar-perigo" 
-              onClick={handleRevogarConsentimento}
+              onClick={() => setConfirmandoRevogacao(true)}
               aria-label="Revogar consentimento de tratamento de dados"
             >
               Revogar Consentimento
@@ -102,6 +90,21 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
           )}
         </div>
       </div>
+      <DialogoConfirmacao
+        aberto={confirmandoRevogacao}
+        titulo="Revogar o consentimento?"
+        mensagem={
+          <>
+            <p>Ao revogar, a coleta de métricas deste aluno para o PEI é suspensa.</p>
+            <p style={{ marginTop: 8 }}>Você poderá reativar o consentimento depois, nesta mesma tela.</p>
+          </>
+        }
+        rotuloConfirmar="Sim, revogar"
+        rotuloCancelar="Não, manter"
+        perigo
+        onConfirmar={executarRevogacao}
+        onCancelar={() => setConfirmandoRevogacao(false)}
+      />
     </div>
   );
 };

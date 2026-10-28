@@ -2015,3 +2015,72 @@ body.high-contrast-yellow.high-contrast {
   font-size: 0.9rem;
   background: var(--bg-app);
 }
+
+/* =====================================================================
+   Feedback, histórico e confirmações (Etapa 3) — Pilar 1
+   ===================================================================== */
+.btn-perigo {
+  background-color: var(--crisis);
+  border: 1px solid var(--crisis);
+  color: var(--text-inverted);
+}
+
+.btn-perigo:hover:not(:disabled) {
+  background-color: var(--crisis-hover);
+}
+
+.registro-atividades {
+  margin-top: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  padding: 20px;
+}
+
+.registro-atividades-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.registro-atividades h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+}
+
+.registro-atividades-ajuda {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.registro-atividades-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.registro-atividades-lista li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bg-app);
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.registro-atividades-lista time {
+  flex: none;
+  min-width: 92px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}

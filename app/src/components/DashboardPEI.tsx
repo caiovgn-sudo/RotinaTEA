@@ -158,7 +158,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
             {crises.length === 0 ? (
               <tr>
                 <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px' }}>
-                  Nenhum episódio de crise registrado para este estudante.
+                  Nenhuma crise registrada para este aluno ainda. Os episódios registrados pelo professor aparecem aqui.
                 </td>
               </tr>
             ) : (
