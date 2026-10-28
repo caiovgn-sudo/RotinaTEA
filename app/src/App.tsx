@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { PerfilUsuario, Estudante, ItemRotina, RegistroCrise, ConsentimentoLGPD } from './types';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { PerfilUsuario, Estudante, ItemRotina, RegistroCrise, ConsentimentoLGPD, SyncItem } from './types';
 import {
   seedInitialDataIfEmpty,
   carregarEstudantes,
@@ -13,15 +13,19 @@ import {
   carregarCrises,
   carregarItensFilaSync,
   sincronizarFilaBatch,
+  reativarItemNaFila,
   carregarConsentimento,
   alternarConsentimento,
   SEED_ROTINA_1_ID,
   SEED_PROFESSOR_ID
 } from './services/db';
-import { AuthProvider, useAuth, ehUsuarioDemo } from './context/AuthContext';
+import { AuthProvider, useAuth, ehUsuarioDemo, MODO_DEMO_HABILITADO } from './context/AuthContext';
+import { useConexaoReal } from './hooks/useConexaoReal';
+import { conexaoEfetiva } from './utils/sync';
 import { podeRegistrarCrise } from './utils/regras';
 import { acessoVisao, acessoVisoes, tipoAcesso, PROPOSITO_VISAO } from './utils/acesso';
 import { Header } from './components/Header';
+import { PainelSincronizacao } from './components/PainelSincronizacao';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
 import { RegistroCriseComponent } from './components/RegistroCrise';
@@ -38,8 +42,14 @@ const AppContent: React.FC = () => {
   
   // Estado do Perfil e Conexão
   const [perfilAtual, setPerfilAtual] = useState<PerfilUsuario>('ALUNO');
-  const [isOnline, setIsOnline] = useState<boolean>(true);
-  const [itensPendentesSync, setItensPendentesSync] = useState<number>(0);
+  // Conexão: a real vem do navegador; o simulador (só em demonstração) força "offline" para fins didáticos
+  const conexaoReal = useConexaoReal();
+  const [simuladoOffline, setSimuladoOffline] = useState<boolean>(false);
+  const simuladorDisponivel = MODO_DEMO_HABILITADO;
+  const isOnline = conexaoEfetiva(conexaoReal, simuladoOffline, simuladorDisponivel);
+  const [filaSync, setFilaSync] = useState<SyncItem[]>([]);
+  const [sincronizando, setSincronizando] = useState<boolean>(false);
+  const itensPendentesSync = filaSync.length;
   const [altoContraste, setAltoContraste] = useState<boolean>(false);
   const [contrasteAmarelo, setContrasteAmarelo] = useState<boolean>(false);
   const [fonteAmpliada, setFonteAmpliada] = useState<boolean>(false);
@@ -118,29 +128,59 @@ const AppContent: React.FC = () => {
 
   const atualizarFilaSync = async () => {
     const fila = await carregarItensFilaSync();
-    setItensPendentesSync(fila.length);
+    setFilaSync(fila);
   };
 
-  // Alternância de Conexão (Simulação Offline-First)
-  const handleAlternarConexao = async () => {
-    const novoStatus = !isOnline;
-    setIsOnline(novoStatus);
+  const handleAlternarSimulador = () => setSimuladoOffline((v) => !v);
 
-    if (novoStatus) {
-      const sincronizados = await sincronizarFilaBatch();
+  // Reage a mudanças da conexão efetiva (real ou simulada): ao voltar, envia a fila; ao cair, avisa.
+  const conexaoAnterior = useRef<boolean>(isOnline);
+  useEffect(() => {
+    if (conexaoAnterior.current === isOnline) return;
+    conexaoAnterior.current = isOnline;
+
+    const reagir = async () => {
+      if (!isOnline) {
+        exibirAviso(
+          conexaoReal
+            ? 'Queda de conexão simulada. Os registros continuam sendo salvos neste aparelho.'
+            : 'Sem internet. Os registros continuam sendo salvos neste aparelho e serão enviados quando a conexão voltar.'
+        );
+        return;
+      }
+      const enviados = await sincronizarFilaBatch();
       await atualizarFilaSync();
-      if (estudanteAtual) {
-        const crisesAtualizadas = await carregarCrises(estudanteAtual.id);
-        setHistoricoCrises(crisesAtualizadas);
-      }
-      if (sincronizados > 0) {
-        exibirAviso(`Conexão restabelecida! ${sincronizados} registro(s) sincronizados com sucesso.`);
-      } else {
-        exibirAviso('Conexão restabelecida. Sistema operando em modo online.');
-      }
-    } else {
-      exibirAviso('Modo Offline Ativo. Todas as ações continuarão sendo salvas localmente no IndexedDB.');
+      if (estudanteAtual) setHistoricoCrises(await carregarCrises(estudanteAtual.id));
+      const restantes = (await carregarItensFilaSync()).length;
+      exibirAviso(
+        enviados > 0
+          ? 'Conexão restabelecida. ' + enviados + ' registro(s) enviados ao servidor.'
+          : demo
+            ? 'Conexão restabelecida. No modo demonstração nada é enviado ao servidor.'
+            : restantes > 0
+              ? 'Conexão restabelecida, mas ' + restantes + ' registro(s) ainda aguardam envio. Veja o painel de sincronização.'
+              : 'Conexão restabelecida. Não havia registros aguardando envio.'
+      );
+    };
+    void reagir();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline]);
+
+  const handleSincronizarAgora = async () => {
+    setSincronizando(true);
+    try {
+      const enviados = await sincronizarFilaBatch();
+      await atualizarFilaSync();
+      if (estudanteAtual) setHistoricoCrises(await carregarCrises(estudanteAtual.id));
+      exibirAviso(enviados > 0 ? enviados + ' registro(s) enviados ao servidor.' : 'Nada foi enviado. Confira a situação dos itens.');
+    } finally {
+      setSincronizando(false);
     }
+  };
+
+  const handleTentarNovamente = async (itemId: string) => {
+    await reativarItemNaFila(itemId);
+    await handleSincronizarAgora();
   };
 
   // Acessibilidade: Contraste e Fonte
@@ -297,7 +337,10 @@ const AppContent: React.FC = () => {
           setMostrarLogin(true);
         }}
         isOnline={isOnline}
-        onAlternarConexao={handleAlternarConexao}
+        conexaoReal={conexaoReal}
+        simuladoOffline={simuladoOffline}
+        simuladorDisponivel={simuladorDisponivel}
+        onAlternarSimulador={handleAlternarSimulador}
         itensPendentesSync={itensPendentesSync}
         altoContraste={altoContraste}
         onAlternarAltoContraste={handleAlternarAltoContraste}
@@ -429,9 +472,19 @@ const AppContent: React.FC = () => {
                     onIniciarCrise={handleIniciarCrise}
                     onEncerrarCrise={handleEncerrarCrise}
                     isOnline={isOnline}
-                    modoDemo={ehUsuarioDemo(usuario)}
+                    modoDemo={demo}
+                    filaSync={filaSync}
                   />
                 )}
+                <PainelSincronizacao
+                  fila={filaSync}
+                  crises={historicoCrises}
+                  isOnline={isOnline}
+                  modoDemo={demo}
+                  ocupado={sincronizando}
+                  onSincronizarAgora={handleSincronizarAgora}
+                  onTentarNovamente={handleTentarNovamente}
+                />
                 <TemporizadorVisual
                   tituloAtividade={atividadeTimer?.titulo || 'Atividade da Rotina'}
                   duracaoMinutosPadrao={atividadeTimer?.duracao || 20}
@@ -469,6 +522,8 @@ const AppContent: React.FC = () => {
             }}
             itensRotina={itensRotina}
             crises={historicoCrises}
+            filaSync={filaSync}
+            modoDemo={demo}
           />
         )}
 

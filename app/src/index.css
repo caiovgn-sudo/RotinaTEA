@@ -1890,3 +1890,128 @@ body.high-contrast-yellow.high-contrast {
   padding: 8px 0 24px;
   background: transparent;
 }
+
+/* =====================================================================
+   Transparência do offline e da sincronização (Etapa 2) — Pilares 1 e 2
+   ===================================================================== */
+.simulador-conexao {
+  border-style: dashed;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.selo-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.selo-sync-local {
+  background: var(--warning-light);
+  color: var(--text-main);
+  border-color: var(--warning);
+}
+
+.selo-sync-enviada {
+  background: var(--success-light);
+  color: var(--text-main);
+  border-color: var(--success);
+}
+
+.selo-sync-falhou {
+  background: var(--crisis-light);
+  color: var(--text-main);
+  border-color: var(--crisis);
+}
+
+.painel-sync {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.painel-sync-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.painel-sync h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.painel-sync-ajuda,
+.painel-sync-aviso {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 640px;
+}
+
+.painel-sync-aviso {
+  padding: 8px 12px;
+  background: var(--warning-light);
+  border-left: 4px solid var(--warning);
+  border-radius: 6px;
+  color: var(--text-main);
+}
+
+.painel-sync-resumo {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.painel-sync-resumo > div {
+  flex: 1 1 140px;
+  background: var(--bg-app);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.painel-sync-resumo dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.painel-sync-resumo dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.texto-erro {
+  color: var(--crisis);
+}
+
+.estado-vazio {
+  padding: 14px 16px;
+  border: 1px dashed var(--border-light);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  background: var(--bg-app);
+}

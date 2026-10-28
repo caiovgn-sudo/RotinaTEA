@@ -4,6 +4,7 @@ import { supabase, verificarConectividadeSupabase } from './supabase';
 import { processarFilaSync } from './filaSync';
 import { calcularDuracaoSegundos, podeExcluirCrise } from '../utils/regras';
 import { logger } from '../utils/logger';
+import { reativarItemFila } from '../utils/sync';
 
 const DB_NAME = 'rotinatea_offline_db';
 const DB_VERSION = 2;
@@ -549,6 +550,20 @@ async function registrarFalhaLocal(item: SyncItem): Promise<void> {
   const db = await getDB();
   const tx = db.transaction('sync_queue', 'readwrite');
   tx.objectStore('sync_queue').put(item);
+  await aguardarTransacao(tx);
+}
+
+/** “Tentar novamente”: zera as tentativas de um item com erro para que volte a ser enviado. */
+export async function reativarItemNaFila(itemId: string): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction('sync_queue', 'readwrite');
+  const store = tx.objectStore('sync_queue');
+  const item: SyncItem | undefined = await new Promise((resolve, reject) => {
+    const req = store.get(itemId);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  if (item) store.put(reativarItemFila(item));
   await aguardarTransacao(tx);
 }
 

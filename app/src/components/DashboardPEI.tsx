@@ -1,5 +1,6 @@
 import React from 'react';
-import { Estudante, ItemRotina, RegistroCrise } from '../types';
+import { Estudante, ItemRotina, RegistroCrise, SyncItem } from '../types';
+import { SeloSync } from './SeloSync';
 import { formatarTempo } from '../utils/tempo';
 import { PainelPEI } from './PainelPEI';
 
@@ -12,6 +13,8 @@ interface DashboardPEIProps {
   onSelecionarEstudante: (estudante: Estudante) => void;
   itensRotina: ItemRotina[];
   crises: RegistroCrise[];
+  filaSync?: SyncItem[];
+  modoDemo?: boolean;
 }
 
 export const DashboardPEI: React.FC<DashboardPEIProps> = ({
@@ -19,7 +22,9 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
   estudanteSelecionado,
   onSelecionarEstudante,
   itensRotina,
-  crises
+  crises,
+  filaSync = [],
+  modoDemo = false
 }) => {
   const totalTarefas = itensRotina.length;
   const concluidas = itensRotina.filter((i) => i.concluido).length;
@@ -145,7 +150,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
               <th>Código Estudante</th>
               <th>Data / Horário</th>
               <th>Duração</th>
-              <th>Status Rede</th>
+              <th>Situação do envio</th>
               <th>Observação do Educador / Gatilho</th>
             </tr>
           </thead>
@@ -170,9 +175,7 @@ export const DashboardPEI: React.FC<DashboardPEIProps> = ({
                     <strong>{formatarTempo(crise.duracaoSegundos)}</strong> ({crise.duracaoSegundos}s)
                   </td>
                   <td>
-                    <span style={{ color: crise.sincronizadoOffline ? 'var(--success)' : 'var(--warning)', fontWeight: 600, fontSize: '0.85rem' }}>
-                      {crise.sincronizadoOffline ? '✓ Sincronizado' : '⏳ Em Fila Local'}
-                    </span>
+                    <SeloSync crise={crise} fila={filaSync} modoDemo={modoDemo} />
                   </td>
                   <td style={{ color: 'var(--text-muted)' }}>
                     {crise.observacoes || 'Nenhuma observação registrada.'}

@@ -6,6 +6,7 @@ import {
   ROTULO_TIPO_ACESSO,
   TipoAcesso
 } from '../utils/acesso';
+import { rotuloConexao } from '../utils/sync';
 import {
   User,
   GraduationCap,
@@ -33,8 +34,12 @@ interface HeaderProps {
   sobreAberto: boolean;
   onAbrirSobre: () => void;
   onEntrar: () => void;
+  /** Conexão efetiva (real, a menos que o simulador esteja forçando offline). */
   isOnline: boolean;
-  onAlternarConexao: () => void;
+  conexaoReal: boolean;
+  simuladoOffline: boolean;
+  simuladorDisponivel: boolean;
+  onAlternarSimulador: () => void;
   itensPendentesSync: number;
   altoContraste: boolean;
   onAlternarAltoContraste: () => void;
@@ -69,7 +74,10 @@ export const Header: React.FC<HeaderProps> = ({
   onAbrirSobre,
   onEntrar,
   isOnline,
-  onAlternarConexao,
+  conexaoReal,
+  simuladoOffline,
+  simuladorDisponivel,
+  onAlternarSimulador,
   itensPendentesSync,
   altoContraste,
   onAlternarAltoContraste,
@@ -146,32 +154,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Ações de Acessibilidade e Conectividade */}
       <div className="header-actions">
-        {/* Simulador Offline-First */}
-        <button
-          type="button"
+        {/* Estado REAL da conexão (o simulador de demonstração fica na faixa abaixo) */}
+        <span
           className={`badge-connection ${isOnline ? 'online' : 'offline'}`}
-          onClick={onAlternarConexao}
-          title="Clique para simular perda de conexão ou restabelecimento de internet"
-          aria-label={`Status da conexão: ${isOnline ? 'Online' : 'Offline'}. Clique para alternar.`}
+          role="status"
+          title="Estado da conexão com a internet"
         >
           {isOnline ? <Wifi size={14} aria-hidden="true" /> : <WifiOff size={14} aria-hidden="true" />}
-          <span>{isOnline ? 'Online' : 'Offline'}</span>
-          {itensPendentesSync > 0 && (
-            <span
-              style={{
-                marginLeft: 4,
-                backgroundColor: '#D4A373',
-                color: '#fff',
-                borderRadius: '10px',
-                padding: '1px 6px',
-                fontSize: '0.75rem'
-              }}
-              title={`${itensPendentesSync} registro(s) aguardando sincronização`}
-            >
-              {itensPendentesSync}
-            </span>
-          )}
-        </button>
+          <span>{rotuloConexao(conexaoReal, simuladoOffline, simuladorDisponivel)}</span>
+        </span>
 
         {/* Alternância de Contraste */}
         <div className="contrast-selector" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -240,6 +231,23 @@ export const Header: React.FC<HeaderProps> = ({
           <strong>{rotuloAcesso.titulo}</strong>
         </span>
         <span className="status-bar-detalhe">{rotuloAcesso.detalhe}</span>
+        {itensPendentesSync > 0 && (
+          <span className="status-bar-detalhe">
+            <strong>{itensPendentesSync}</strong> registro(s) aguardando envio ao servidor.
+          </span>
+        )}
+        {simuladorDisponivel && (
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm simulador-conexao"
+            onClick={onAlternarSimulador}
+            aria-pressed={simuladoOffline}
+            title="Ferramenta de demonstração: simula a falta de internet sem desligar o Wi-Fi."
+          >
+            <FlaskConical size={14} aria-hidden="true" />
+            Simulador de conexão (demonstração): {simuladoOffline ? 'restabelecer' : 'simular queda'}
+          </button>
+        )}
         {temVisaoBloqueada && (
           <span className="status-bar-detalhe">
             <Lock size={12} aria-hidden="true" /> Visões com cadeado exigem login com o perfil correspondente.

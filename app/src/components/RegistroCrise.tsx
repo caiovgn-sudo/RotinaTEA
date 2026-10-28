@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { RegistroCrise, Estudante } from '../types';
+import { RegistroCrise, Estudante, SyncItem } from '../types';
+import { SeloSync } from './SeloSync';
 import { formatarTempo } from './PainelPEI';
 import { AlertTriangle, Square, Trash2 } from 'lucide-react';
 
@@ -12,6 +13,7 @@ interface RegistroCriseProps {
   onExcluirCrise?: (criseId: string) => void;
   isOnline: boolean;
   modoDemo?: boolean;
+  filaSync?: SyncItem[];
 }
 
 export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
@@ -22,7 +24,8 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
   onEncerrarCrise,
   onExcluirCrise,
   isOnline,
-  modoDemo = false
+  modoDemo = false,
+  filaSync = []
 }) => {
   const [segundosDecorridos, setSegundosDecorridos] = useState(0);
   const [modalObservacaoAberto, setModalObservacaoAberto] = useState(false);
@@ -171,18 +174,7 @@ export const RegistroCriseComponent: React.FC<RegistroCriseProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      backgroundColor: crise.sincronizadoOffline ? 'var(--success-light)' : 'var(--warning-light)',
-                      color: crise.sincronizadoOffline ? 'var(--success)' : 'var(--warning)',
-                      fontWeight: 600
-                    }}
-                  >
-                    {crise.sincronizadoOffline ? '✓ Sincronizado' : '⏳ Salvo Offline'}
-                  </span>
+                  <SeloSync crise={crise} fila={filaSync} modoDemo={modoDemo} />
 
                   {onExcluirCrise && (
                     <button
