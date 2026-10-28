@@ -43,10 +43,10 @@ import { ConfiguracaoRotina } from './components/ConfiguracaoRotina';
 import { Login } from './components/Login';
 import { SobreRotinaTEA } from './components/SobreRotinaTEA';
 import { FormularioSUS } from './components/FormularioSUS';
-import { Bell, ClipboardList, Plus, Calendar } from 'lucide-react';
+import { Bell, ClipboardList, Plus, Calendar, Lock } from 'lucide-react';
 
 const AppContent: React.FC = () => {
-  const { usuario, loading: authLoading, signOut, refreshUsuario } = useAuth();
+  const { usuario, loading: authLoading, signOut, refreshUsuario, sessaoExpirada, dispensarSessaoExpirada } = useAuth();
   
   // Estado do Perfil e Conexão
   const [perfilAtual, setPerfilAtual] = useState<PerfilUsuario>('ALUNO');
@@ -65,6 +65,8 @@ const AppContent: React.FC = () => {
   // Navegação: página "Sobre" e tela de login são abertas sob demanda
   const [sobreAberto, setSobreAberto] = useState<boolean>(false);
   const [mostrarLogin, setMostrarLogin] = useState<boolean>(false);
+  // Motivo de uma visão bloqueada, mostrado até o usuário fechar (não some sozinho como o aviso rápido)
+  const [avisoAcesso, setAvisoAcesso] = useState<string | null>(null);
 
   // Sub-aba do Professor
   const [abaProfessor, setAbaProfessor] = useState<'ACOMPANHAMENTO' | 'CONFIGURACAO'>('ACOMPANHAMENTO');
@@ -318,9 +320,10 @@ const AppContent: React.FC = () => {
   const handleTrocarPerfil = (novo: PerfilUsuario) => {
     const acesso = acessoVisao(novo, usuario, demo);
     if (!acesso.permitida) {
-      exibirAviso(acesso.motivo ?? 'Esta visão não está liberada para a sua conta.');
+      setAvisoAcesso(acesso.motivo ?? 'Esta visão não está liberada para a sua conta.');
       return;
     }
+    setAvisoAcesso(null);
     setSobreAberto(false);
     setMostrarLogin(false);
     setPerfilAtual(novo);
@@ -337,10 +340,21 @@ const AppContent: React.FC = () => {
     }
   }, [usuario, mostrarLogin, exibirAviso, registrar]);
 
+  useEffect(() => {
+    if (sessaoExpirada) registrar('ACESSO', 'Sessão encerrada pelo servidor (tempo esgotado ou revogação).');
+  }, [sessaoExpirada, registrar]);
+
   // Se a sessão terminar em uma visão restrita, volta para a prancha do aluno
   useEffect(() => {
     if (!usuario && !authLoading && perfilAtual !== 'ALUNO') setPerfilAtual('ALUNO');
   }, [usuario, authLoading, perfilAtual]);
+
+  const irParaLogin = () => {
+    setAvisoAcesso(null);
+    dispensarSessaoExpirada();
+    setSobreAberto(false);
+    setMostrarLogin(true);
+  };
 
   // Mostra loading durante verificação de auth
   if (authLoading) {
@@ -360,17 +374,15 @@ const AppContent: React.FC = () => {
         perfilAtual={perfilAtual}
         onTrocarPerfil={handleTrocarPerfil}
         acessos={acessos}
-        onVisaoBloqueada={exibirAviso}
+        onVisaoBloqueada={setAvisoAcesso}
         tipoAcesso={tipoAcesso(usuario, demo)}
         sobreAberto={sobreAberto}
         onAbrirSobre={() => {
+          setAvisoAcesso(null);
           setMostrarLogin(false);
           setSobreAberto(true);
         }}
-        onEntrar={() => {
-          setSobreAberto(false);
-          setMostrarLogin(true);
-        }}
+        onEntrar={irParaLogin}
         isOnline={isOnline}
         conexaoReal={conexaoReal}
         simuladoOffline={simuladoOffline}
@@ -415,6 +427,41 @@ const AppContent: React.FC = () => {
       )}
 
       <main className="main-content" id="conteudo-principal">
+        {sessaoExpirada && !usuario && !mostrarLogin && (
+          <div className="aviso-persistente" role="alert">
+            <p>
+              <strong>Sua sessão terminou.</strong> Por segurança, o acesso foi encerrado. Entre novamente para continuar.
+              Os registros salvos neste aparelho não foram perdidos.
+            </p>
+            <div className="aviso-persistente-acoes">
+              <button type="button" className="btn btn-primary" onClick={irParaLogin}>
+                Entrar novamente
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={dispensarSessaoExpirada}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {avisoAcesso && !mostrarLogin && (
+          <div className="aviso-persistente" role="alert">
+            <p>
+              <strong>Esta visão está bloqueada.</strong> {avisoAcesso}
+            </p>
+            <div className="aviso-persistente-acoes">
+              {!usuario && (
+                <button type="button" className="btn btn-primary" onClick={irParaLogin}>
+                  Entrar
+                </button>
+              )}
+              <button type="button" className="btn btn-secondary" onClick={() => setAvisoAcesso(null)}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
         {mostrarLogin && !usuario && (
           <Login onLoginSuccess={refreshUsuario} onVoltarAluno={() => setMostrarLogin(false)} />
         )}
@@ -436,6 +483,9 @@ const AppContent: React.FC = () => {
               Estudante Ativo: <strong>{estudanteAtual?.codigoAnonimizado || 'Carregando...'}</strong> • Turma: {estudanteAtual?.turma}
             </p>
             <p className="proposito-visao">{PROPOSITO_VISAO[perfilAtual]}</p>
+            <p className="aviso-anonimizacao">
+              <Lock size={13} aria-hidden="true" /> O aluno aparece só pelo código (ALN-XXXX). Nomes reais não são armazenados.
+            </p>
           </div>
 
           {perfilAtual === 'COORDENACAO' && usuario && (

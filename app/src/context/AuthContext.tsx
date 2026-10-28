@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { supabase } from '../services/supabase';
 import { Usuario, PerfilUsuario } from '../types';
 
@@ -61,6 +61,9 @@ interface AuthContextType {
   signUp: (nome: string, email: string, senha: string) => Promise<ResultadoAuth>;
   signOut: () => Promise<void>;
   refreshUsuario: () => Promise<void>;
+  /** Verdadeiro quando o servidor encerrou a sessão sem que o usuário tenha saído (tempo esgotado ou revogação). */
+  sessaoExpirada: boolean;
+  dispensarSessaoExpirada: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -99,6 +102,9 @@ function limparCache(): void {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessaoExpirada, setSessaoExpirada] = useState(false);
+  // Distingue a saída pedida pelo usuário do encerramento feito pelo servidor
+  const saidaManual = useRef(false);
 
   /** O perfil vem SEMPRE da tabela `usuarios` (protegida por RLS), nunca do formulário nem dos metadados. */
   const buscarUsuarioNoBanco = async (userId: string): Promise<Usuario | null> => {
@@ -167,6 +173,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setUsuario(doBanco);
           }
         } else if (evento === 'SIGNED_OUT') {
+          if (saidaManual.current) {
+            saidaManual.current = false;
+          } else if (localStorage.getItem(CHAVE_SESSAO_LOCAL)) {
+            setSessaoExpirada(true);
+          }
           limparCache();
           setUsuario(null);
         }
@@ -258,18 +269,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signOut = async () => {
+    saidaManual.current = true;
     limparCache();
     try {
       await supabase.auth.signOut();
     } catch {
       // Ignora falha de rede ao deslogar
     }
+    // Se o servidor não emitir o evento (sem rede), a marca não pode ficar presa
+    setTimeout(() => {
+      saidaManual.current = false;
+    }, 2000);
+    setSessaoExpirada(false);
     setUsuario(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ usuario, loading, signIn, signInDemo, signUp, signOut, refreshUsuario: restaurarSessao }}
+      value={{
+        usuario,
+        loading,
+        signIn,
+        signInDemo,
+        signUp,
+        signOut,
+        refreshUsuario: restaurarSessao,
+        sessaoExpirada,
+        dispensarSessaoExpirada: () => setSessaoExpirada(false)
+      }}
     >
       {children}
     </AuthContext.Provider>

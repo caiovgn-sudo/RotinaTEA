@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { DialogoConfirmacao } from './DialogoConfirmacao';
 import { Estudante, ConsentimentoLGPD } from '../types';
-import { mascararIp } from '../utils/regras';
+import { descreverIpRegistrado } from '../utils/regras';
+import { DialogoConfirmacao } from './DialogoConfirmacao';
+import { Lock } from 'lucide-react';
 
 interface ConsentimentoLGPDProps {
   estudante?: Estudante;
   consentimento?: ConsentimentoLGPD | null;
   onAlternarConsentimento?: () => void;
 }
+
+const formatarData = (iso?: string) =>
+  iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
 
 export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   estudante,
@@ -25,7 +29,7 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
   const codigoEstudante = estudante ? estudante.codigoAnonimizado : 'ALN-8921';
 
   return (
-    <div className="painel-lgpd" style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="painel-lgpd">
       <div>
         <h2 style={{ fontSize: '1.4rem', color: 'var(--primary)', fontWeight: 700 }}>
           Gestão de Consentimento e Privacidade (LGPD)
@@ -35,43 +39,61 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
         </p>
       </div>
 
-      <div style={{ background: 'var(--bg-surface)', padding: 24, borderRadius: 16, border: '1px solid var(--border-light)' }}>
-        <h3 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: 12 }}>
-          Termo de Tratamento de Dados de Menores no Ambiente Escolar
+      {/* Anonimização: o que aparece e o que não é guardado */}
+      <section className="lgpd-bloco lgpd-destaque" aria-labelledby="lgpd-anonimo">
+        <h3 id="lgpd-anonimo">
+          <Lock size={18} aria-hidden="true" /> Seu filho aparece só por um código
         </h3>
-        
-        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p>
-            O <strong>RotinaTEA</strong> atua como Tecnologia Assistiva com base no <strong>Artigo 14 da Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong>, com o propósito exclusivo de fornecer previsibilidade visual ao estudante e auxiliar os educadores no acompanhamento de transições escolares.
-          </p>
-          <ul style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <li><strong>Anonimização na Origem (RN02):</strong> O estudante é identificado exclusivamente pelo código <code style={{ background: 'var(--bg-app)', padding: '2px 6px', borderRadius: 4 }}>{codigoEstudante}</code>.</li>
-            <li><strong>Finalidade Exclusiva:</strong> Apoio pedagógico e elaboração do Plano de Ensino Individualizado (PEI).</li>
-            <li><strong>Sem Comercialização:</strong> É terminantemente proibido o compartilhamento comercial ou publicidade com os dados coletados.</li>
-            <li><strong>Direito à Revogação:</strong> O responsável legal pode retirar o consentimento a qualquer instante, suspendendo a coleta de métricas.</li>
-          </ul>
-        </div>
+        <p>
+          O aluno é identificado exclusivamente pelo código <code className="codigo-aluno">{codigoEstudante}</code>.
+          Nome completo, CPF e fotos que identifiquem a criança <strong>não são armazenados</strong> nem exibidos em telas
+          e relatórios (regra RN02).
+        </p>
+      </section>
 
-        <hr style={{ margin: '20px 0', borderColor: 'var(--border-light)' }} />
+      <section className="lgpd-bloco" aria-labelledby="lgpd-coletado">
+        <h3 id="lgpd-coletado">O que é coletado</h3>
+        <ul className="lgpd-lista">
+          <li>Horário de início e de fim de cada crise e a duração calculada.</li>
+          <li>Observação opcional escrita pelo educador (por exemplo, um possível gatilho).</li>
+          <li>Quais atividades da rotina do dia foram concluídas.</li>
+          <li>Os dados deste consentimento: data do aceite, versão do termo e endereço IP parcialmente oculto.</li>
+        </ul>
+      </section>
 
-        <div className="status-rodape" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+      <section className="lgpd-bloco" aria-labelledby="lgpd-finalidade">
+        <h3 id="lgpd-finalidade">Para que serve</h3>
+        <p>
+          Exclusivamente para apoio pedagógico: dar previsibilidade ao estudante e ajudar os educadores a montar o Plano
+          Educacional Individualizado (PEI). Não há uso comercial nem publicidade com esses dados.
+        </p>
+      </section>
+
+      {/* REVISAR: redação jurídica a conferir com a orientação do curso antes da apresentação à banca. */}
+      <section className="lgpd-bloco" aria-labelledby="lgpd-base">
+        <h3 id="lgpd-base">Base legal</h3>
+        <p>
+          O tratamento segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Informações sobre comportamento e
+          saúde são dados pessoais sensíveis (art. 11), e os dados de crianças exigem consentimento específico e em
+          destaque de um dos pais ou do responsável legal (art. 14). Por isso esta tela existe: para você autorizar, ou
+          retirar a autorização, a qualquer momento.
+        </p>
+      </section>
+
+      <section className="lgpd-bloco" aria-labelledby="lgpd-status">
+        <h3 id="lgpd-status">Seu consentimento</h3>
+        <div className="lgpd-status">
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Status da Autorização:</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Situação:</div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: isAtivo ? 'var(--success)' : 'var(--crisis)' }}>
               {isAtivo ? '✔️ Consentimento Ativo e Autorizado' : '❌ Consentimento Revogado'}
             </div>
-            {consentimento && (
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-subtle)', marginTop: 4 }}>
-                IP Registrado: {mascararIp(consentimento.ipOrigem)} • Versão: {consentimento.termoVersao}
-              </div>
-            )}
           </div>
 
-          {/* Botão com confirmação em diálogo próprio, em linguagem simples */}
           {isAtivo ? (
-            <button 
+            <button
               type="button"
-              className="btn-revogar-perigo" 
+              className="btn-revogar-perigo"
               onClick={() => setConfirmandoRevogacao(true)}
               aria-label="Revogar consentimento de tratamento de dados"
             >
@@ -89,13 +111,51 @@ export const ConsentimentoLGPDComponent: React.FC<ConsentimentoLGPDProps> = ({
             </button>
           )}
         </div>
-      </div>
+
+        <p className="lgpd-nota" role="note">
+          Neste protótipo, a revogação é registrada, mas o bloqueio automático da coleta ainda não foi implementado.
+          Enquanto isso, a escola deve interromper o uso dos dados do aluno quando houver revogação.
+        </p>
+
+        {consentimento && (
+          <dl className="lgpd-detalhes">
+            <div>
+              <dt>Versão do termo</dt>
+              <dd>{consentimento.termoVersao}</dd>
+            </div>
+            <div>
+              <dt>Data do aceite</dt>
+              <dd>{formatarData(consentimento.dataAceite)}</dd>
+            </div>
+            {consentimento.revogadoEm && (
+              <div>
+                <dt>Revogado em</dt>
+                <dd>{formatarData(consentimento.revogadoEm)}</dd>
+              </div>
+            )}
+            <div>
+              <dt>IP registrado no aceite</dt>
+              <dd>{descreverIpRegistrado(consentimento.ipOrigem)}</dd>
+            </div>
+          </dl>
+        )}
+      </section>
+
+      <section className="lgpd-bloco" aria-labelledby="lgpd-revogar">
+        <h3 id="lgpd-revogar">Como revogar</h3>
+        <ol className="lgpd-lista">
+          <li>Toque em “Revogar Consentimento”, no quadro acima.</li>
+          <li>Leia o aviso e confirme em “Sim, revogar”. Se mudar de ideia, toque em “Não, manter”.</li>
+          <li>A revogação fica registrada com a data. Você pode reativar o consentimento nesta mesma tela.</li>
+        </ol>
+      </section>
+
       <DialogoConfirmacao
         aberto={confirmandoRevogacao}
         titulo="Revogar o consentimento?"
         mensagem={
           <>
-            <p>Ao revogar, a coleta de métricas deste aluno para o PEI é suspensa.</p>
+            <p>Ao revogar, o seu pedido fica registrado com a data.</p>
             <p style={{ marginTop: 8 }}>Você poderá reativar o consentimento depois, nesta mesma tela.</p>
           </>
         }

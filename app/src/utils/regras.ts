@@ -49,6 +49,15 @@ export function mascararIp(ip?: string | null): string {
   return '—';
 }
 
+/**
+ * Texto do IP para a tela do responsável. O IP nunca é exibido por inteiro; o valor neutro de
+ * exemplo (0.0.0.0) e a ausência de IP aparecem como “Não registrado”.
+ */
+export function descreverIpRegistrado(ip?: string | null): string {
+  if (!ip || ip === '0.0.0.0') return 'Não registrado';
+  return mascararIp(ip) + ' (parte do número é ocultada por privacidade)';
+}
+
 /** RN03 — Política de tentativas da fila de sincronização. */
 export const MAX_TENTATIVAS_SYNC = 3;
 

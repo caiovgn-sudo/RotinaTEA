@@ -4,6 +4,7 @@ import {
   podeExcluirCrise,
   validarCodigoAnonimizado,
   mascararIp,
+  descreverIpRegistrado,
   statusAposFalha,
   MAX_TENTATIVAS_SYNC,
   PERFIL_PADRAO_CADASTRO,
@@ -67,6 +68,16 @@ describe('RN02 — Anonimização (LGPD)', () => {
     expect(mascararIp('2001:db8::1')).toBe('2001:…');
     expect(mascararIp('')).toBe('—');
     expect(mascararIp(undefined)).toBe('—');
+  });
+});
+
+describe('RN02 — IP exibido ao responsável', () => {
+  it('nunca mostra o IP inteiro e trata o valor neutro como não registrado', () => {
+    expect(descreverIpRegistrado('0.0.0.0')).toBe('Não registrado');
+    expect(descreverIpRegistrado(null)).toBe('Não registrado');
+    const t = descreverIpRegistrado('189.45.12.34');
+    expect(t).toContain('189.45.xxx.xxx');
+    expect(t).not.toContain('12.34');
   });
 });
 
