@@ -20,6 +20,7 @@ import {
 } from './services/db';
 import { AuthProvider, useAuth, ehUsuarioDemo } from './context/AuthContext';
 import { podeRegistrarCrise } from './utils/regras';
+import { acessoVisao, acessoVisoes, tipoAcesso, PROPOSITO_VISAO } from './utils/acesso';
 import { Header } from './components/Header';
 import { PranchaVisual } from './components/PranchaVisual';
 import { TemporizadorVisual } from './components/TemporizadorVisual';
@@ -28,10 +29,9 @@ import { DashboardPEI } from './components/DashboardPEI';
 import { ConsentimentoLGPDComponent } from './components/ConsentimentoLGPD';
 import { ConfiguracaoRotina } from './components/ConfiguracaoRotina';
 import { Login } from './components/Login';
+import { SobreRotinaTEA } from './components/SobreRotinaTEA';
 import { FormularioSUS } from './components/FormularioSUS';
 import { Bell, ClipboardList, Plus, Calendar } from 'lucide-react';
-
-const PerfisRequeremAuth: PerfilUsuario[] = ['PROFESSOR', 'COORDENACAO', 'RESPONSAVEL'];
 
 const AppContent: React.FC = () => {
   const { usuario, loading: authLoading, signOut, refreshUsuario } = useAuth();
@@ -43,6 +43,10 @@ const AppContent: React.FC = () => {
   const [altoContraste, setAltoContraste] = useState<boolean>(false);
   const [contrasteAmarelo, setContrasteAmarelo] = useState<boolean>(false);
   const [fonteAmpliada, setFonteAmpliada] = useState<boolean>(false);
+
+  // Navegação: página "Sobre" e tela de login são abertas sob demanda
+  const [sobreAberto, setSobreAberto] = useState<boolean>(false);
+  const [mostrarLogin, setMostrarLogin] = useState<boolean>(false);
 
   // Sub-aba do Professor
   const [abaProfessor, setAbaProfessor] = useState<'ACOMPANHAMENTO' | 'CONFIGURACAO'>('ACOMPANHAMENTO');
@@ -69,8 +73,10 @@ const AppContent: React.FC = () => {
     setTimeout(() => setAviso(null), 4000);
   }, []);
 
-  // Verifica se o perfil atual requer autenticação
-  const perfilRequerAuth = PerfisRequeremAuth.includes(perfilAtual);
+  // Acesso: o que a conta atual pode abrir (o servidor continua sendo a fonte de verdade via RLS)
+  const demo = ehUsuarioDemo(usuario);
+  const acessos = acessoVisoes(usuario, demo);
+  const visaoPermitida = acessoVisao(perfilAtual, usuario, demo).permitida;
 
   // Inicialização do Banco de Dados
   useEffect(() => {
@@ -230,23 +236,36 @@ const AppContent: React.FC = () => {
 
   const handleLogout = async () => {
     await signOut();
+    setPerfilAtual('ALUNO');
+    setSobreAberto(false);
     exibirAviso('Sessão encerrada com sucesso.');
   };
 
-  const handleLoginSuccess = () => {
-    refreshUsuario();
-    exibirAviso(`Bem-vindo, ${usuario?.nome || 'Usuário'}!`);
+  const handleTrocarPerfil = (novo: PerfilUsuario) => {
+    const acesso = acessoVisao(novo, usuario, demo);
+    if (!acesso.permitida) {
+      exibirAviso(acesso.motivo ?? 'Esta visão não está liberada para a sua conta.');
+      return;
+    }
+    setSobreAberto(false);
+    setMostrarLogin(false);
+    setPerfilAtual(novo);
   };
 
-  // Mostra tela de login se perfil requer auth e não está autenticado
-  if (perfilRequerAuth && !usuario && !authLoading) {
-    return (
-      <Login
-        onLoginSuccess={handleLoginSuccess}
-        onVoltarAluno={() => setPerfilAtual('ALUNO')}
-      />
-    );
-  }
+  // Após entrar, abre a visão do perfil da conta e fecha a tela de login
+  useEffect(() => {
+    if (usuario && mostrarLogin) {
+      setMostrarLogin(false);
+      setSobreAberto(false);
+      setPerfilAtual(usuario.perfil);
+      exibirAviso(`Bem-vindo(a), ${usuario.nome}!`);
+    }
+  }, [usuario, mostrarLogin, exibirAviso]);
+
+  // Se a sessão terminar em uma visão restrita, volta para a prancha do aluno
+  useEffect(() => {
+    if (!usuario && !authLoading && perfilAtual !== 'ALUNO') setPerfilAtual('ALUNO');
+  }, [usuario, authLoading, perfilAtual]);
 
   // Mostra loading durante verificação de auth
   if (authLoading) {
@@ -260,31 +279,23 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Perfil fixado no servidor: o usuário só acessa a visão compatível com o perfil da sua conta.
-  if (perfilRequerAuth && usuario && usuario.perfil !== perfilAtual && !ehUsuarioDemo(usuario)) {
-    return (
-      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <div role="alert" style={{ textAlign: 'center', maxWidth: 420, padding: 24 }}>
-          <h2>Acesso restrito</h2>
-          <p>Sua conta ({usuario.perfil}) não tem permissão para esta visão.</p>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16 }}>
-            <button className="btn btn-primary" onClick={() => setPerfilAtual(usuario.perfil)}>
-              Ir para a minha visão
-            </button>
-            <button className="btn btn-secondary" onClick={() => setPerfilAtual('ALUNO')}>
-              Voltar à prancha do aluno
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container">
       <Header
         perfilAtual={perfilAtual}
-        onTrocarPerfil={setPerfilAtual}
+        onTrocarPerfil={handleTrocarPerfil}
+        acessos={acessos}
+        onVisaoBloqueada={exibirAviso}
+        tipoAcesso={tipoAcesso(usuario, demo)}
+        sobreAberto={sobreAberto}
+        onAbrirSobre={() => {
+          setMostrarLogin(false);
+          setSobreAberto(true);
+        }}
+        onEntrar={() => {
+          setSobreAberto(false);
+          setMostrarLogin(true);
+        }}
         isOnline={isOnline}
         onAlternarConexao={handleAlternarConexao}
         itensPendentesSync={itensPendentesSync}
@@ -296,7 +307,6 @@ const AppContent: React.FC = () => {
         onAlternarFonteAmpliada={handleAlternarFonteAmpliada}
         usuario={usuario}
         onLogout={handleLogout}
-        perfilRequerAuth={perfilRequerAuth}
       />
 
       {/* Notificação Flutuante / Toast Suave */}
@@ -327,6 +337,14 @@ const AppContent: React.FC = () => {
       )}
 
       <main className="main-content" id="conteudo-principal">
+        {mostrarLogin && !usuario && (
+          <Login onLoginSuccess={refreshUsuario} onVoltarAluno={() => setMostrarLogin(false)} />
+        )}
+
+        {!mostrarLogin && sobreAberto && <SobreRotinaTEA />}
+
+        {!mostrarLogin && !sobreAberto && (
+        <>
         {/* Banner do Perfil Ativo */}
         <section className="profile-banner" aria-label="Informações do Perfil Selecionado">
           <div className="profile-info">
@@ -339,6 +357,7 @@ const AppContent: React.FC = () => {
             <p>
               Estudante Ativo: <strong>{estudanteAtual?.codigoAnonimizado || 'Carregando...'}</strong> • Turma: {estudanteAtual?.turma}
             </p>
+            <p className="proposito-visao">{PROPOSITO_VISAO[perfilAtual]}</p>
           </div>
 
           {perfilAtual === 'COORDENACAO' && usuario && (
@@ -378,7 +397,7 @@ const AppContent: React.FC = () => {
         </section>
 
         {/* 1. VISÃO DO ALUNO */}
-        {perfilAtual === 'ALUNO' && (
+        {visaoPermitida && perfilAtual === 'ALUNO' && (
           <>
             <TemporizadorVisual
               tituloAtividade={atividadeTimer?.titulo || 'Atividade da Rotina'}
@@ -398,7 +417,7 @@ const AppContent: React.FC = () => {
         )}
 
         {/* 2. VISÃO DO PROFESSOR */}
-        {perfilAtual === 'PROFESSOR' && usuario && (
+        {visaoPermitida && perfilAtual === 'PROFESSOR' && usuario && (
           <>
             {abaProfessor === 'ACOMPANHAMENTO' ? (
               <>
@@ -440,7 +459,7 @@ const AppContent: React.FC = () => {
         )}
 
         {/* 3. VISÃO DA COORDENAÇÃO / PEI */}
-        {perfilAtual === 'COORDENACAO' && usuario && estudanteAtual && (
+        {visaoPermitida && perfilAtual === 'COORDENACAO' && usuario && estudanteAtual && (
           <DashboardPEI
             estudantes={estudantes}
             estudanteSelecionado={estudanteAtual}
@@ -454,7 +473,7 @@ const AppContent: React.FC = () => {
         )}
 
         {/* 4. VISÃO DO RESPONSÁVEL LEGAL */}
-        {perfilAtual === 'RESPONSAVEL' && usuario && estudanteAtual && (
+        {visaoPermitida && perfilAtual === 'RESPONSAVEL' && usuario && estudanteAtual && (
           <ConsentimentoLGPDComponent
             estudante={estudanteAtual}
             consentimento={consentimento}
@@ -462,13 +481,17 @@ const AppContent: React.FC = () => {
           />
         )}
 
-        {/* Mensagem de login necessário */}
-        {perfilRequerAuth && !usuario && (
-          <div className="login-required" role="alert">
-            <h3>Área Restrita</h3>
-            <p>Faça login para acessar esta funcionalidade.</p>
-            <p>Use o seletor de perfis no topo para voltar à visão do Aluno (livre) ou faça login como Professor, Coordenação ou Responsável.</p>
+        {/* Salvaguarda: visão fora do alcance da conta (a navegação já bloqueia, o servidor também) */}
+        {!visaoPermitida && (
+          <div className="acesso-negado" role="alert">
+            <h3>Esta visão não está liberada para a sua conta</h3>
+            <p>{acessoVisao(perfilAtual, usuario, demo).motivo}</p>
+            <button type="button" className="btn btn-primary" onClick={() => setPerfilAtual('ALUNO')}>
+              Ir para a prancha do aluno
+            </button>
           </div>
+        )}
+        </>
         )}
       </main>
 

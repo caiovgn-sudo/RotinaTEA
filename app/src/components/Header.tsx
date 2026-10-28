@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { PerfilUsuario, Usuario } from '../types';
 import {
+  AcessoVisao,
+  NOME_PERFIL,
+  ROTULO_TIPO_ACESSO,
+  TipoAcesso
+} from '../utils/acesso';
+import {
   User,
   GraduationCap,
   BarChart3,
@@ -9,12 +15,24 @@ import {
   WifiOff,
   LogOut,
   LogIn,
-  Type
+  Type,
+  Lock,
+  Info,
+  FlaskConical,
+  UserCheck,
+  Eye
 } from 'lucide-react';
 
 interface HeaderProps {
   perfilAtual: PerfilUsuario;
   onTrocarPerfil: (novoPerfil: PerfilUsuario) => void;
+  /** Visões que a conta atual pode abrir, com o motivo quando bloqueadas. */
+  acessos: AcessoVisao[];
+  onVisaoBloqueada: (motivo: string) => void;
+  tipoAcesso: TipoAcesso;
+  sobreAberto: boolean;
+  onAbrirSobre: () => void;
+  onEntrar: () => void;
   isOnline: boolean;
   onAlternarConexao: () => void;
   itensPendentesSync: number;
@@ -26,12 +44,30 @@ interface HeaderProps {
   onAlternarFonteAmpliada: () => void;
   usuario: Usuario | null;
   onLogout: () => void;
-  perfilRequerAuth?: boolean;
 }
+
+const VISOES: { perfil: PerfilUsuario; rotulo: string; icone: React.ReactNode }[] = [
+  { perfil: 'ALUNO', rotulo: 'Aluno TEA', icone: <User size={16} aria-hidden="true" /> },
+  { perfil: 'PROFESSOR', rotulo: 'Professor', icone: <GraduationCap size={16} aria-hidden="true" /> },
+  { perfil: 'COORDENACAO', rotulo: 'Coordenação / PEI', icone: <BarChart3 size={16} aria-hidden="true" /> },
+  { perfil: 'RESPONSAVEL', rotulo: 'Responsável LGPD', icone: <ShieldCheck size={16} aria-hidden="true" /> }
+];
+
+const ICONE_ACESSO: Record<TipoAcesso, React.ReactNode> = {
+  VISITANTE: <Eye size={14} aria-hidden="true" />,
+  CONTA_REAL: <UserCheck size={14} aria-hidden="true" />,
+  DEMONSTRACAO: <FlaskConical size={14} aria-hidden="true" />
+};
 
 export const Header: React.FC<HeaderProps> = ({
   perfilAtual,
   onTrocarPerfil,
+  acessos,
+  onVisaoBloqueada,
+  tipoAcesso,
+  sobreAberto,
+  onAbrirSobre,
+  onEntrar,
   isOnline,
   onAlternarConexao,
   itensPendentesSync,
@@ -60,6 +96,10 @@ export const Header: React.FC<HeaderProps> = ({
       if (contrasteAmarelo) onAlternarContrasteAmarelo();
     }
   };
+
+  const temVisaoBloqueada = acessos.some((a) => !a.permitida);
+  const rotuloAcesso = ROTULO_TIPO_ACESSO[tipoAcesso];
+
   return (
     <header className="app-header" role="banner">
       <div className="brand-section">
@@ -72,39 +112,35 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Seletor de Perfis */}
-      <nav aria-label="Seleção de Perfis de Acesso" className="role-tabs">
+      {/* Navegação: cada visão mostra se está liberada para a conta atual */}
+      <nav aria-label="Visões do sistema" className="role-tabs">
+        {VISOES.map(({ perfil, rotulo, icone }) => {
+          const acesso = acessos.find((a) => a.perfil === perfil);
+          const bloqueada = !!acesso && !acesso.permitida;
+          const ativa = !sobreAberto && perfilAtual === perfil;
+          return (
+            <button
+              key={perfil}
+              type="button"
+              className={`role-tab-btn ${ativa ? 'active' : ''} ${bloqueada ? 'blocked' : ''}`}
+              onClick={() => (bloqueada && acesso?.motivo ? onVisaoBloqueada(acesso.motivo) : onTrocarPerfil(perfil))}
+              aria-pressed={ativa}
+              aria-disabled={bloqueada}
+              title={bloqueada ? acesso?.motivo ?? undefined : `Abrir a visão: ${NOME_PERFIL[perfil]}`}
+            >
+              {icone} {rotulo}
+              {bloqueada && <Lock size={13} aria-label="Bloqueada para a conta atual" />}
+            </button>
+          );
+        })}
         <button
           type="button"
-          className={`role-tab-btn ${perfilAtual === 'ALUNO' ? 'active' : ''}`}
-          onClick={() => onTrocarPerfil('ALUNO')}
-          aria-pressed={perfilAtual === 'ALUNO'}
+          className={`role-tab-btn ${sobreAberto ? 'active' : ''}`}
+          onClick={onAbrirSobre}
+          aria-pressed={sobreAberto}
+          title="Entenda o objetivo, os perfis e as regras do sistema"
         >
-          <User size={16} aria-hidden="true" /> Aluno TEA
-        </button>
-        <button
-          type="button"
-          className={`role-tab-btn ${perfilAtual === 'PROFESSOR' ? 'active' : ''}`}
-          onClick={() => onTrocarPerfil('PROFESSOR')}
-          aria-pressed={perfilAtual === 'PROFESSOR'}
-        >
-          <GraduationCap size={16} aria-hidden="true" /> Professor
-        </button>
-        <button
-          type="button"
-          className={`role-tab-btn ${perfilAtual === 'COORDENACAO' ? 'active' : ''}`}
-          onClick={() => onTrocarPerfil('COORDENACAO')}
-          aria-pressed={perfilAtual === 'COORDENACAO'}
-        >
-          <BarChart3 size={16} aria-hidden="true" /> Coordenação / PEI
-        </button>
-        <button
-          type="button"
-          className={`role-tab-btn ${perfilAtual === 'RESPONSAVEL' ? 'active' : ''}`}
-          onClick={() => onTrocarPerfil('RESPONSAVEL')}
-          aria-pressed={perfilAtual === 'RESPONSAVEL'}
-        >
-          <ShieldCheck size={16} aria-hidden="true" /> Responsável LGPD
+          <Info size={16} aria-hidden="true" /> Sobre
         </button>
       </nav>
 
@@ -144,17 +180,7 @@ export const Header: React.FC<HeaderProps> = ({
             onChange={(e) => handleContrasteChange(e.target.value as 'padrao' | 'alto' | 'amarelo')}
             aria-label="Selecionar modo de contraste"
             title="Modo de Contraste"
-            style={{
-              padding: '6px 10px',
-              border: '1px solid var(--border-light)',
-              borderRadius: '6px',
-              background: 'var(--bg-surface)',
-              color: 'var(--text-main)',
-              fontFamily: 'inherit',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              minHeight: '38px'
-            }}
+            className="control-select"
           >
             <option value="padrao">🌙 Padrão</option>
             <option value="alto">☀️ Alto Contraste</option>
@@ -178,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
         {usuario ? (
           <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-              {usuario.nome} <small style={{ opacity: 0.8 }}>({usuario.perfil})</small>
+              {usuario.nome} <small style={{ opacity: 0.8 }}>({NOME_PERFIL[usuario.perfil]})</small>
             </span>
             <button
               type="button"
@@ -196,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => onTrocarPerfil('PROFESSOR')}
+              onClick={onEntrar}
               aria-label="Fazer login no sistema"
               style={{ display: 'flex', alignItems: 'center', gap: 6 }}
             >
@@ -204,6 +230,20 @@ export const Header: React.FC<HeaderProps> = ({
               Entrar
             </button>
           </div>
+        )}
+      </div>
+
+      {/* Faixa de estado do acesso: sempre visível, para ninguém confundir dados fictícios com reais */}
+      <div className="status-bar" role="group" aria-label="Estado do acesso">
+        <span className={`selo-acesso selo-${tipoAcesso.toLowerCase()}`} title={rotuloAcesso.detalhe}>
+          {ICONE_ACESSO[tipoAcesso]}
+          <strong>{rotuloAcesso.titulo}</strong>
+        </span>
+        <span className="status-bar-detalhe">{rotuloAcesso.detalhe}</span>
+        {temVisaoBloqueada && (
+          <span className="status-bar-detalhe">
+            <Lock size={12} aria-hidden="true" /> Visões com cadeado exigem login com o perfil correspondente.
+          </span>
         )}
       </div>
     </header>
