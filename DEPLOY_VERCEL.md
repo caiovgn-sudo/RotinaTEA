@@ -17,8 +17,8 @@ Supabase, uma por vez, na ordem:
 | 3 | `20261028000001_endurece_perfis.sql` | Perfil fixo no servidor | Aplicada |
 | 4 | `20261028000002_restringe_crises.sql` | Gravação de crises só por professor e coordenação | Aplicada (4 políticas confirmadas) |
 | 5 | `20261028000003_respostas_sus.sql` | Tabela das respostas do SUS | Aplicada (2 políticas confirmadas) |
-| 6 | `20261029000001_resumo_sus.sql` | Função `resumo_sus()` (só agregados, só Coordenação) | **Pendente** |
-| 7 | `20261029000002_dados_exemplo_remotos.sql` | Estudantes, rotina e cartões de exemplo no servidor | **Pendente** |
+| 6 | `20261029000001_resumo_sus.sql` | Função `resumo_sus()` (só agregados, só Coordenação) | Aplicada (função confirmada no servidor em 29/10/2026) |
+| 7 | `20261029000002_dados_exemplo_remotos.sql` | Estudantes, rotina e cartões de exemplo no servidor | Aplicada (função confirmada no servidor em 29/10/2026) |
 
 Conferência da 6 e da 7, em consultas separadas:
 

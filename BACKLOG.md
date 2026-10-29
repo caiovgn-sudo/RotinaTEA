@@ -120,7 +120,7 @@ Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS
 - [x] **UX05** (Pilar 2): alvos de toque ≥ 48px, contraste dos elementos alterados, "Mostrar senha" acessível por teclado, SUS sem etiquetas Positivo/Negativo e cabeçalho sem rolagem horizontal no celular.
 
 **Limitações restantes (não concluído):**
-- A migração do SUS foi aplicada no Supabase (2 políticas confirmadas em 28/10/2026); as migrações `20261029000001` e `20261029000002` estão **pendentes** de aplicação, e o envio com conta real **não foi testado** (roteiro em DEPLOY_VERCEL.md).
+- A migração do SUS foi aplicada no Supabase (2 políticas confirmadas em 28/10/2026); as migrações `20261029000001` e `20261029000002` foram aplicadas (funções `resumo_sus` e `vincular_conta_aos_exemplos` confirmadas no servidor em 29/10/2026; os códigos ALN-4412 e ALN-8921 conferidos no SQL Editor), e o envio com conta real **não foi testado** (roteiro em DEPLOY_VERCEL.md).
 - O relatório do PEI usa a impressão do navegador (a opção de salvar em PDF vem do próprio navegador); a aparência impressa não foi conferida em papel nem em outros navegadores. As leituras de padrão são indícios estatísticos simples, não diagnóstico.
 - O CSP (política de conteúdo) não foi configurado na Vercel; o aplicativo usa fontes do Google e a API do ARASAAC. Não há tela que consolide as respostas (consulta por SQL) e as faixas de classificação têm `REVISAR` (conferir a referência no artigo).
 - O bloqueio ao revogar vale **no aparelho** (estado local, IndexedDB): não há regra no servidor (RLS) que impeça um educador de gravar crises de um aluno com consentimento revogado, e a revogação feita em outro aparelho só chega aqui quando houver sincronização do termo. Também não apaga dados já coletados.
