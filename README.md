@@ -4,6 +4,32 @@
 
 O **RotinaTEA** é um Progressive Web App (PWA) acessível, intuitivo e com arquitetura *offline-first*, desenvolvido para promover previsibilidade, reduzir a sobrecarga sensorial e mitigar crises de ansiedade durante transições de atividades escolares, otimizando simultaneamente o registro e a análise comportamental pelos docentes para alimentar o Plano de Ensino Individualizado (PEI).
 
+**Trabalho de Conclusão de Curso** · Sistemas de Informação · CEUNI FAMETRO · turma SIS231N01 · Manaus – AM · 2026
+**Autores:** Caio Victor Galvão do Nascimento e Pedro Neves Alberto · **Orientadora:** Profa. Luana Magalhães Leal
+
+### Situação atual (novembro de 2026)
+
+| Item | Situação |
+|---|---|
+| Prancha visual, temporizador, registro de crise em 1 clique, painel do PEI, formulário SUS | Implementados |
+| Testes automatizados | 114 testes em 9 arquivos, sem falhas (`npm test`) |
+| Sincronização com o Supabase | Testada com um dublê; teste ponta a ponta com conta real **pendente** |
+| Publicação (Vercel) | **Pendente**; o sistema roda localmente |
+| Avaliação de usabilidade (SUS) com educadores | **Não aplicada** |
+| Dados | Fictícios; nenhuma criança real; alunos identificados só por código |
+
+### Telas (modo de demonstração, dados fictícios)
+
+| Entrada e perfis | Prancha do aluno |
+|---|---|
+| ![Tela de entrada](imagens/tela-1-entrada.jpg) | ![Prancha de rotina do aluno](imagens/tela-2-prancha.jpg) |
+
+| Registro de crise em 1 clique | Painel do PEI |
+|---|---|
+| ![Registro de crise](imagens/tela-4-registro-crise.jpg) | ![Painel do PEI](imagens/tela-5-painel-pei.jpg) |
+
+Também em `imagens/`: temporizador visual (`tela-3-temporizador.jpg`) e formulário SUS (`tela-6-formulario-sus.jpg`).
+
 ---
 
 ## 🎯 Diferencial Inovador
