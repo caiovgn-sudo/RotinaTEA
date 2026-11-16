@@ -35,8 +35,9 @@ O RotinaTEA adota uma arquitetura desacoplada e modular baseada no princípio de
                                │ (Quando online - segundo plano)
                                ▼
 ┌───────────────────────────────────────────────────────────────┐
-│                      API BACKEND (Node.js)                    │
-│      - RESTful API / JWT Auth / Endpoints de Sincronização    │
+│                SUPABASE (API gerada + Auth/JWT)               │
+│   - Autenticação, API REST gerada a partir do esquema         │
+│   - Políticas RLS aplicam a separação por perfil no banco     │
 └──────────────────────────────┬────────────────────────────────┘
                                │
                                ▼
@@ -45,6 +46,8 @@ O RotinaTEA adota uma arquitetura desacoplada e modular baseada no princípio de
 │       - Persistência estruturada em servidor central          │
 └───────────────────────────────────────────────────────────────┘
 ```
+
+> **Atualização (novembro de 2026):** o desenho inicial previa uma API própria em Node.js. A implementação adotou o Supabase (PostgreSQL, autenticação e Row Level Security), e o navegador conversa direto com ele; não há servidor Node.js no projeto. Ver ADR 05.
 
 ---
 
@@ -128,3 +131,8 @@ Em alinhamento direto com o **Diagrama de Classes** oficial do projeto:
 - **Contexto**: O Artigo 14 da LGPD exige tratamento estrito de dados pessoais de crianças e adolescentes. O diagnóstico e dados comportamentais de TEA são dados de saúde sensíveis.
 - **Decisão**: Identificadores pessoais diretos (nome completo, CPF, foto) não transitam para relatórios gerais e dashboards. Toda agregação analítica é associada unicamente ao `codigoAnonimizado` do aluno.
 - **Consequência**: Conformidade com a legislação e preservação ética da identidade do menor.
+
+### ADR 05: Supabase como banco remoto e camada de segurança, no lugar de API própria
+- **Contexto**: o desenho inicial previa uma API Node.js com JWT. Para um projeto de dois autores, manter um servidor próprio aumentaria o código e a superfície de ataque.
+- **Decisão**: usar o Supabase (PostgreSQL, autenticação e API gerada). A separação entre perfis é aplicada por Row Level Security no banco (migrações em `app/supabase/migrations`), e o perfil é fixado no servidor.
+- **Consequência**: menos código de servidor e regras de acesso que valem mesmo se a interface for contornada. Em contrapartida, o teste ponta a ponta com conta real e a publicação ainda estão pendentes, e a chave pública do Supabase precisa ser trocada antes da publicação (ver `DEPLOY_VERCEL.md`).

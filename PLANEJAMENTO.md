@@ -102,7 +102,7 @@ Desenvolver uma plataforma digital web e mobile (Progressive Web App) para geren
 2. **Agilidade**: Tempo de disparo do registro de crise inferior a **1 segundo** (1 único clique).
 3. **Resiliência Offline**: Gravação garantida de 100% dos eventos locais mesmo sem conexão de rede.
 4. **Privacidade**: 0 ocorrências de nomes completos ou fotos de alunos em dashboards ou relatórios exportados.
-5. **Usabilidade**: Pontuação média superior a 75 pontos na escala SUS com educadores.
+5. **Usabilidade**: Pontuação média de pelo menos 68 pontos na escala SUS com educadores (média de referência da escala; valor também usado no artigo e no sistema).
 
 ---
 

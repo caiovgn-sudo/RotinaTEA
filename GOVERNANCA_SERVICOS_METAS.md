@@ -52,6 +52,6 @@ Estrutura de governança ágil, gerenciamento de serviços inspirado no ITIL (de
 | **Taxa de Disparo de Crise (Agilidade)** | Assegurar que o registro não atrapalhe a aula | Tempo medido entre o clique e o início do cronômetro | < 1,0 segundo | Contínua | Devs |
 | **Taxa de Sucesso Offline** | Garantir que nenhum dado seja perdido sem internet | % de eventos de crise gravados localmente sem erro | 100% | Por versão | Devs |
 | **Conformidade com Acessibilidade** | Aderir às normas de inclusão digital | Pontuação nos testes automatizados axe-core / Lighthouse | >= 95% | Quinzenal | Devs |
-| **Índice de Usabilidade SUS** | Validar a facilidade de uso com educadores | Aplicação de questionário padronizado System Usability Scale | >= 75 pontos | Mensal | Educadores / Devs |
+| **Índice de Usabilidade SUS** | Validar a facilidade de uso com educadores | Aplicação de questionário padronizado System Usability Scale | >= 68 pontos | Mensal | Educadores / Devs |
 | **Conclusão de Rotinas pelos Alunos** | Medir a efetividade da tecnologia assistiva | % de tarefas diárias marcadas como concluídas | >= 80% | Semanal | Professores |
 | **Incidentes de Vazamento LGPD** | Garantir proteção de dados sensíveis | Auditoria de dados exportados e payloads de API | 0 incidentes | Contínua | Equipe |
