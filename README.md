@@ -1,11 +1,26 @@
 # RotinaTEA — Plataforma Digital de Tecnologia Assistiva
 
+[![Testes](https://img.shields.io/badge/testes-114%20passando-2e7d32)](app/src) [![React](https://img.shields.io/badge/React-18-3a6b7e)](https://react.dev) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3a6b7e)](https://www.typescriptlang.org) [![PWA](https://img.shields.io/badge/PWA-offline--first-5c8374)](ARQUITETURA_ENGENHARIA.md) [![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-5c8374)](DIRETRIZES_UX_ACESSIBILIDADE.md) [![LGPD](https://img.shields.io/badge/LGPD-anonimiza%C3%A7%C3%A3o%20na%20origem-b45309)](ARQUITETURA_ENGENHARIA.md) ![Status](https://img.shields.io/badge/status-TCC%20em%20valida%C3%A7%C3%A3o-757575)
+
 > **Solução digital centrada nas necessidades reais de alunos com Transtorno do Espectro Autista (TEA), educadores, familiares e gestores escolares.**
 
 O **RotinaTEA** é um Progressive Web App (PWA) acessível, intuitivo e com arquitetura *offline-first*, desenvolvido para promover previsibilidade, reduzir a sobrecarga sensorial e mitigar crises de ansiedade durante transições de atividades escolares, otimizando simultaneamente o registro e a análise comportamental pelos docentes para alimentar o Plano de Ensino Individualizado (PEI).
 
 **Trabalho de Conclusão de Curso** · Sistemas de Informação · CEUNI FAMETRO · turma SIS231N01 · Manaus – AM · 2026
 **Autores:** Caio Victor Galvão do Nascimento e Pedro Neves Alberto · **Orientadora:** Profa. Luana Magalhães Leal
+
+### Funcionalidades
+
+- **Prancha visual** com cartões de pictogramas ARASAAC, conclusão por clique, arraste ou teclado.
+- **Temporizador visual** sem alarme sonoro, com anel que se esvazia.
+- **Registro de crise em 1 clique**, com duração calculada e gravação local antes de qualquer envio (offline-first).
+- **Painel do PEI** anonimizado, com gráficos por dia, faixa de horário e dia da semana, e relatório para impressão ou PDF.
+- **Consentimento LGPD** revogável pelo responsável e formulário **SUS** integrado.
+- **Três modos de contraste** e fonte ampliável.
+
+### Tecnologias
+
+React 18 · TypeScript · Vite · vite-plugin-pwa (Service Worker) · IndexedDB · Supabase (PostgreSQL, Auth, RLS) · Vitest.
 
 ### Situação atual (novembro de 2026)
 
@@ -46,19 +61,20 @@ Enquanto ferramentas existentes focam exclusivamente em comunicação alternativ
 2. **Eixo 2 — Interação Humano-Computador (IHC) e UX/UI**: Design centrado no usuário neurodivergente, conformidade WCAG 2.1 AA/AAA, paleta de cores atenuadas, navegação por teclado e testes empíricos de usabilidade (SUS).
 3. **Eixo 3 — Dados, Inteligência e Infraestrutura**: Persistência relacional e local (IndexedDB offline-first), painéis analíticos com correlação temporal e autenticação segura (RBAC/JWT).
 4. **Eixo 4 — Gestão, Negócios e Governança de TI**: Otimização processual em sala de aula (registro sem sobrecarga), governança baseada em ITIL enxuto e exportação estruturada para o PEI.
-5. **Eixo 5 — Transversal: Ética, Sustentabilidade e Sociedade (ODS)**: Alinhamento aos ODS 4 (Educação de Qualidade) e ODS 10 (Redução das Desigualdades); conformidade rigorosa com a LGPD (anonimização na origem de dados de menores).
+5. **Eixo 5 — Transversal: Ética, Sustentabilidade e Sociedade (ODS)**: Alinhamento ao ODS 4 (Educação de Qualidade), principal, e ao ODS 3 (Saúde e Bem-Estar), complementar; conformidade rigorosa com a LGPD (anonimização na origem de dados de menores).
 
 ---
 
 ## 📂 Estrutura de Documentação do Projeto
 
-- [README.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/README.md): Visão geral, guia de instalação e execução.
-- [PLANEJAMENTO.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/PLANEJAMENTO.md): Tema, problema de pesquisa, personas, jornada do usuário, escopo e backlog priorizado (Kanban).
-- [ARQUITETURA_ENGENHARIA.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/ARQUITETURA_ENGENHARIA.md): Arquitetura de software, offline-first, modelo de dados e decisões técnicas (ADR).
-- [DIRETRIZES_UX_ACESSIBILIDADE.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/DIRETRIZES_UX_ACESSIBILIDADE.md): Acessibilidade cognitiva para TEA, paleta de cores, pictogramas ARASAAC e checklist WCAG.
-- [PROCESSOS_FLUXOS.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/PROCESSOS_FLUXOS.md): Mapeamento de processos e fluxos BPMN (Mermaid).
-- [PLANO_TESTES_QUALIDADE.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/PLANO_TESTES_QUALIDADE.md): Matriz de rastreabilidade, casos de teste (ISO/IEC 25010) e ciclo PDCA.
-- [GOVERNANCA_SERVICOS_METAS.md](file:///c:/Users/raiderZ/Documents/Projetos/RotinaTEA/docs/GOVERNANCA_SERVICOS_METAS.md): Gestão de incidentes (ITIL enxuto), matriz de riscos, indicadores e metas (KPIs).
+- [README.md](README.md): Visão geral, guia de instalação e execução.
+- [desenvolvimento/](desenvolvimento/): [Requisitos e regras de negócio](desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md), [Padrões de projeto](desenvolvimento/PADROES_DE_PROJETO.md), [Avaliação heurística](desenvolvimento/AVALIACAO_HEURISTICA.md) e [Documento de interface (wireframes)](desenvolvimento/DOCUMENTO_DE_INTERFACE.md).
+- [PLANEJAMENTO.md](PLANEJAMENTO.md): Tema, problema de pesquisa, personas, jornada do usuário, escopo e backlog priorizado (Kanban).
+- [ARQUITETURA_ENGENHARIA.md](ARQUITETURA_ENGENHARIA.md): Arquitetura de software, offline-first, modelo de dados e decisões técnicas (ADR).
+- [DIRETRIZES_UX_ACESSIBILIDADE.md](DIRETRIZES_UX_ACESSIBILIDADE.md): Acessibilidade cognitiva para TEA, paleta de cores, pictogramas ARASAAC e checklist WCAG.
+- [PROCESSOS_FLUXOS.md](PROCESSOS_FLUXOS.md): Mapeamento de processos e fluxos BPMN (Mermaid).
+- [PLANO_TESTES_QUALIDADE.md](PLANO_TESTES_QUALIDADE.md): Matriz de rastreabilidade, casos de teste (ISO/IEC 25010) e ciclo PDCA.
+- [GOVERNANCA_SERVICOS_METAS.md](GOVERNANCA_SERVICOS_METAS.md): Gestão de incidentes (ITIL enxuto), matriz de riscos, indicadores e metas (KPIs).
 
 ---
 
@@ -83,7 +99,9 @@ npm run dev
 npm test
 ```
 
-A aplicação estará disponível em `http://localhost:5173`.
+A aplicação estará disponível em `http://localhost:5173`. Para ver o sistema sem criar conta, abra **Entrar → Demonstração** e escolha um perfil (dados fictícios, nada é enviado a servidor).
+
+> **Vídeo de demonstração:** ainda não publicado. O link será acrescentado aqui e em `LINKS_DO_PROJETO.md`.
 
 
 ---

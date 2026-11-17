@@ -37,7 +37,7 @@ O RotinaTEA é um Progressive Web App com prancha de rotina visual para o aluno 
 | RNF02 | Disponibilidade offline | Registro de crise e prancha sem conexão, com gravação prévia em IndexedDB | Verificado por `integracao.test.ts` (IndexedDB simulado) |
 | RNF03 | Privacidade | Anonimização na origem e consentimento revogável (LGPD, arts. 11 e 14) | Implementado; sem regra de revogação no servidor |
 | RNF04 | Segurança | Supabase Auth, perfil fixado no servidor e RLS, com gravação de crises restrita a professor e coordenação | Migrações aplicadas em 28/10/2026 (4 políticas confirmadas) |
-| RNF05 | Desempenho | Botão de crise com resposta em menos de 1 segundo, mesmo sem rede | **Não medido** |
+| RNF05 | Desempenho | Botão de crise com resposta em menos de 1 segundo, mesmo sem rede | Medição preliminar em 17/11/2026: cerca de 10 ms online e no máximo 14 ms offline simulado (ver seção 5.1) |
 | RNF06 | Manutenibilidade | Separação entre interface, regras e dados; testes automatizados | 114 testes em 9 arquivos, sem falhas |
 | RNF07 | Usabilidade | Pontuação SUS medida com educadores (meta: 68 pontos) | **SUS não aplicado** |
 
@@ -56,12 +56,18 @@ O RotinaTEA é um Progressive Web App com prancha de rotina visual para o aluno 
 | Critério | Meta | Situação |
 |---|---|---|
 | Acessibilidade | Fluxos principais operáveis por teclado, WCAG 2.1 AA | Parcial (contraste medido; teclado e leitor de tela sem registro completo) |
-| Agilidade | Registro de crise em menos de 1 segundo | Não medido |
+| Agilidade | Registro de crise em menos de 1 segundo | Medição preliminar: cerca de 10 ms (ver seção 5.1); falta medir em tablet real |
 | Resiliência offline | 100% dos eventos gravados localmente sem conexão | Verificado em teste com IndexedDB simulado |
 | Privacidade | Nenhum nome ou foto de aluno em painéis ou relatórios | Verificado por regra e teste (código ALN-0000) |
 | Usabilidade | Média SUS de pelo menos 68 pontos | Não aplicado |
 
 > A meta do SUS é **68**, a média de referência da escala (BROOKE, 1996; SAURO; LEWIS), e é o valor usado no artigo e no sistema. Documentos antigos do projeto citavam 75; foram alinhados a 68.
+
+### 5.1 Medição preliminar do RNF05 (17/11/2026)
+
+- **Método:** no modo de demonstração (perfil Professor), com o servidor de desenvolvimento (Vite), um script no navegador registrou o tempo entre o clique em "Iniciar registro de crise" e o aparecimento do botão "Encerrar" no DOM. Foram 10 repetições com conexão e 10 com a queda simulada pelo botão de demonstração.
+- **Resultado:** online, de 7,0 a 10,3 ms; offline simulado, de 10,2 a 14,0 ms. Todos muito abaixo do limite de 1 segundo.
+- **Limites:** clique disparado por script (não inclui a latência do toque), computador de desenvolvimento (não um tablet escolar), build de desenvolvimento (não o de produção), tempo até a atualização do DOM (não inclui a pintura nem a gravação no IndexedDB) e queda de rede simulada pelo sistema (não o Wi-Fi desligado). Para a banca, repetir em um tablet com o build publicado.
 
 ## 6. Rastreabilidade resumida
 

@@ -50,7 +50,7 @@ Telas inspecionadas: (1) entrada e perfis, (2) prancha do aluno, (3) temporizado
 - **H5:** a exclusão de crise em andamento é bloqueada (RN01), e o botão de iniciar fica inativo, com o motivo explicado, quando o consentimento está revogado.
 - **H6 (reconhecer em vez de lembrar):** estados vazios dizem o que fazer ("Use o botão vermelho quando um episódio começar…"), e o registro de atividades lista as últimas 30 ações.
 - **H9 (ajudar a reconhecer e corrigir erros):** o aviso de sessão encerrada diz que os registros salvos no aparelho não foram perdidos.
-- **Melhorias:** o tempo de resposta do botão (RNF05, menos de 1 segundo) ainda **não foi medido** (gravidade 3 para a validação, pois é critério de sucesso do projeto).
+- **Melhorias:** o tempo de resposta do botão (RNF05, menos de 1 segundo) teve medição preliminar em 17/11/2026 (cerca de 10 ms; ver `REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, seção 5.1), faltando repetir em tablet real com o build publicado.
 
 ### Tela 5 — Painel do PEI e relatório
 
@@ -96,7 +96,7 @@ Telas inspecionadas: (1) entrada e perfis, (2) prancha do aluno, (3) temporizado
 
 1. Aplicar o SUS e o teste de tarefas com educadores (ainda não feito) e comparar com esta inspeção.
 2. Acrescentar a recuperação de senha e decidir o envio do SUS pelo Professor.
-3. Medir o tempo de resposta do botão de crise (RNF05) e testar com um leitor de tela.
+3. Repetir a medição do botão de crise (RNF05) em tablet real com o build publicado e testar com um leitor de tela.
 
 ## Referência
 

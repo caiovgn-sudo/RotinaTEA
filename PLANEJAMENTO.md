@@ -18,8 +18,9 @@ Documento consolidado de pré-projeto, escopo e planejamento estratégico do **R
 - **Inclusão Escolar e Neurodiversidade**: A inclusão de estudantes com TEA em salas de aula regulares exige suporte pedagógico estruturado. Transições bruscas e imprevisíveis são os maiores causadores de sobrecarga sensorial e desregulação.
 - **Sobrecarga do Docente**: O registro manual em fichas impressas durante a aula retira a atenção do professor e gera lacunas nos relatórios pedagógicos.
 - **Alinhamento com os ODS da ONU**:
-  - **ODS 4 (Educação de Qualidade)**: Garante ambientes de aprendizagem inclusivos e equitativos.
-  - **ODS 10 (Redução das Desigualdades)**: Promove a permanência e autonomia de pessoas com deficiência.
+  - **ODS 4 (Educação de Qualidade), principal**: Garante ambientes de aprendizagem inclusivos e equitativos.
+  - **ODS 3 (Saúde e Bem-Estar), complementar**: Apoia o bem-estar do aluno nas transições e nas crises, com dados que orientam a equipe.
+  - *Nota (novembro de 2026):* o ODS 10, usado antes, saiu da lista; a orientação da disciplina admite para SIS os ODS 3, 4, 8, 11 e 12.
 
 ---
 
