@@ -43,6 +43,11 @@ describe('Contraste da paleta (WCAG 2.1 AA, mínimo 4,5:1)', () => {
           }
         }
         expect(falhas).toEqual([]);
+        // Regressão achada pelo Lighthouse em produção (24/11/2026): a opacidade do cartão concluído
+        // misturava as cores e reduzia o contraste do texto a menos de 4,5:1.
+        const bloco = css.match(/[.]routine-card[.]completed-card[ ]*[{][^}]*[}]/);
+        expect(bloco).not.toBeNull();
+        expect(bloco![0]).not.toMatch(/opacity[ ]*:/);
       });
 
       it('texto sobre preenchimentos sólidos (botões e selos)', () => {
