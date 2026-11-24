@@ -26,7 +26,7 @@ O RotinaTEA é um Progressive Web App (PWA) em React 18 e TypeScript, com persis
 
 - **Onde:** `src/utils/regras.ts`, `acesso.ts`, `pei.ts`, `sus.ts`.
 - **O que faz:** as regras (duração da crise, quem pode registrar, quando a coleta é permitida, pontuação do SUS) são funções sem efeito colateral, que recebem dados e devolvem um resultado.
-- **Por quê:** permite testar a regra sem abrir tela nem banco. Os 114 testes automatizados (Vitest, 9 arquivos) importam esse código real. A interface apenas chama a regra e mostra o resultado.
+- **Por quê:** permite testar a regra sem abrir tela nem banco. Os 121 testes automatizados (Vitest, 10 arquivos) importam esse código real. A interface apenas chama a regra e mostra o resultado.
 - **Exemplo:** `podeExcluirCrise(crise)` aplica a RN01 (não excluir registro sem fim); a mesma função é usada na tela e nos testes.
 
 ### 2.2 Offline-first com fila de saída (Outbox)

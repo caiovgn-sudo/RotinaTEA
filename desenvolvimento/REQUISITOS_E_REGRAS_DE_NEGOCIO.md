@@ -38,7 +38,7 @@ O RotinaTEA é um Progressive Web App com prancha de rotina visual para o aluno 
 | RNF03 | Privacidade | Anonimização na origem e consentimento revogável (LGPD, arts. 11 e 14) | Implementado; sem regra de revogação no servidor |
 | RNF04 | Segurança | Supabase Auth, perfil fixado no servidor e RLS, com gravação de crises restrita a professor e coordenação | Migrações aplicadas em 28/10/2026 (4 políticas confirmadas) |
 | RNF05 | Desempenho | Botão de crise com resposta em menos de 1 segundo, mesmo sem rede | Medição preliminar em 17/11/2026: cerca de 10 ms online e no máximo 14 ms offline simulado (ver seção 5.1) |
-| RNF06 | Manutenibilidade | Separação entre interface, regras e dados; testes automatizados | 114 testes em 9 arquivos, sem falhas |
+| RNF06 | Manutenibilidade | Separação entre interface, regras e dados; testes automatizados | 121 testes em 10 arquivos, sem falhas |
 | RNF07 | Usabilidade | Pontuação SUS medida com educadores (meta: 68 pontos) | **SUS não aplicado** |
 
 ## 4. Regras de negócio

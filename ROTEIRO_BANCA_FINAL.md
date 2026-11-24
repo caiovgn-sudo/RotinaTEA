@@ -11,7 +11,7 @@ Apresentadores: Caio (C) e Pedro (P). Meta: 6 min 30 s de fala e 30 s de folga. 
 | 1:15–2:00 | 3 A solução | P | Prancha e temporizador visual; crise em 1 clique; painel do PEI anonimizado. Falar pelo benefício. |
 | 2:00–4:30 | 4 Demonstração | C e P | Ao vivo, no modo Demonstração (seção 2). Plano B: `RotinaTEA Web.mp4` aberto em outra aba. |
 | 4:30–5:15 | 5 Tecnologias | P | Uma escolha: dado gravado primeiro no aparelho (IndexedDB) e enviado depois ao Supabase, porque a internet das escolas é instável. |
-| 5:15–6:00 | 6 Resultados | P | 114 testes; 11 de 12 requisitos; cerca de 10 ms no botão de crise (medição preliminar); questionário com 22 participantes. **Dizer que o SUS com educadores não foi aplicado.** |
+| 5:15–6:00 | 6 Resultados | P | 121 testes; 11 de 12 requisitos; cerca de 10 ms no botão de crise (medição preliminar); questionário com 22 participantes. **Dizer que o SUS com educadores não foi aplicado.** |
 | 6:00–6:30 | 7 Encerramento | C | Retomar o problema em uma frase, agradecer e deixar o slide aberto para as perguntas. |
 
 Se estourar o tempo, corte primeiro a lista de tecnologias e depois a segunda metade dos resultados.
@@ -20,7 +20,7 @@ Se estourar o tempo, corte primeiro a lista de tecnologias e depois a segunda me
 
 | Afirmação | Origem |
 |---|---|
-| 114 testes sem falhas | `npm test` (9 arquivos) |
+| 121 testes sem falhas | `npm test` (10 arquivos) |
 | 11 de 12 requisitos | `desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md` (RF09 parcial) |
 | cerca de 10 ms | seção 5.1 do mesmo documento (computador, modo Demonstração) |
 | 22 participantes; 77,3% com nota 4 ou 5 na facilidade; 77,3% sem ajuda; 86,4% recomendariam, os demais "talvez" | `VALIDACAO_PRODUTO.md` |

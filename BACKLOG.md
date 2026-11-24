@@ -74,7 +74,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
-- ✅ `npm test` — Vitest: 114 testes (9 arquivos) importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar, cálculo do SUS, agregações do PEI, integração do IndexedDB com a fila (fake-indexeddb), configuração de publicação e contraste da paleta (lê o `index.css`)
+- ✅ `npm test` — Vitest: 121 testes (10 arquivos) importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar, cálculo do SUS, agregações do PEI, integração do IndexedDB com a fila (fake-indexeddb), configuração de publicação e contraste da paleta (lê o `index.css`)
 - ⚠️ Lint: **ESLint/Prettier não estão configurados**; o build acusa apenas o aviso de import dinâmico ineficaz (não bloqueante)
 
 ---
@@ -104,7 +104,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 
 Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS_UX_2026-10.md).
 
-**Concluído (verificado com tsc, 114 testes e build; telas conferidas no navegador):**
+**Concluído (verificado com tsc, 121 testes e build; telas conferidas no navegador):**
 - [x] **UX01** (Pilar 1): frase de propósito por visão, navegação com visões bloqueadas explicadas, faixa de tipo de acesso (visitante, conta real, demonstração) e aba "Sobre o RotinaTEA".
 - [x] **UX02** (Pilares 1 e 2): conexão real (`navigator.onLine`) separada do simulador de demonstração; painel de sincronização com "Sincronizar agora" e "Tentar novamente"; selos "Salva só neste aparelho", "Enviada ao servidor" e "Falhou o envio".
 - [x] **UX03** (Pilar 1): registro local de atividades sem dados pessoais, diálogo de confirmação acessível e estados vazios explicativos.
@@ -135,7 +135,7 @@ Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS
 
 ## 🔎 Revisão geral de 24/11/2026 (Pilares 2 e 3)
 
-- **Verificado:** `tsc --noEmit` sem erros; 114 testes aprovados em 9 arquivos; build do PWA concluído (26 entradas, 523 KiB); `npm audit --omit=dev` com 0 vulnerabilidades.
+- **Verificado:** `tsc --noEmit` sem erros; 121 testes aprovados em 10 arquivos; build do PWA concluído (26 entradas, 523 KiB); `npm audit --omit=dev` com 0 vulnerabilidades.
 - **Corrigido:** `npm audit fix` (sem mudança de versão principal) em `package-lock.json`; diagrama de sequência de `PROCESSOS_FLUXOS.md` atualizado para o Supabase; `PLANO_TESTES_QUALIDADE.md` ganhou CT05, CT06 e a seção de evidências; `CHECKLIST.md` identificado como histórico; integração contínua adicionada (`.github/workflows/ci.yml`).
 - **Novo documento:** `PROTOCOLO_AVALIACAO_SUS.md` (termo de consentimento, tarefas por perfil, ficha de observação e como calcular o SUS) e `ROTEIRO_BANCA_FINAL.md` (substitui o roteiro da pré-banca).
 - **Dados da validação:** 22 respostas reais (`VALIDACAO_PRODUTO.md`); números antigos sem comprovação foram retirados.

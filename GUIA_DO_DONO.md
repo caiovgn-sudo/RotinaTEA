@@ -17,7 +17,7 @@ TCC da FAMETRO, turma SIS231N01. Autores: Caio Victor Galvão do Nascimento e Pe
 - **Perfis:** Responsável (nasce assim ao cadastrar), Professor, Coordenação; o Aluno usa a prancha sem login. O perfil é fixado no servidor; ninguém se promove sozinho.
 - **Telas principais:** prancha visual com temporizador; crise em 1 clique; Coordenação/PEI com "Padrões observados" e relatório com gráficos; avaliação SUS (resultados agregados só para a Coordenação); 3 modos de contraste.
 - **Figuras:** vêm da API do ARASAAC (precisa de internet na primeira carga).
-- **Testes:** 114 em 9 arquivos (Vitest), incluindo integração do IndexedDB e da fila com um dublê do Supabase, e medição real de contraste. A integração contínua (GitHub Actions) roda tipos, testes e build a cada alteração.
+- **Testes:** 121 em 10 arquivos (Vitest), incluindo integração do IndexedDB e da fila com um dublê do Supabase, e medição real de contraste. A integração contínua (GitHub Actions) roda tipos, testes e build a cada alteração.
 
 ## 3. Regras que não podem quebrar
 
