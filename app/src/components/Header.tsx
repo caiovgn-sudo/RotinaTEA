@@ -184,7 +184,7 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           className={`accessibility-btn ${fonteAmpliada ? 'active' : ''}`}
           onClick={onAlternarFonteAmpliada}
-          aria-label={fonteAmpliada ? 'Restaurar tamanho padrão da fonte' : 'Ampliar tamanho da fonte'}
+          aria-label={fonteAmpliada ? 'Grande: restaurar tamanho padrão da fonte' : 'Normal: ampliar tamanho da fonte'}
           title={fonteAmpliada ? 'Fonte Padrão' : 'Fonte Ampliada (A+)'}
         >
           <Type size={16} aria-hidden="true" />
@@ -214,7 +214,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               className="btn btn-primary btn-sm"
               onClick={onEntrar}
-              aria-label="Fazer login no sistema"
+              aria-label="Entrar: fazer login no sistema"
               style={{ display: 'flex', alignItems: 'center', gap: 6 }}
             >
               <LogIn size={14} aria-hidden="true" />

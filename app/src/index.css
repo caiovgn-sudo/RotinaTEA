@@ -320,7 +320,7 @@ body {
 .routine-card.completed-card {
   background-color: var(--success-light);
   border-color: var(--success);
-  opacity: 0.85;
+  /* Sem transparência no cartão: ela mistura as cores do texto e derruba o contraste (Lighthouse mediu de 3,9 a 4,3 para 1). */
 }
 
 .card-order-badge {
