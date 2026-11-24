@@ -26,12 +26,15 @@ Arquivos atuais: `Artigo_RotinaTEA_v11` (.docx e .pdf), `Banner_RotinaTEA_v11` (
 
 ---
 
-## 🌐 Site Publicado na Vercel ⏳ **PENDENTE DE DEPLOY**
+## 🌐 Site Publicado na Vercel ✅ **PUBLICADO EM 24/11/2026**
 
-- **URL de Produção:** **não confirmado** — requer deploy manual via Vercel
-- **URL de Preview (PRs):** **não confirmado**
+- **URL de Produção:** https://rotinatea.vercel.app (projeto `rotinatea`, time `RotinaTEA`, plano Hobby)
+- **Como foi publicado:** pela CLI da Vercel, a partir de `docs/app`, com as variáveis de produção abaixo e `VITE_MODO_DEMO=false` (só contas reais; sem login de demonstração).
+- **Conferido:** a página carrega, o manifesto e o service worker estão presentes e o console não acusa erros. **Não conferido:** cadastro e login reais, sincronização com conta real e instalação do PWA em aparelho.
+- **Pendências:** configurar **Site URL** e **Redirect URLs** do Supabase Auth com esse endereço; conectar o repositório do GitHub ao projeto para publicar a cada alteração na `main`; trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
+- **URL de Preview (PRs):** não configurada (depende da conexão com o GitHub).
 
-### Como fazer o deploy (necessário acesso à conta Vercel):
+### Como refazer o deploy (necessário acesso à conta Vercel):
 
 ```bash
 # 1. Login na Vercel (requer interação do usuário)
@@ -97,10 +100,10 @@ npx vercel --prod
 ## 📋 Checklist de Deploy
 
 - [x] Código na `origin/main` (pull request nº 1 mesclado em 24/11/2026)
-- [ ] Repositório importado na Vercel
-- [ ] Variáveis de ambiente configuradas na Vercel
-- [ ] Build de produção bem-sucedido na Vercel
-- [ ] URL de produção acessível
+- [ ] Repositório do GitHub conectado à Vercel (o deploy de 24/11 foi pela CLI)
+- [x] Variáveis de ambiente configuradas na Vercel (5 variáveis de produção)
+- [x] Build de produção bem-sucedido na Vercel
+- [x] URL de produção acessível (https://rotinatea.vercel.app)
 - [x] Supabase project configurado com migração aplicada (**concluído**: `up to date`)
 - [x] RLS policies validadas em produção (**concluído**: migração aplicada)
 - [ ] PWA instalável verificado em dispositivo real

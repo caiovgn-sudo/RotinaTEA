@@ -36,7 +36,7 @@ Toda mudança deve dizer a qual pilar serve: 1 engenharia, 2 qualidade/testes, 3
 | Questionário de validação com usuários | **22 respostas** (amostra de conveniência, 5 educadores); aceitação preliminar favorável; resultados em `VALIDACAO_PRODUTO.md` |
 | Sincronização | Testada só contra um **dublê** do Supabase. **Falta teste ponta a ponta com conta real** |
 | Migrações 1 a 7 | Aplicadas e conferidas no Supabase até 29/10/2026 |
-| Publicação na Vercel | **Não feita.** O app só roda local (`npm run dev` em `app`) |
+| Publicação na Vercel | **Feita em 24/11/2026**: https://rotinatea.vercel.app, com `VITE_MODO_DEMO=false` (só contas reais). **Falta** configurar Site URL e Redirect URLs no Supabase Auth e rodar o teste com conta real. A demonstração da banca continua local (`npm run dev` em `app`) |
 | Avaliação SUS com educadores | **Não feita.** Não há nota para citar. O protocolo está pronto: `PROTOCOLO_AVALIACAO_SUS.md` |
 | Relatório do PEI impresso em papel | Não conferido |
 | Leitor de tela, tablet, axe/Lighthouse | Não testados |
@@ -49,7 +49,7 @@ Nunca digam à banca que a nuvem foi validada, que há resultado de usabilidade 
 
 1. **SUS com educadores:** conseguir pelo menos 5 educadores e seguir `PROTOCOLO_AVALIACAO_SUS.md`; confirmar com a orientadora se o TCLE precisa de aprovação. Só então citar resultados.
 2. Trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
-3. Criar o projeto na Vercel: Root Directory `app`, `VITE_MODO_DEMO=false`, demais variáveis da seção 3. Configurar Site URL e Redirect URLs no Supabase Auth.
+3. (Vercel já criada) Configurar **Site URL** e **Redirect URLs** do Supabase Auth com `https://rotinatea.vercel.app`; conectar o repositório do GitHub ao projeto da Vercel para publicar a cada alteração na `main` (hoje o deploy foi feito pela CLI).
 4. Teste ponta a ponta com conta real: cadastrar, promover a Professor via SQL, vincular aos exemplos, registrar uma crise e ver o selo mudar para "Enviada". Roteiro na seção 4 do `DEPLOY_VERCEL.md`.
 5. Repetir a medição do botão de crise (RNF05) em um tablet e conferir o relatório do PEI impresso.
 6. Gravar e publicar o vídeo de demonstração.
