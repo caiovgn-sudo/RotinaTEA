@@ -62,6 +62,30 @@ sequenceDiagram
     end
 ```
 
+### 2.1 Diagrama de atividades: decisões do registro e do envio
+
+Complementa o diagrama de sequência acima mostrando as decisões do fluxo (consentimento, conexão, confirmação do servidor e limite de tentativas). É a Figura 4 do artigo (v11). Imagem: `imagens/diagramas/atividades-registro-crise.png`.
+
+```mermaid
+flowchart TD
+    Ini([Início]) --> Toca[Professor toca em Iniciar registro de crise]
+    Toca --> Cons[Aplicativo verifica o consentimento do responsável - RN04]
+    Cons --> D1{Coleta permitida?}
+    D1 -- Não --> Motivo[Mostra o motivo e não registra] --> Fim1([Fim])
+    D1 -- Sim --> Grava[Grava o início no IndexedDB e mostra o cronômetro - RN03]
+    Grava --> Enc[Professor toca em Encerrar crise e, se quiser, anota]
+    Enc --> Fim[Grava o fim, calcula a duração - RN01 - e enfileira o envio]
+    Fim --> D2{Conexão e sessão ativas?}
+    D2 -- Não --> Fila[Mantém na fila: Salva só neste aparelho] --> Fim2([Fim])
+    D2 -- Sim --> Srv[Servidor recebe o registro: envio idempotente sob RLS]
+    Srv --> D3{Servidor confirmou?}
+    D3 -- Sim --> Ok[Remove da fila: Enviada ao servidor - RN03] --> Fim3([Fim])
+    D3 -- Não --> Tent[Soma 1 tentativa]
+    Tent --> D4{Menos de 3 tentativas?}
+    D4 -- Sim --> Mantem[Mantém na fila e tenta de novo] --> Fim4([Fim])
+    D4 -- Não --> Erro[Marca Falhou o envio e oferece Tentar novamente] --> Fim5([Fim])
+```
+
 ---
 
 ## 3. Fluxo de Governança e Consentimento LGPD (Responsável Legal)
