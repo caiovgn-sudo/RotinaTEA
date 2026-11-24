@@ -16,7 +16,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 
 - **Plan (Planejar)**: Definição dos critérios de aceitação para cada estória de usuário e elaboração da matriz de rastreabilidade e casos de teste.
 - **Do (Executar)**: Implementação do software e execução dos testes automatizados e empíricos.
-- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade (contraste medido por varredura no navegador e por teste automatizado; axe-core foi executado sobre componentes em teste automatizado (seção 5); Lighthouse e axe na página inteira **não foram executados**) e questionário SUS com educadores (**não aplicado**).
+- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade (contraste medido por varredura no navegador e por teste automatizado; axe-core foi executado sobre componentes em teste automatizado (seção 5); o Lighthouse foi executado no site publicado (seção 5); axe na página inteira **não foi executado**) e questionário SUS com educadores (**não aplicado**).
 - **Act (Agir)**: Correção de defeitos identificados, refinamento de fluxos visuais e atualização contínua da documentação técnica.
 
 ---
@@ -115,12 +115,13 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 | `npm audit --omit=dev` | 0 vulnerabilidades nas dependências de produção |
 | `npm audit` (todas) | 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox); a correção exige atualização com mudança de versão e não afeta o código enviado ao navegador |
 | Acessibilidade automática (axe-core 4, regras WCAG 2.1 A e AA) | 7 testes em `acessibilidade.test.tsx` sobre Sobre, diálogo de confirmação, gráfico, temporizador, cartão de rotina (aluno e educador), painel de sincronização, registro de atividades e selo de sincronização: **0 violações**. Limites: jsdom não mede contraste nem layout (regra `color-contrast` desligada; o contraste é medido em `contraste.test.ts`); não cobre Login, Header, formulário SUS, consentimento e relatório do PEI; não substitui leitor de tela |
+| Lighthouse 13.6 (mobile) em https://rotinatea.vercel.app, tela inicial | **1.ª execução (antes da correção):** desempenho 89, acessibilidade 96, boas práticas 100, SEO 91. Achados: contraste de 3,94 a 4,3:1 no cartão concluído (causa: `opacity: 0.85`, que a varredura e o teste de tokens não cobriam), nomes acessíveis sem o texto visível (botões "Normal/Grande" e "Entrar") e `robots.txt` inválido. **Após a correção (PR 7):** desempenho 90, **acessibilidade 100**, boas práticas 100, SEO 100. Limites: uma página (tela inicial, modo padrão), uma execução por versão, sem outros modos de contraste nem as demais visões; desempenho com FCP 2,3 s e LCP 3,3 s (simulação móvel) |
 | Contraste (WCAG 2.1 AA, texto) | 10.813 textos em 78 estados, nos 3 modos, sem falhas; protegido por `contraste.test.ts` |
 | Desempenho do botão de crise (RNF05) | Medição preliminar de cerca de 10 ms em computador (ver `desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, seção 5.1) |
 
 ### Lacunas de qualidade (não executado)
 
-- Lighthouse e axe na página inteira (inclui Login, Header, SUS, consentimento e relatório do PEI); teste com leitor de tela; teste em outros navegadores e em tablet.
+- Lighthouse nas demais visões e nos modos de alto contraste, e axe na página inteira (inclui Login, Header, SUS, consentimento e relatório do PEI); teste com leitor de tela; teste em outros navegadores e em tablet.
 - Teste de ponta a ponta da sincronização com conta real do Supabase (a fila foi testada com um dublê).
 - Avaliação de usabilidade com educadores (SUS): ver `PROTOCOLO_AVALIACAO_SUS.md`.
 - Testes de componente (React Testing Library) e E2E (Playwright/Cypress).
