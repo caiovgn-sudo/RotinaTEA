@@ -12,6 +12,8 @@
 > | 4. Sessão em `localStorage` em texto plano | **Parcialmente tratado**: contas de teste com senha fixa foram removidas e o modo demonstração não usa senha; a sessão do Supabase segue o armazenamento padrão do SDK |
 > | 5. Vulnerabilidades de dependências | **Corrigido para produção** (`npm audit --omit=dev`: 0); restam 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox) |
 >
+> Lighthouse em produção em 24/11/2026: acessibilidade 100 após corrigir o contraste do cartão concluído (ver `PLANO_TESTES_QUALIDADE.md`, seção 5).
+>
 > Hoje: 121 testes em 10 arquivos, 36 commits, integração contínua no GitHub Actions (`.github/workflows/ci.yml`). Ver `PLANO_TESTES_QUALIDADE.md`, seção 5, e `BACKLOG.md`, revisão de 24/11/2026.
 
 ---
