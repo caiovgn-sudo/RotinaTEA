@@ -38,7 +38,7 @@
 
 | Eixo | Aplicação no RotinaTEA | Evidência |
 |---|---|---|
-| 1. Tecnologia e desenvolvimento de software | Engenharia de requisitos, UML, PWA em React e TypeScript, persistência local em IndexedDB e banco remoto no Supabase (PostgreSQL) | `REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, diagramas, 114 testes automatizados |
+| 1. Tecnologia e desenvolvimento de software | Engenharia de requisitos, UML, PWA em React e TypeScript, persistência local em IndexedDB e banco remoto no Supabase (PostgreSQL) | `REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, diagramas, 121 testes automatizados |
 | 2. IHC e UX/UI | Interface de baixa carga sensorial, WCAG 2.1 AA, três modos de contraste, avaliação heurística e SUS | `DOCUMENTO_DE_INTERFACE.md`, `AVALIACAO_HEURISTICA.md`; SUS ainda não aplicado |
 | 3. Dados, inteligência e infraestrutura | Painel do PEI com gráficos, autenticação e controle de acesso por perfil (RLS), LGPD, nuvem | Painel do PEI; migrações do Supabase |
 | 4. Gestão, negócios e governança de TI | Registro de crise em 1 clique, relatório do PEI, governança enxuta inspirada no ITIL | `GOVERNANCA_SERVICOS_METAS.md`, `PROCESSOS_FLUXOS.md` |

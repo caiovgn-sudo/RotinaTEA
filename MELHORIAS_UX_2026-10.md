@@ -164,7 +164,7 @@ Legenda dos pilares: **1** engenharia/arquitetura · **2** qualidade/testes · *
 | Verificação | Resultado |
 |---|---|
 | `npx tsc --noEmit` | sem erros |
-| `npm test` | **114 testes aprovados** em 9 arquivos (eram 15 antes das melhorias de UX; +99 desde então) |
+| `npm test` | **121 testes aprovados** em 10 arquivos (eram 15 antes das melhorias de UX; +106 desde então) |
 | `npm run build` | sem erros (PWA gerado) |
 | Auditoria no navegador (alvos, contraste e nome acessível) | Etapa 5: 30 combinações (3 contrastes × 2 tamanhos de fonte × 5 visões) mais login e SUS: **0 alvos < 48px, 0 controles sem nome**. Rodada 2 (contraste): **78 estados** (login em 3 abas, 5 visões, crise em andamento, modal de observação, configuração de cartões, SUS e diálogo de revogação × 3 modos × 2 tamanhos de fonte), **10.813 textos medidos, 0 falhas de contraste**, incluindo o pior ponto de fundos com gradiente |
 | Celular (375px, fonte ampliada) | sem rolagem horizontal nas 5 visões |

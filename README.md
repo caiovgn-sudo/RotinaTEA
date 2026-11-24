@@ -1,6 +1,6 @@
 # RotinaTEA — Plataforma Digital de Tecnologia Assistiva
 
-[![CI](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml/badge.svg)](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml) [![Testes](https://img.shields.io/badge/testes-114%20passando-2e7d32)](app/src) [![React](https://img.shields.io/badge/React-18-3a6b7e)](https://react.dev) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3a6b7e)](https://www.typescriptlang.org) [![PWA](https://img.shields.io/badge/PWA-offline--first-5c8374)](ARQUITETURA_ENGENHARIA.md) [![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-5c8374)](DIRETRIZES_UX_ACESSIBILIDADE.md) [![LGPD](https://img.shields.io/badge/LGPD-anonimiza%C3%A7%C3%A3o%20na%20origem-b45309)](ARQUITETURA_ENGENHARIA.md) ![Status](https://img.shields.io/badge/status-TCC%20em%20valida%C3%A7%C3%A3o-757575)
+[![CI](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml/badge.svg)](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml) [![Testes](https://img.shields.io/badge/testes-121%20passando-2e7d32)](app/src) [![React](https://img.shields.io/badge/React-18-3a6b7e)](https://react.dev) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3a6b7e)](https://www.typescriptlang.org) [![PWA](https://img.shields.io/badge/PWA-offline--first-5c8374)](ARQUITETURA_ENGENHARIA.md) [![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-5c8374)](DIRETRIZES_UX_ACESSIBILIDADE.md) [![LGPD](https://img.shields.io/badge/LGPD-anonimiza%C3%A7%C3%A3o%20na%20origem-b45309)](ARQUITETURA_ENGENHARIA.md) ![Status](https://img.shields.io/badge/status-TCC%20em%20valida%C3%A7%C3%A3o-757575)
 
 > **Solução digital centrada nas necessidades reais de alunos com Transtorno do Espectro Autista (TEA), educadores, familiares e gestores escolares.**
 
@@ -27,7 +27,7 @@ React 18 · TypeScript · Vite · vite-plugin-pwa (Service Worker) · IndexedDB 
 | Item | Situação |
 |---|---|
 | Prancha visual, temporizador, registro de crise em 1 clique, painel do PEI, formulário SUS | Implementados |
-| Testes automatizados | 114 testes em 9 arquivos, sem falhas (`npm test`); integração contínua no GitHub Actions |
+| Testes automatizados | 121 testes em 10 arquivos, sem falhas (`npm test`); integração contínua no GitHub Actions |
 | Sincronização com o Supabase | Testada com um dublê; teste ponta a ponta com conta real **pendente** |
 | Publicação (Vercel) | **Pendente**; o sistema roda localmente |
 | Validação com usuários (questionário de 7 perguntas) | 22 respostas, amostra de conveniência; aceitação preliminar favorável ([VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md)) |

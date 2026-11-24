@@ -16,7 +16,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 
 - **Plan (Planejar)**: Definição dos critérios de aceitação para cada estória de usuário e elaboração da matriz de rastreabilidade e casos de teste.
 - **Do (Executar)**: Implementação do software e execução dos testes automatizados e empíricos.
-- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade (contraste medido por varredura no navegador e por teste automatizado; axe/Lighthouse **não foram executados**) e questionário SUS com educadores (**não aplicado**).
+- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade (contraste medido por varredura no navegador e por teste automatizado; axe-core foi executado sobre componentes em teste automatizado (seção 5); Lighthouse e axe na página inteira **não foram executados**) e questionário SUS com educadores (**não aplicado**).
 - **Act (Agir)**: Correção de defeitos identificados, refinamento de fluxos visuais e atualização contínua da documentação técnica.
 
 ---
@@ -109,16 +109,17 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 | Verificação | Resultado |
 | :--- | :--- |
 | `npx tsc --noEmit` (TypeScript estrito) | Sem erros |
-| `npm test` (Vitest) | **114 testes aprovados em 9 arquivos** |
+| `npm test` (Vitest) | **121 testes aprovados em 10 arquivos** |
 | `npm run build` (Vite + PWA) | Build concluído; 26 entradas precacheadas (523 KiB) |
 | `npm audit --omit=dev` | 0 vulnerabilidades nas dependências de produção |
 | `npm audit` (todas) | 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox); a correção exige atualização com mudança de versão e não afeta o código enviado ao navegador |
+| Acessibilidade automática (axe-core 4, regras WCAG 2.1 A e AA) | 7 testes em `acessibilidade.test.tsx` sobre Sobre, diálogo de confirmação, gráfico, temporizador, cartão de rotina (aluno e educador), painel de sincronização, registro de atividades e selo de sincronização: **0 violações**. Limites: jsdom não mede contraste nem layout (regra `color-contrast` desligada; o contraste é medido em `contraste.test.ts`); não cobre Login, Header, formulário SUS, consentimento e relatório do PEI; não substitui leitor de tela |
 | Contraste (WCAG 2.1 AA, texto) | 10.813 textos em 78 estados, nos 3 modos, sem falhas; protegido por `contraste.test.ts` |
 | Desempenho do botão de crise (RNF05) | Medição preliminar de cerca de 10 ms em computador (ver `desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, seção 5.1) |
 
 ### Lacunas de qualidade (não executado)
 
-- Auditoria automática com axe-core ou Lighthouse; teste com leitor de tela; teste em outros navegadores e em tablet.
+- Lighthouse e axe na página inteira (inclui Login, Header, SUS, consentimento e relatório do PEI); teste com leitor de tela; teste em outros navegadores e em tablet.
 - Teste de ponta a ponta da sincronização com conta real do Supabase (a fila foi testada com um dublê).
 - Avaliação de usabilidade com educadores (SUS): ver `PROTOCOLO_AVALIACAO_SUS.md`.
 - Testes de componente (React Testing Library) e E2E (Playwright/Cypress).
