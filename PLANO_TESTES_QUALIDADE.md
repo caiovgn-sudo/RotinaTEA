@@ -111,6 +111,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 | `npx tsc --noEmit` (TypeScript estrito) | Sem erros |
 | `npm test` (Vitest) | **121 testes aprovados em 10 arquivos** |
 | `npm run build` (Vite + PWA) | Build concluído; 26 entradas precacheadas (523 KiB) |
+| `npm run lint` (ESLint) | 0 erros; 10 avisos das regras do React Compiler (setState em efeito e uso antes da declaração), mantidos como aviso |
 | `npm audit --omit=dev` | 0 vulnerabilidades nas dependências de produção |
 | `npm audit` (todas) | 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox); a correção exige atualização com mudança de versão e não afeta o código enviado ao navegador |
 | Acessibilidade automática (axe-core 4, regras WCAG 2.1 A e AA) | 7 testes em `acessibilidade.test.tsx` sobre Sobre, diálogo de confirmação, gráfico, temporizador, cartão de rotina (aluno e educador), painel de sincronização, registro de atividades e selo de sincronização: **0 violações**. Limites: jsdom não mede contraste nem layout (regra `color-contrast` desligada; o contraste é medido em `contraste.test.ts`); não cobre Login, Header, formulário SUS, consentimento e relatório do PEI; não substitui leitor de tela |

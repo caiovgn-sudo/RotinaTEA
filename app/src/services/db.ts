@@ -514,7 +514,7 @@ async function enviarItemRotina(it: ItemRotina): Promise<boolean> {
 }
 
 async function enviarConsentimento(c: ConsentimentoLGPD): Promise<boolean> {
-  let conta: string | null = null;
+  let conta: string | null;
   try {
     conta = (await supabase.auth.getSession()).data.session?.user.id ?? null;
   } catch {
