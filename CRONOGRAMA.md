@@ -29,7 +29,7 @@
 | Avaliação de usabilidade com educadores (SUS) | 24/11 a 30/11 | Pendente | Instrumento implementado no sistema; **não aplicado**; só 5 dos 22 participantes do questionário eram educadores |
 | Resultados e discussões com os dados da validação, considerações finais e resumo | 01/12 a 07/12 | Em andamento | Resultados do questionário já no artigo (v11); falta incluir o SUS, se aplicado |
 | Publicação (Vercel) | 24/11 | Concluída | https://rotinatea.vercel.app, publicada pela CLI em 24/11/2026, com o modo de demonstração desligado |
-| Teste de envio à nuvem com conta real | 08/12 a 14/12 | Pendente | Roteiro em `DEPLOY_VERCEL.md`; exige Site URL do Supabase configurado |
+| Teste de envio à nuvem com conta real | 08/12 a 14/12 | Pendente | Roteiro em `DEPLOY_VERCEL.md`; Site URL do Supabase já configurado em 24/11 |
 | Correção do artigo conforme os comentários da orientadora (pasta "ARTIGOS PARA CORRIGIR - BANCA FINAL") | até 14/12 | Pendente | Aguardando os comentários |
 | Revisão geral, protocolo do SUS e roteiro da banca (24/11) | 24/11 | Concluída | `PROTOCOLO_AVALIACAO_SUS.md`, `ROTEIRO_BANCA_FINAL.md`, integração contínua e correção de documentos desatualizados |
 | Entrega final: produto e projeto final | 15/12 a 22/12 | Pendente | Reserva do calendário da disciplina, depois das 14 semanas planejadas |

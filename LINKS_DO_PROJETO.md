@@ -32,7 +32,8 @@ Arquivos atuais: `Artigo_RotinaTEA_v11` (.docx e .pdf), `Banner_RotinaTEA_v11` (
 - **Como foi publicado:** pela CLI da Vercel, a partir de `docs/app`, com as variáveis de produção abaixo e `VITE_MODO_DEMO=false` (só contas reais; sem login de demonstração).
 - **Conferido:** a página carrega, o manifesto e o service worker estão presentes e o console não acusa erros. **Não conferido:** cadastro e login reais, sincronização com conta real e instalação do PWA em aparelho.
 - **Deploy automático:** o repositório do GitHub está conectado ao projeto (branch de produção `main`; as outras branches e PRs geram previews). O **Root Directory** do projeto é `app`, porque a raiz do Git é `docs`. Conferido em 24/11/2026 com um redeploy a partir da `main`.
-- **Pendências:** configurar **Site URL** e **Redirect URLs** do Supabase Auth com esse endereço; trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
+- **Supabase Auth (24/11/2026):** Site URL definido como `https://rotinatea.vercel.app`; Redirect URLs `https://rotinatea.vercel.app/**` e `http://localhost:5173/**` (desenvolvimento).
+- **Pendências:** trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2) e rodar o teste de ponta a ponta com conta real.
 - **Atenção:** com o Root Directory `app`, deploys pela CLI devem ser feitos a partir de `docs` (raiz do Git), não de `docs/app`.
 
 ### Como refazer o deploy (necessário acesso à conta Vercel):
