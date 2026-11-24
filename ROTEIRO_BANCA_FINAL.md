@@ -40,7 +40,7 @@ Se algo travar, dizer "vou mostrar pelo vídeo" e abrir o vídeo, sem tentar con
 ## 3. Riscos da demonstração
 
 - **Internet:** as figuras vêm da API do ARASAAC e as fontes do Google; sem rede algumas imagens podem faltar. O vídeo cobre isso.
-- **Site não publicado:** o sistema roda localmente. O slide 7 já diz que a publicação está em preparação; não afirmar o contrário.
+- **Site publicado, sem modo demonstração:** https://rotinatea.vercel.app só aceita contas reais (`VITE_MODO_DEMO=false`). Para a demonstração da banca, rodar localmente. Não afirmar que a sincronização com conta real foi validada.
 - **Fonte Montserrat:** se o computador não tiver a fonte, o PowerPoint troca por outra. Levar o PDF do pitch.
 - **QR Code do slide 7:** leva ao repositório; conferir se abre antes.
 
@@ -54,7 +54,7 @@ Se algo travar, dizer "vou mostrar pelo vídeo" e abrir o vídeo, sem tentar con
 6. **Diferença para Tiimo, Rotina Divertida e SymboTalk?** Eles organizam a rotina ou a comunicação; o RotinaTEA liga a rotina ao registro de crise e ao relatório do PEI.
 7. **Diagnostica ou prevê crises?** Não. São contagens simples, com aviso quando há menos de 5 crises.
 8. **Por que PWA?** Instala sem loja, funciona offline e usa uma base de código para tablet e celular.
-9. **O que falta?** SUS com educadores, publicação na Vercel, teste de sincronização com conta real, teste em tablet e com leitor de tela, e o vídeo de demonstração no YouTube.
+9. **O que falta?** SUS com educadores, teste de sincronização com conta real no site publicado (já em https://rotinatea.vercel.app), teste em tablet e com leitor de tela, e o vídeo de demonstração no YouTube.
 10. **Por que mudaram de API própria para Supabase?** Para reduzir código e superfície de ataque em um projeto de dois autores; o RLS aplica a separação por perfil (ADR em `ARQUITETURA_ENGENHARIA.md`).
 
 ## 5. Checklist de ensaio

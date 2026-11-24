@@ -18,3 +18,6 @@ Thumbs.db
 # Artefatos gerados (PWA em dev e Supabase CLI)
 dev-dist/
 supabase/.temp/
+
+.vercel
+.env.local
