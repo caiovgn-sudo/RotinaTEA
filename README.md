@@ -29,7 +29,7 @@ React 18 · TypeScript · Vite · vite-plugin-pwa (Service Worker) · IndexedDB 
 | Prancha visual, temporizador, registro de crise em 1 clique, painel do PEI, formulário SUS | Implementados |
 | Testes automatizados | 121 testes em 10 arquivos, sem falhas (`npm test`); integração contínua no GitHub Actions |
 | Sincronização com o Supabase | Testada com um dublê; teste ponta a ponta com conta real **pendente** |
-| Publicação (Vercel) | **Publicado em 24/11/2026**: https://rotinatea.vercel.app (modo de demonstração desligado, só contas reais). Teste de ponta a ponta com conta real e ajuste do Site URL no Supabase **pendentes** |
+| Publicação (Vercel) | **Publicado em 24/11/2026**: https://rotinatea.vercel.app (modo de demonstração desligado, só contas reais). Deploy automático pela `main`. Teste de ponta a ponta com conta real e ajuste do Site URL no Supabase **pendentes** |
 | Validação com usuários (questionário de 7 perguntas) | 22 respostas, amostra de conveniência; aceitação preliminar favorável ([VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md)) |
 | Avaliação de usabilidade (SUS) com educadores | **Não aplicada** |
 | Dados | Fictícios; nenhuma criança real; alunos identificados só por código |

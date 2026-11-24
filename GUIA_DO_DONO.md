@@ -49,7 +49,7 @@ Nunca digam à banca que a nuvem foi validada, que há resultado de usabilidade 
 
 1. **SUS com educadores:** conseguir pelo menos 5 educadores e seguir `PROTOCOLO_AVALIACAO_SUS.md`; confirmar com a orientadora se o TCLE precisa de aprovação. Só então citar resultados.
 2. Trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
-3. (Vercel já criada) Configurar **Site URL** e **Redirect URLs** do Supabase Auth com `https://rotinatea.vercel.app`; conectar o repositório do GitHub ao projeto da Vercel para publicar a cada alteração na `main` (hoje o deploy foi feito pela CLI).
+3. (Vercel já criada e conectada ao GitHub: cada alteração na `main` publica sozinha) Configurar **Site URL** e **Redirect URLs** do Supabase Auth com `https://rotinatea.vercel.app`.
 4. Teste ponta a ponta com conta real: cadastrar, promover a Professor via SQL, vincular aos exemplos, registrar uma crise e ver o selo mudar para "Enviada". Roteiro na seção 4 do `DEPLOY_VERCEL.md`.
 5. Repetir a medição do botão de crise (RNF05) em um tablet e conferir o relatório do PEI impresso.
 6. Gravar e publicar o vídeo de demonstração.

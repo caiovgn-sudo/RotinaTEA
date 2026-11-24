@@ -31,8 +31,9 @@ Arquivos atuais: `Artigo_RotinaTEA_v11` (.docx e .pdf), `Banner_RotinaTEA_v11` (
 - **URL de Produção:** https://rotinatea.vercel.app (projeto `rotinatea`, time `RotinaTEA`, plano Hobby)
 - **Como foi publicado:** pela CLI da Vercel, a partir de `docs/app`, com as variáveis de produção abaixo e `VITE_MODO_DEMO=false` (só contas reais; sem login de demonstração).
 - **Conferido:** a página carrega, o manifesto e o service worker estão presentes e o console não acusa erros. **Não conferido:** cadastro e login reais, sincronização com conta real e instalação do PWA em aparelho.
-- **Pendências:** configurar **Site URL** e **Redirect URLs** do Supabase Auth com esse endereço; conectar o repositório do GitHub ao projeto para publicar a cada alteração na `main`; trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
-- **URL de Preview (PRs):** não configurada (depende da conexão com o GitHub).
+- **Deploy automático:** o repositório do GitHub está conectado ao projeto (branch de produção `main`; as outras branches e PRs geram previews). O **Root Directory** do projeto é `app`, porque a raiz do Git é `docs`. Conferido em 24/11/2026 com um redeploy a partir da `main`.
+- **Pendências:** configurar **Site URL** e **Redirect URLs** do Supabase Auth com esse endereço; trocar a chave pública do Supabase (`DEPLOY_VERCEL.md`, seção 2).
+- **Atenção:** com o Root Directory `app`, deploys pela CLI devem ser feitos a partir de `docs` (raiz do Git), não de `docs/app`.
 
 ### Como refazer o deploy (necessário acesso à conta Vercel):
 
@@ -100,7 +101,7 @@ npx vercel --prod
 ## 📋 Checklist de Deploy
 
 - [x] Código na `origin/main` (pull request nº 1 mesclado em 24/11/2026)
-- [ ] Repositório do GitHub conectado à Vercel (o deploy de 24/11 foi pela CLI)
+- [x] Repositório do GitHub conectado à Vercel (Root Directory `app`)
 - [x] Variáveis de ambiente configuradas na Vercel (5 variáveis de produção)
 - [x] Build de produção bem-sucedido na Vercel
 - [x] URL de produção acessível (https://rotinatea.vercel.app)
