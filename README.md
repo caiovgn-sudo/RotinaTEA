@@ -30,6 +30,7 @@ React 18 · TypeScript · Vite · vite-plugin-pwa (Service Worker) · IndexedDB 
 | Testes automatizados | 114 testes em 9 arquivos, sem falhas (`npm test`) |
 | Sincronização com o Supabase | Testada com um dublê; teste ponta a ponta com conta real **pendente** |
 | Publicação (Vercel) | **Pendente**; o sistema roda localmente |
+| Validação com usuários (questionário de 7 perguntas) | 22 respostas, amostra de conveniência; aceitação preliminar favorável ([VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md)) |
 | Avaliação de usabilidade (SUS) com educadores | **Não aplicada** |
 | Dados | Fictícios; nenhuma criança real; alunos identificados só por código |
 
@@ -58,8 +59,8 @@ Enquanto ferramentas existentes focam exclusivamente em comunicação alternativ
 ## 🏛️ Alinhamento aos 5 Eixos Acadêmicos (CEUNI FAMETRO / ENADE)
 
 1. **Eixo 1 — Tecnologia e Desenvolvimento de Software**: Engenharia de requisitos com foco em acessibilidade cognitiva, modelagem UML (casos de uso, classes, sequência), arquitetura cliente-servidor e frontend reativo PWA.
-2. **Eixo 2 — Interação Humano-Computador (IHC) e UX/UI**: Design centrado no usuário neurodivergente, conformidade WCAG 2.1 AA/AAA, paleta de cores atenuadas, navegação por teclado e testes empíricos de usabilidade (SUS).
-3. **Eixo 3 — Dados, Inteligência e Infraestrutura**: Persistência relacional e local (IndexedDB offline-first), painéis analíticos com correlação temporal e autenticação segura (RBAC/JWT).
+2. **Eixo 2 — Interação Humano-Computador (IHC) e UX/UI**: Design centrado no usuário neurodivergente, conformidade WCAG 2.1 AA, paleta de cores atenuadas, navegação por teclado e avaliação de usabilidade (questionário de validação com 22 respostas; SUS ainda não aplicado).
+3. **Eixo 3 — Dados, Inteligência e Infraestrutura**: Persistência relacional e local (IndexedDB offline-first), painéis analíticos com correlação temporal e autenticação e controle de acesso por perfil (Supabase Auth e RLS).
 4. **Eixo 4 — Gestão, Negócios e Governança de TI**: Otimização processual em sala de aula (registro sem sobrecarga), governança baseada em ITIL enxuto e exportação estruturada para o PEI.
 5. **Eixo 5 — Transversal: Ética, Sustentabilidade e Sociedade (ODS)**: Alinhamento ao ODS 4 (Educação de Qualidade), principal, e ao ODS 3 (Saúde e Bem-Estar), complementar; conformidade rigorosa com a LGPD (anonimização na origem de dados de menores).
 
@@ -69,6 +70,7 @@ Enquanto ferramentas existentes focam exclusivamente em comunicação alternativ
 
 - [README.md](README.md): Visão geral, guia de instalação e execução.
 - [desenvolvimento/](desenvolvimento/): [Requisitos e regras de negócio](desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md), [Padrões de projeto](desenvolvimento/PADROES_DE_PROJETO.md), [Avaliação heurística](desenvolvimento/AVALIACAO_HEURISTICA.md) e [Documento de interface (wireframes)](desenvolvimento/DOCUMENTO_DE_INTERFACE.md).
+- [VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md): Resultados do questionário de validação com 22 participantes, sugestões e limites.
 - [PLANEJAMENTO.md](PLANEJAMENTO.md): Tema, problema de pesquisa, personas, jornada do usuário, escopo e backlog priorizado (Kanban).
 - [ARQUITETURA_ENGENHARIA.md](ARQUITETURA_ENGENHARIA.md): Arquitetura de software, offline-first, modelo de dados e decisões técnicas (ADR).
 - [DIRETRIZES_UX_ACESSIBILIDADE.md](DIRETRIZES_UX_ACESSIBILIDADE.md): Acessibilidade cognitiva para TEA, paleta de cores, pictogramas ARASAAC e checklist WCAG.

@@ -5,6 +5,13 @@
 
 ---
 
+## 📝 Formulário de validação com usuários
+
+- **Link para responder:** https://docs.google.com/forms/d/e/1FAIpQLSe02Xo4ayIbSc9KratR8kRrja6A1Z6JgDZxpxvxkq63cbyFbA/viewform
+- **Situação:** 22 respostas; resultados em [VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md).
+
+---
+
 ## 📦 Repositório GitHub ✅ **CONFIRMADO**
 
 - **URL:** https://github.com/caiovgn-sudo/RotinaTEA
