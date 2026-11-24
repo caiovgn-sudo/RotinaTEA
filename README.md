@@ -71,6 +71,7 @@ Enquanto ferramentas existentes focam exclusivamente em comunicação alternativ
 - [README.md](README.md): Visão geral, guia de instalação e execução.
 - [desenvolvimento/](desenvolvimento/): [Requisitos e regras de negócio](desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md), [Padrões de projeto](desenvolvimento/PADROES_DE_PROJETO.md), [Avaliação heurística](desenvolvimento/AVALIACAO_HEURISTICA.md) e [Documento de interface (wireframes)](desenvolvimento/DOCUMENTO_DE_INTERFACE.md).
 - [VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md): Resultados do questionário de validação com 22 participantes, sugestões e limites. Apresentação dos resultados: [Resultados_Validacao_RotinaTEA.pdf](Resultados_Validacao_RotinaTEA.pdf); gráficos em `imagens/graficos/`.
+- [ORGANIZACAO_DO_DRIVE.md](ORGANIZACAO_DO_DRIVE.md): Mapa das pastas do Drive, inventário por pasta, histórico do que foi feito e pendências.
 - [RotinaTEA_DiagramaAtividades.pdf](RotinaTEA_DiagramaAtividades.pdf): Diagrama de atividades do registro de crise e do envio ao servidor (com o texto em [PROCESSOS_FLUXOS.md](PROCESSOS_FLUXOS.md), seção 2.1).
 - [PROTOCOLO_AVALIACAO_SUS.md](PROTOCOLO_AVALIACAO_SUS.md): Protocolo de aplicação do SUS com educadores (ainda não aplicado), com rascunho de termo, tarefas e ficha de observação.
 - [CRONOGRAMA.md](CRONOGRAMA.md): Cronograma de entregas e situação atual (a data da banca fica em branco).
