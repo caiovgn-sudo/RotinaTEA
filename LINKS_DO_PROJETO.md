@@ -1,7 +1,7 @@
 # Links do Projeto RotinaTEA
 
-> **Atualizado em:** 2026-10-14  
-> **Último commit:** `0f5f2d2` — `feat: implementa sincronização Supabase, autenticação, PWA, SUS, ARASAAC e alto contraste amarelo/preto`
+> **Atualizado em:** 2026-11-24  
+> O histórico de commits está em https://github.com/caiovgn-sudo/RotinaTEA/commits/main (o hash do último commit muda a cada alteração).
 
 ---
 
@@ -12,11 +12,17 @@
 
 ---
 
+## 📁 Pasta do Drive (Entrega Final)
+
+Arquivos atuais: `Artigo_RotinaTEA_v11` (.docx e .pdf), `Banner_RotinaTEA_v11` (.pptx e .pdf), `Pitch_Final_RotinaTEA_v11` (.pptx e .pdf) e `RotinaTEA Web.mp4`. Documentação: requisitos, padrões de projeto, heurística, interface, cronograma, relatório ABNT, pré-projeto e o formulário de validação. Versões antigas, com números sem comprovação, foram removidas em 24/11/2026.
+
+---
+
 ## 📦 Repositório GitHub ✅ **CONFIRMADO**
 
 - **URL:** https://github.com/caiovgn-sudo/RotinaTEA
 - **Branch principal:** `main`
-- **Último commit:** `0f5f2d2` (push realizado com sucesso em 2026-10-14)
+- **Integração contínua:** `.github/workflows/ci.yml` (tipos, testes, build e auditoria de produção a cada push e pull request)
 
 ---
 
@@ -53,8 +59,8 @@ npx vercel --prod
 - **Chave Anônima (anon):** Configurada no `.env` local e deve ser adicionada na Vercel
 - **Status da migração:** ✅ **Aplicada** — banco remoto está `up to date` (verificado via `supabase db push`)
 
-### Migração aplicada:
-- Arquivo: `docs/app/supabase/migrations/20261013000001_schema_inicial.sql`
+### Migrações (7 arquivos em `app/supabase/migrations/`, aplicadas até 29/10/2026):
+- Esquema inicial: `20261013000001_schema_inicial.sql`; as seis seguintes endurecem perfis e RLS, gravam o SUS e criam dados de exemplo.
 - Tabelas: `usuarios`, `estudantes`, `vinculos_usuario_estudante`, `rotinas_visuais`, `itens_rotina`, `registros_crise`, `consentimentos_lgpd`, `fila_sincronizacao`
 - RLS: Políticas por `auth.uid()` e vínculos — **ativas e funcionando**
 
@@ -66,7 +72,7 @@ npx vercel --prod
 - ✅ `manifest.webmanifest` gerado com ícones 72–512px, atalhos, categorias
 - ✅ Service Worker (Workbox) gerado: `sw.js` + `workbox-*.js`
 - ✅ Cache strategies: NetworkFirst (Supabase API), CacheFirst (ARASAAC)
-- ✅ Build de produção Vite + PWA plugin: 26 entradas precacheadas (447 KiB)
+- ✅ Build de produção Vite + PWA plugin: 26 entradas precacheadas (523 KiB, conferido em 24/11/2026)
 - ✅ `vite.config.ts` configurado com `registerType: 'autoUpdate'`
 
 ### Passos para validar em dispositivo real (necessário acesso físico):
@@ -90,7 +96,7 @@ npx vercel --prod
 
 ## 📋 Checklist de Deploy
 
-- [x] Push para `origin/main` autorizado (**concluído**: commit `0f5f2d2`)
+- [x] Código na `origin/main` (pull request nº 1 mesclado em 24/11/2026)
 - [ ] Repositório importado na Vercel
 - [ ] Variáveis de ambiente configuradas na Vercel
 - [ ] Build de produção bem-sucedido na Vercel

@@ -13,7 +13,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 - [x] **US12**: Integração remota com a API de busca online do ARASAAC quando houver conectividade (busca em tempo real no ConfiguracaoRotina).
 
 ### ⏳ To Do (Próximo Ciclo)
-- [x] **US07**: Sistema de autenticação JWT com controle de rotas por perfis (Supabase Auth + RLS).
+- [x] **US07**: Autenticação com controle de rotas por perfis (Supabase Auth, que usa tokens de sessão JWT, e RLS).
 - [x] **US08**: Tela de edição e ordenação personalizada de rotinas pelo educador (ConfiguracaoRotina + drag-drop).
 
 ### ⚙️ Doing (Em Andamento / Implementação Atual)
@@ -75,7 +75,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
 - ✅ `npm test` — Vitest: 114 testes (9 arquivos) importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar, cálculo do SUS, agregações do PEI, integração do IndexedDB com a fila (fake-indexeddb), configuração de publicação e contraste da paleta (lê o `index.css`)
-- ✅ Lint: sem warnings críticos, apenas aviso de dynamic import ineficaz (não bloqueante)
+- ⚠️ Lint: **ESLint/Prettier não estão configurados**; o build acusa apenas o aviso de import dinâmico ineficaz (não bloqueante)
 
 ---
 
@@ -130,3 +130,13 @@ Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS
 - Sem teste com leitor de tela, sem testes de componente e sem teste da sessão encerrada nem da sincronização com conta real do Supabase.
 - O registro de atividades é local e não é trilha de auditoria.
 - Desativar o simulador em produção também remove o login de demonstração (`VITE_MODO_DEMO=false`).
+
+---
+
+## 🔎 Revisão geral de 24/11/2026 (Pilares 2 e 3)
+
+- **Verificado:** `tsc --noEmit` sem erros; 114 testes aprovados em 9 arquivos; build do PWA concluído (26 entradas, 523 KiB); `npm audit --omit=dev` com 0 vulnerabilidades.
+- **Corrigido:** `npm audit fix` (sem mudança de versão principal) em `package-lock.json`; diagrama de sequência de `PROCESSOS_FLUXOS.md` atualizado para o Supabase; `PLANO_TESTES_QUALIDADE.md` ganhou CT05, CT06 e a seção de evidências; `CHECKLIST.md` identificado como histórico; integração contínua adicionada (`.github/workflows/ci.yml`).
+- **Novo documento:** `PROTOCOLO_AVALIACAO_SUS.md` (termo de consentimento, tarefas por perfil, ficha de observação e como calcular o SUS) e `ROTEIRO_BANCA_FINAL.md` (substitui o roteiro da pré-banca).
+- **Dados da validação:** 22 respostas reais (`VALIDACAO_PRODUTO.md`); números antigos sem comprovação foram retirados.
+- **Aberto:** ESLint/Prettier; 4 avisos de ferramentas de build; SUS com educadores; publicação na Vercel; teste de sincronização com conta real; teste em tablet e com leitor de tela; vídeo de demonstração.

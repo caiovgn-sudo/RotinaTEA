@@ -28,7 +28,7 @@ Pessoas com TEA frequentemente processam estímulos visuais, auditivos e espacia
 | `--cor-secundaria` | `#5C8374` | Verde Sálvia: associado à tranquilidade e finalização de tarefas. |
 | `--cor-alerta-suave`| `#D4A373` | Âmbar Suave: cor para o temporizador e atenção, sem o terror do vermelho puro. |
 | `--cor-crise-ativo` | `#C85A54` | Terracota Suave: botão de crise do professor (visível sem alarmar o aluno). |
-| `--cor-texto-forte` | `#1F2937` | Contraste de texto escuro com taxa >= 7:1 (WCAG AAA). |
+| `--cor-texto-forte` | `#1F2937` | Contraste de texto escuro com taxa >= 7:1 (acima do mínimo de 4,5:1 do nível AA; o alvo do projeto é WCAG 2.1 AA). |
 | `--cor-texto-medio` | `#4B5563` | Texto secundário legível com taxa >= 4.5:1 (WCAG AA). |
 
 ---

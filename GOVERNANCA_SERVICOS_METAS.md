@@ -42,6 +42,9 @@ Estrutura de governança ágil, gerenciamento de serviços inspirado no ITIL (de
 | **Queda de Internet na Sala** | Alta | Alto | Arquitetura offline-first nativa com gravação imediata no IndexedDB antes de qualquer tentativa de rede (RN03). |
 | **Vazamento de Dados de Menores** | Muito Baixa | Crítico | Anonimização na origem (RN02), impedindo que nomes ou fotos componham relatórios e dashboards. |
 | **Resistência do Professor por Falta de Tempo** | Média | Alto | Redução do fluxo de registro de crise a **1 clique** para iniciar e **1 clique** para finalizar. |
+| **Validação limitada (amostra pequena e de conveniência)** | Alta | Médio | Declarar os limites no artigo (22 respostas, 5 educadores, autodeclaradas), não generalizar e aplicar o SUS com educadores (`PROTOCOLO_AVALIACAO_SUS.md`). |
+| **Dados sem comprovação em documentos** | Média | Alto | Toda cifra do artigo, do banner e do pitch deve ter origem rastreável (`VALIDACAO_PRODUTO.md`); números não comprovados foram retirados em 24/11/2026. |
+| **Sincronização não validada com conta real** | Média | Médio | Executar o roteiro de `DEPLOY_VERCEL.md` antes de afirmar que a nuvem está validada. |
 
 ---
 
@@ -55,3 +58,5 @@ Estrutura de governança ágil, gerenciamento de serviços inspirado no ITIL (de
 | **Índice de Usabilidade SUS** | Validar a facilidade de uso com educadores | Aplicação de questionário padronizado System Usability Scale | >= 68 pontos | Mensal | Educadores / Devs |
 | **Conclusão de Rotinas pelos Alunos** | Medir a efetividade da tecnologia assistiva | % de tarefas diárias marcadas como concluídas | >= 80% | Semanal | Professores |
 | **Incidentes de Vazamento LGPD** | Garantir proteção de dados sensíveis | Auditoria de dados exportados e payloads de API | 0 incidentes | Contínua | Equipe |
+
+**Situação dos indicadores em 24/11/2026:** agilidade medida de forma preliminar (cerca de 10 ms, em computador); taxa de sucesso offline verificada em teste com IndexedDB simulado; acessibilidade medida só no contraste do texto (axe-core/Lighthouse **não executados**, portanto a meta de 95% não foi aferida); SUS **não aplicado**; conclusão de rotinas **não medida** (não há uso real em sala); nenhum incidente de vazamento conhecido, sem auditoria formal.

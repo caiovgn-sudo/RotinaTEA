@@ -1,6 +1,6 @@
 # RotinaTEA — Plataforma Digital de Tecnologia Assistiva
 
-[![Testes](https://img.shields.io/badge/testes-114%20passando-2e7d32)](app/src) [![React](https://img.shields.io/badge/React-18-3a6b7e)](https://react.dev) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3a6b7e)](https://www.typescriptlang.org) [![PWA](https://img.shields.io/badge/PWA-offline--first-5c8374)](ARQUITETURA_ENGENHARIA.md) [![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-5c8374)](DIRETRIZES_UX_ACESSIBILIDADE.md) [![LGPD](https://img.shields.io/badge/LGPD-anonimiza%C3%A7%C3%A3o%20na%20origem-b45309)](ARQUITETURA_ENGENHARIA.md) ![Status](https://img.shields.io/badge/status-TCC%20em%20valida%C3%A7%C3%A3o-757575)
+[![CI](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml/badge.svg)](https://github.com/caiovgn-sudo/RotinaTEA/actions/workflows/ci.yml) [![Testes](https://img.shields.io/badge/testes-114%20passando-2e7d32)](app/src) [![React](https://img.shields.io/badge/React-18-3a6b7e)](https://react.dev) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3a6b7e)](https://www.typescriptlang.org) [![PWA](https://img.shields.io/badge/PWA-offline--first-5c8374)](ARQUITETURA_ENGENHARIA.md) [![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-5c8374)](DIRETRIZES_UX_ACESSIBILIDADE.md) [![LGPD](https://img.shields.io/badge/LGPD-anonimiza%C3%A7%C3%A3o%20na%20origem-b45309)](ARQUITETURA_ENGENHARIA.md) ![Status](https://img.shields.io/badge/status-TCC%20em%20valida%C3%A7%C3%A3o-757575)
 
 > **Solução digital centrada nas necessidades reais de alunos com Transtorno do Espectro Autista (TEA), educadores, familiares e gestores escolares.**
 
@@ -27,7 +27,7 @@ React 18 · TypeScript · Vite · vite-plugin-pwa (Service Worker) · IndexedDB 
 | Item | Situação |
 |---|---|
 | Prancha visual, temporizador, registro de crise em 1 clique, painel do PEI, formulário SUS | Implementados |
-| Testes automatizados | 114 testes em 9 arquivos, sem falhas (`npm test`) |
+| Testes automatizados | 114 testes em 9 arquivos, sem falhas (`npm test`); integração contínua no GitHub Actions |
 | Sincronização com o Supabase | Testada com um dublê; teste ponta a ponta com conta real **pendente** |
 | Publicação (Vercel) | **Pendente**; o sistema roda localmente |
 | Validação com usuários (questionário de 7 perguntas) | 22 respostas, amostra de conveniência; aceitação preliminar favorável ([VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md)) |
@@ -71,6 +71,10 @@ Enquanto ferramentas existentes focam exclusivamente em comunicação alternativ
 - [README.md](README.md): Visão geral, guia de instalação e execução.
 - [desenvolvimento/](desenvolvimento/): [Requisitos e regras de negócio](desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md), [Padrões de projeto](desenvolvimento/PADROES_DE_PROJETO.md), [Avaliação heurística](desenvolvimento/AVALIACAO_HEURISTICA.md) e [Documento de interface (wireframes)](desenvolvimento/DOCUMENTO_DE_INTERFACE.md).
 - [VALIDACAO_PRODUTO.md](VALIDACAO_PRODUTO.md): Resultados do questionário de validação com 22 participantes, sugestões e limites.
+- [PROTOCOLO_AVALIACAO_SUS.md](PROTOCOLO_AVALIACAO_SUS.md): Protocolo de aplicação do SUS com educadores (ainda não aplicado), com rascunho de termo, tarefas e ficha de observação.
+- [CRONOGRAMA.md](CRONOGRAMA.md): Cronograma de entregas e situação atual (a data da banca fica em branco).
+- [ROTEIRO_BANCA_FINAL.md](ROTEIRO_BANCA_FINAL.md) e [GUIA_DO_DONO.md](GUIA_DO_DONO.md): Roteiro de 7 minutos com perguntas e respostas honestas, e guia de estado real do projeto.
+- [CHECKLIST.md](CHECKLIST.md): Auditoria técnica de 26/10/2026 (histórica; a situação atual está no início do arquivo).
 - [PLANEJAMENTO.md](PLANEJAMENTO.md): Tema, problema de pesquisa, personas, jornada do usuário, escopo e backlog priorizado (Kanban).
 - [ARQUITETURA_ENGENHARIA.md](ARQUITETURA_ENGENHARIA.md): Arquitetura de software, offline-first, modelo de dados e decisões técnicas (ADR).
 - [DIRETRIZES_UX_ACESSIBILIDADE.md](DIRETRIZES_UX_ACESSIBILIDADE.md): Acessibilidade cognitiva para TEA, paleta de cores, pictogramas ARASAAC e checklist WCAG.

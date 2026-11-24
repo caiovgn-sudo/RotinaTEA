@@ -1,9 +1,9 @@
-# Cronograma de Entregas — RotinaTEA (atualizado em 23/11/2026)
+# Cronograma de Entregas — RotinaTEA (atualizado em 24/11/2026)
 
 **Trabalho de Conclusão de Curso** · Sistemas de Informação · CEUNI FAMETRO · turma SIS231N01 · Manaus – AM
 **Autores:** Caio Victor Galvão do Nascimento e Pedro Neves Alberto · **Orientadora:** Profa. Luana Magalhães Leal
 
-> **Como ler.** A coluna "Data" repete as datas do cronograma da disciplina (turma noturna). A coluna "Situação" registra o que a equipe de fato entregou, com a data do arquivo no Drive quando há. As datas das etapas ainda abertas são **previsões da equipe**, baseadas no cronograma de 15 semanas do pré-projeto, e podem ser ajustadas pela orientadora. **A data da banca fica em branco**, conforme a orientação.
+> **Como ler.** A coluna "Data" repete as datas do cronograma da disciplina (turma noturna). A coluna "Situação" registra o que a equipe de fato entregou, com a data do arquivo no Drive quando há. As datas das etapas ainda abertas são **previsões da equipe**, baseadas no cronograma de 14 semanas do pré-projeto e do artigo (Quadro 5), e podem ser ajustadas pela orientadora. **A data da banca fica em branco**, conforme a orientação.
 
 ---
 
@@ -30,7 +30,8 @@
 | Resultados e discussões com os dados da validação, considerações finais e resumo | 01/12 a 07/12 | Em andamento | Resultados do questionário já no artigo (v11); falta incluir o SUS, se aplicado |
 | Teste de envio à nuvem com conta real e publicação (Vercel) | 08/12 a 14/12 | Pendente | Roteiro em `DEPLOY_VERCEL.md` |
 | Correção do artigo conforme os comentários da orientadora (pasta "ARTIGOS PARA CORRIGIR - BANCA FINAL") | até 14/12 | Pendente | Aguardando os comentários |
-| Entrega final: produto e projeto final | 15/12 a 22/12 | Pendente | Reserva (buffer) do cronograma de 15 semanas |
+| Revisão geral, protocolo do SUS e roteiro da banca (24/11) | 24/11 | Concluída | `PROTOCOLO_AVALIACAO_SUS.md`, `ROTEIRO_BANCA_FINAL.md`, integração contínua e correção de documentos desatualizados |
+| Entrega final: produto e projeto final | 15/12 a 22/12 | Pendente | Reserva do calendário da disciplina, depois das 14 semanas planejadas |
 | Banca final | | | |
 
 ## 2. Alinhamento aos 5 eixos (situação atual)
