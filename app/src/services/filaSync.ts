@@ -26,7 +26,7 @@ export async function processarFilaSync(itens: SyncItem[], h: ManipuladoresFila)
   for (const original of ordenados) {
     const item: SyncItem = { ...original };
 
-    let enviado = false;
+    let enviado: boolean;
     try {
       enviado = await h.enviar(item);
     } catch {

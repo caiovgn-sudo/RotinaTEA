@@ -1,0 +1,23 @@
+// Pilar 2 (Qualidade): regras de lint do RotinaTEA (TypeScript + React Hooks).
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
+
+export default tseslint.config(
+  { ignores: ['dist', 'dev-dist', 'node_modules', 'public'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    languageOptions: { globals: { ...globals.browser } },
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      // Regras do React Compiler: orientam refatoração (setState em efeito, uso antes da declaração),
+      // não apontam defeito. Ficam como aviso até uma refatoração planejada; ver BACKLOG.md.
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/immutability': 'warn'
+    }
+  }
+);

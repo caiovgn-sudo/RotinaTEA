@@ -75,7 +75,7 @@ Acompanhamento ágil das entregas do projeto alinhadas ao cronograma de 14 seman
 ### Testes & Build
 - ✅ `npm run build` — TypeScript strict + Vite production build sem erros
 - ✅ `npm test` — Vitest: 121 testes (10 arquivos) importando o código real (`utils/regras`, `services/filaSync`, `utils/tempo`): RN01, RN02, RN03, mascaramento de IP, perfil padrão, perfis que registram crise, visibilidade por perfil, estados de sincronização, registro de atividades, IP mascarado, bloqueio da coleta ao revogar, cálculo do SUS, agregações do PEI, integração do IndexedDB com a fila (fake-indexeddb), configuração de publicação e contraste da paleta (lê o `index.css`)
-- ⚠️ Lint: **ESLint/Prettier não estão configurados**; o build acusa apenas o aviso de import dinâmico ineficaz (não bloqueante)
+- ✅ Lint: ESLint configurado em 24/11/2026 (`npm run lint`, no CI): 0 erros e 10 avisos das regras do React Compiler (`set-state-in-effect` e `immutability`), mantidos como aviso até uma refatoração planejada; Prettier não configurado
 
 ---
 
@@ -139,4 +139,4 @@ Detalhes, antes/depois e roteiro de teste em [MELHORIAS_UX_2026-10.md](MELHORIAS
 - **Corrigido:** `npm audit fix` (sem mudança de versão principal) em `package-lock.json`; diagrama de sequência de `PROCESSOS_FLUXOS.md` atualizado para o Supabase; `PLANO_TESTES_QUALIDADE.md` ganhou CT05, CT06 e a seção de evidências; `CHECKLIST.md` identificado como histórico; integração contínua adicionada (`.github/workflows/ci.yml`).
 - **Novo documento:** `PROTOCOLO_AVALIACAO_SUS.md` (termo de consentimento, tarefas por perfil, ficha de observação e como calcular o SUS) e `ROTEIRO_BANCA_FINAL.md` (substitui o roteiro da pré-banca).
 - **Dados da validação:** 22 respostas reais (`VALIDACAO_PRODUTO.md`); números antigos sem comprovação foram retirados.
-- **Aberto:** ESLint/Prettier; 4 avisos de ferramentas de build; SUS com educadores; publicação na Vercel; teste de sincronização com conta real; teste em tablet e com leitor de tela; vídeo de demonstração.
+- **Aberto:** Prettier; 10 avisos de lint (React Compiler); 4 avisos de ferramentas de build; SUS com educadores; publicação na Vercel; teste de sincronização com conta real; teste em tablet e com leitor de tela; vídeo de demonstração.
