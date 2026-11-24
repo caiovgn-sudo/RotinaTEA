@@ -2,6 +2,18 @@
 > Auditoria executada em: **2026-10-26** | Auditor: Antigravity (modo somente leitura)
 > Raiz do projeto: `docs/` | App: `docs/app/`
 
+> **Nota de 24/11/2026 — documento histórico.** Esta auditoria descreve o estado de **26/10/2026** (7 commits, 9 testes). Os números e achados abaixo não foram reescritos, para preservar o registro. A situação atual dos cinco maiores riscos é:
+>
+> | Risco (26/10) | Situação em 24/11/2026 |
+> |---|---|
+> | 1. `carregarCrises()` apagava registros | **Corrigido** em 28/10 (a leitura não apaga mais; teste em `integracao.test.ts`) |
+> | 2. IP fixo no seed exibido na interface | **Corrigido** em 28/10 (IP mascarado; seed neutro; `mascararIp` testado) |
+> | 3. Sem ESLint/Prettier | **Aberto** (não configurados) |
+> | 4. Sessão em `localStorage` em texto plano | **Parcialmente tratado**: contas de teste com senha fixa foram removidas e o modo demonstração não usa senha; a sessão do Supabase segue o armazenamento padrão do SDK |
+> | 5. Vulnerabilidades de dependências | **Corrigido para produção** (`npm audit --omit=dev`: 0); restam 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox) |
+>
+> Hoje: 114 testes em 9 arquivos, 36 commits, integração contínua no GitHub Actions (`.github/workflows/ci.yml`). Ver `PLANO_TESTES_QUALIDADE.md`, seção 5, e `BACKLOG.md`, revisão de 24/11/2026.
+
 ---
 
 ## Mapeamento da Stack (Etapa 0)

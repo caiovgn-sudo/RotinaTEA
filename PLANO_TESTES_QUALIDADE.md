@@ -16,7 +16,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 
 - **Plan (Planejar)**: Definição dos critérios de aceitação para cada estória de usuário e elaboração da matriz de rastreabilidade e casos de teste.
 - **Do (Executar)**: Implementação do software e execução dos testes automatizados e empíricos.
-- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade via axe/Lighthouse e questionário SUS com educadores.
+- **Check (Verificar)**: Análise dos resultados dos testes, medição de cobertura de fluxos e validação de acessibilidade (contraste medido por varredura no navegador e por teste automatizado; axe/Lighthouse **não foram executados**) e questionário SUS com educadores (**não aplicado**).
 - **Act (Agir)**: Correção de defeitos identificados, refinamento de fluxos visuais e atualização contínua da documentação técnica.
 
 ---
@@ -30,7 +30,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
 | **RNF03** (Privacidade e LGPD) | **RN02** (Anonimização na Origem) | **CT03** | Relatórios e dashboards exibem estritamente códigos anonimizados (`ALN-8921`), sem nomes reais ou fotos. |
 | **RF01** (Prancha Visual) | **RNF01** (Acessibilidade Cognitiva) | **CT04** | Cartão arrastado para área de concluído ou acionado por teclado atualiza o estado imediatamente. |
 | **RF02** (Temporizador Visual) | **RNF01** (Mitigação de Sobrecarga) | **CT05** | Temporizador realiza contagem regressiva em disco suave sem alarmes estridentes. |
-| **RF06** (Consentimento LGPD) | **RNF03** (Direito do Titular) | **CT06** | Responsável pode revogar consentimento, suspendendo a coleta de métricas da criança. |
+| **RF06** (Consentimento LGPD) | **RN04** (Revogação com confirmação) | **CT06** | Responsável pode revogar consentimento, suspendendo a coleta de métricas da criança. |
 
 ---
 
@@ -48,7 +48,7 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
   - Calcula a duração em segundos;
   - Exibe formulário opcional para observação qualitativa pós-crise;
   - Registro surge no histórico de desregulações do estudante.
-- **Status de Aprovação**: Aprovado.
+- **Status de Aprovação**: Aprovado (automatizado em `integracao.test.ts` e `db.test.ts`; conferido no navegador em 28/10/2026).
 
 ### Caso de Teste 02: Resiliência em Cenário Desconectado / Offline (RNF02 / RN03)
 - **Cenário**: Falha completa na rede Wi-Fi da escola durante o uso da prancha e registro de crise.
@@ -87,3 +87,38 @@ Estratégia de garantia da qualidade alinhada à norma **ISO/IEC 25010**, ao mod
   - Anel de foco nítido e visível (`outline: 3px solid #3A6B7E`);
   - O cartão transita para "Concluído" com anúncio em leitor de tela (`aria-live`).
 - **Status de Aprovação**: Aprovado.
+
+### Caso de Teste 05: Temporizador sem alarme sonoro (RF02 / RNF01)
+- **Cenário**: o aluno acompanha o tempo restante de uma atividade sem estímulo sonoro.
+- **Pré-condições**: prancha com um cartão em andamento e duração configurada.
+- **Ação**: iniciar o temporizador e deixar o tempo chegar a zero.
+- **Resultado Esperado**: o anel se esvazia de forma contínua; o código não contém nenhuma chamada de áudio (busca por Audio, AudioContext e speechSynthesis sem resultados); o estado é anunciado por texto (`aria-live`); com `prefers-reduced-motion` a animação é reduzida.
+- **Status de Aprovação**: Aprovado na inspeção do código e no navegador; o cálculo do tempo é coberto por `tempo` nos testes automatizados. Sem teste com leitor de tela.
+
+### Caso de Teste 06: Revogação do consentimento (RF06 / RN04 / RNF03)
+- **Cenário**: o responsável revoga o consentimento e a coleta de novos registros de crise deve parar.
+- **Pré-condições**: consentimento ativo; perfil Responsável.
+- **Ação**: (1) revogar, confirmando no diálogo; (2) tentar iniciar uma crise como Professor.
+- **Resultado Esperado**: a revogação só ocorre após a confirmação explícita; o botão de iniciar crise fica inativo com explicação e o clique é barrado relendo o termo salvo; uma crise já em andamento pode ser encerrada (RN01) e os registros anteriores permanecem.
+- **Status de Aprovação**: Aprovado (`coletaPermitida`, 5 testes; `integracao.test.ts`). **Limitação:** o bloqueio vale no aparelho; não há regra equivalente no servidor.
+
+---
+
+## 5. Evidências executadas (24/11/2026)
+
+| Verificação | Resultado |
+| :--- | :--- |
+| `npx tsc --noEmit` (TypeScript estrito) | Sem erros |
+| `npm test` (Vitest) | **114 testes aprovados em 9 arquivos** |
+| `npm run build` (Vite + PWA) | Build concluído; 26 entradas precacheadas (523 KiB) |
+| `npm audit --omit=dev` | 0 vulnerabilidades nas dependências de produção |
+| `npm audit` (todas) | 4 avisos moderados em ferramentas de build (`glob`/`minimatch`, via Workbox); a correção exige atualização com mudança de versão e não afeta o código enviado ao navegador |
+| Contraste (WCAG 2.1 AA, texto) | 10.813 textos em 78 estados, nos 3 modos, sem falhas; protegido por `contraste.test.ts` |
+| Desempenho do botão de crise (RNF05) | Medição preliminar de cerca de 10 ms em computador (ver `desenvolvimento/REQUISITOS_E_REGRAS_DE_NEGOCIO.md`, seção 5.1) |
+
+### Lacunas de qualidade (não executado)
+
+- Auditoria automática com axe-core ou Lighthouse; teste com leitor de tela; teste em outros navegadores e em tablet.
+- Teste de ponta a ponta da sincronização com conta real do Supabase (a fila foi testada com um dublê).
+- Avaliação de usabilidade com educadores (SUS): ver `PROTOCOLO_AVALIACAO_SUS.md`.
+- Testes de componente (React Testing Library) e E2E (Playwright/Cypress).

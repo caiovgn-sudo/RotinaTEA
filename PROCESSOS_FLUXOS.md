@@ -17,7 +17,7 @@ flowchart TD
     Tempo --> Acao{Como conclui a tarefa?}
     Acao -- Arrastar e Soltar --> Drop[Arrasta o cartão para o cesto de Concluído]
     Acao -- Toque / Teclado --> Click[Toca no botão Concluir ou pressiona Espaço]
-    Drop --> Feedback[Feedback sonoro/visual atenuado de tarefa cumprida]
+    Drop --> Feedback[Feedback visual atenuado de tarefa cumprida, sem som]
     Click --> Feedback
     Feedback --> Proxima[Próxima atividade assume a posição de destaque]
     Proxima --> Fim([Fim do Período Escolar])
@@ -27,7 +27,7 @@ flowchart TD
 
 ## 2. Fluxo do Professor: Registro Rápido de Crise em 1 Clique (Offline-First)
 
-Mapeamento do processo crítico em momento de estresse em sala de aula (alinhado ao Diagrama de Sequência oficial).
+Mapeamento do processo crítico em momento de estresse em sala de aula. Atualizado em 24/11/2026 para a arquitetura implementada (Supabase em vez da API Node.js prevista no desenho inicial e no Diagrama de Sequência de setembro; ver ADR em `ARQUITETURA_ENGENHARIA.md`).
 
 ```mermaid
 sequenceDiagram
@@ -36,34 +36,29 @@ sequenceDiagram
     participant PWA as Interface PWA
     participant IDB as Banco Local (IndexedDB)
     participant Sync as Fila de Sincronização
-    participant API as API RESTful (Node.js)
+    participant SB as Supabase (Auth + API + RLS)
     participant BD as Banco Central (PostgreSQL)
 
     Note over Professor,PWA: Momento de desregulação sensorial da criança
     Professor->>PWA: Clica no botão "Iniciar Crise" (1 clique)
     PWA->>IDB: Grava timestamp dataHoraInicio + estudanteId
-    IDB-->>PWA: Confirmação de gravação local
+    IDB-->>PWA: Confirmação de gravação local (RN03)
     PWA-->>Professor: Botão alterna para "Encerrar Crise" + cronômetro ativo
 
     Note over Professor,PWA: Crise é acolhida e estabilizada
     Professor->>PWA: Clica no botão "Encerrar Crise" (1 clique)
     PWA->>IDB: Grava dataHoraFim e calcula duracaoSegundos
-    
-    alt Com conexão à Internet ativa
-        PWA->>API: POST /api/crises (registro completo)
-        API->>BD: INSERT em RegistroCrise
-        BD-->>API: Confirmação de persistência
-        API-->>PWA: HTTP 201 Created
-        PWA-->>Professor: Notificação suave: "Registro sincronizado com sucesso"
-    else Sem conexão de rede (Offline-First)
-        PWA->>Sync: Enfileira registro na fila pendente local
-        PWA-->>Professor: Notificação: "Salvo localmente no dispositivo (offline)"
-        Note over Sync,API: Conexão é restabelecida posteriormente
-        Sync->>API: POST /api/crises/sincronizar (lote com registros acumulados)
-        API->>BD: INSERT batch
-        BD-->>API: Confirmação
-        API-->>Sync: Sincronização aprovada
-        Sync-->>PWA: Fila esvaziada e status atualizado
+    PWA->>Sync: Enfileira o registro (status pendente)
+
+    alt Com conexão e sessão ativa
+        Sync->>SB: upsert do registro pelo UUID local (idempotente)
+        SB->>BD: INSERT/UPDATE sob RLS (só professor ou coordenação vinculados)
+        BD-->>SB: Confirmação
+        SB-->>Sync: Resposta de sucesso
+        Sync-->>PWA: Item sai da fila; selo "Enviada ao servidor"
+    else Sem conexão ou falha de envio
+        Sync-->>PWA: Item permanece na fila; selo "Salva só neste aparelho"
+        Note over Sync,SB: Nova tentativa quando a conexão voltar (até 3 tentativas; depois "Falhou o envio" e botão "Tentar novamente")
     end
 ```
 
